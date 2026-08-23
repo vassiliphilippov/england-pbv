@@ -62,6 +62,7 @@ SAT_NEAR_M: float = 2000.0
 SAT_FULL_M: float = 3500.0
 SAT_STRENGTH: float = 0.85
 SAT_GAIN: float = 1.22
+SAT_SATURATION: float = 1.35  # TCI reflectance reads paler than the graded palette
 
 PROJECTION_PANORAMA: int = 0
 PROJECTION_RECTILINEAR: int = 1
@@ -409,16 +410,15 @@ def _render_kernel(
                     # Fine grass/crop mottling so the near foreground is not a smooth wall,
                     # plus a coarser tussock/rush patch layer (~18 m) — real hillsides are
                     # blotchy at two scales, and the single fine octave left Mam Tor's and
-                    # Conistone's own-slope reading as polished domes.
-                    near_amp = 0.16 * math.exp(-r / 500.0)
-                    grain *= 1.0 + near_amp * (2.0 * _smooth_noise(x * 0.22, y * 0.22) - 1.0)
-                    # Gate the patches by view incidence: seen edge-on, world-space
-                    # noise iso-lines compress into horizontal "corduroy" stripes.
-                    patch_amp = 0.10 * math.exp(-r / 700.0)
+                    # Conistone's own-slope reading as polished domes. BOTH octaves are
+                    # gated by view incidence: seen edge-on, world-space noise iso-lines
+                    # compress into horizontal "corduroy" stripes (High Shield, c12).
                     graze_gate = incidence * 12.0
                     if graze_gate > 1.0:
                         graze_gate = 1.0
-                    patch_amp *= graze_gate
+                    near_amp = 0.16 * math.exp(-r / 500.0) * graze_gate
+                    grain *= 1.0 + near_amp * (2.0 * _smooth_noise(x * 0.22, y * 0.22) - 1.0)
+                    patch_amp = 0.10 * math.exp(-r / 700.0) * graze_gate
                     grain *= 1.0 + patch_amp * (
                         2.0 * _smooth_noise(x * 0.055 + 91.0, y * 0.055) - 1.0
                     )
@@ -575,6 +575,16 @@ def _render_kernel(
                         sat_green = float(satellite[sat_row, sat_col, 1])
                         sat_blue = float(satellite[sat_row, sat_col, 2])
                         if sat_red + sat_green + sat_blue > 12.0:
+                            sat_luma = 0.299 * sat_red + 0.587 * sat_green + 0.114 * sat_blue
+                            sat_red = sat_luma + (sat_red - sat_luma) * SAT_SATURATION
+                            sat_green = sat_luma + (sat_green - sat_luma) * SAT_SATURATION
+                            sat_blue = sat_luma + (sat_blue - sat_luma) * SAT_SATURATION
+                            if sat_red < 0.0:
+                                sat_red = 0.0
+                            if sat_green < 0.0:
+                                sat_green = 0.0
+                            if sat_blue < 0.0:
+                                sat_blue = 0.0
                             sat_w = (r - SAT_NEAR_M) / (SAT_FULL_M - SAT_NEAR_M)
                             if sat_w > 1.0:
                                 sat_w = 1.0
