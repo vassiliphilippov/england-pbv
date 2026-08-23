@@ -8,6 +8,14 @@
   <span class="rankline">#{{ vp.rank }} in England &middot; {% if vp.regional_pct >= 99.5 %}the best view in its area{% else %}top {{ "%.0f"|format(100 - vp.regional_pct) }}% of its area beats it{% endif %} &middot; {{ vp.region }}</span>
 </div>
 
+<div class="links-row" style="margin: 12px 0 18px;">
+  <a href="{{ vp.gmaps }}">Google Maps</a>
+  <a href="{{ vp.osmaps }}">OS Maps</a>
+  <a href="{{ vp.osm }}">OpenStreetMap</a>
+  <a href="{{ vp.peakfinder }}">PeakFinder panorama</a>
+  <a href="{{ vp.geograph }}">Photos of this square (Geograph)</a>
+</div>
+
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
     <div class="big-score">{{ "%.1f"|format(vp.score) }}<small>view potential (percentile composite)</small></div>
@@ -97,13 +105,26 @@
   </div>
 </div>
 
-<div class="links-row">
-  <a href="{{ vp.gmaps }}">Google Maps</a>
-  <a href="{{ vp.osmaps }}">OS Maps</a>
-  <a href="{{ vp.osm }}">OpenStreetMap</a>
-  <a href="{{ vp.peakfinder }}">PeakFinder panorama</a>
-  <a href="{{ vp.geograph }}">Photos of this square (Geograph)</a>
+{% if vp.nearby %}
+<div class="card">
+  <h3 style="margin-top:0">More beautiful places nearby</h3>
+  <p class="note">The staircase of upgrades: each row has a higher view potential than everything
+  closer. Driving times are estimates from straight-line distance, calibrated against real road
+  routing &mdash; check an actual route before setting out.</p>
+  <table class="rank">
+    <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
+    {% for row in vp.nearby %}
+    <tr>
+      <td><a href="{{ root }}viewpoints/{{ row.slug }}.html">{{ row.name }}</a></td>
+      <td>{{ row.direction }} &middot; {{ "%.0f"|format(row.crow_km) }} km</td>
+      <td class="num">~{{ "%.0f"|format(row.drive_minutes) }} min</td>
+      <td class="num"><span class="score-pill">{{ "%.1f"|format(row.score) }}</span></td>
+    </tr>
+    {% endfor %}
+  </table>
 </div>
+{% endif %}
+
 <p class="note" style="margin-top:14px">
   {{ vp.lat }}, {{ vp.lon }} &middot; source: {{ vp.source }} &middot; position refined by local search.
   Computed location &mdash; check access rights before visiting.

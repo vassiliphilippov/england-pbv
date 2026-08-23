@@ -41,6 +41,9 @@ uv run python -m england_pbv.verification.evaluate  # verification report
 uv run python -m england_pbv.site.build             # static site into docs/
 ```
 
+Optional: `uv run python -m england_pbv.data.vote_photos` refreshes
+`verification/vote_photos.json` (free-licensed view photos for the pair-voting page).
+
 ## Conventions
 
 - Python 3.12, `uv`-managed. mypy `--strict` clean, ruff clean, pytest green before finishing.

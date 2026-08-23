@@ -16,6 +16,12 @@
     Inspired by the view from Coombe Hill Monument. Each viewpoint was fine-tuned with a
     12.5-metre local search to find the exact best place to stand.
   </p>
+  <form class="postcode-form" action="postcode.html" method="get">
+    <input type="text" name="postcode" placeholder="Your postcode, e.g. HP22 6NE" required
+           autocomplete="postal-code" aria-label="Postcode">
+    <button type="submit">Best views near me &rarr;</button>
+    <span class="area-note">driving-time ladder of ever-better views from your door</span>
+  </form>
 </section>
 
 <div id="map"></div>
@@ -26,12 +32,12 @@
   <span class="dot" style="background:#2f6f4f"></span>80
   <span class="dot" style="background:#1d4436"></span>90+
   &middot; click a point for details &middot; zoomed out: the national top {{ n_map_points }};
-  zoom in (or press the button) and every one of the {{ n_all_points }} candidate viewpoints appears.
+  zoom in and every one of the {{ n_all_points }} candidate viewpoints appears.
 </div>
 <div class="area-panel">
-  <button id="area-btn">Best views in this area</button>
-  <span class="area-note">ranks every candidate inside the current map view &mdash; local champions,
-  even where nothing makes the national list</span>
+  <button id="england-btn">&#8630; Back to all of England</button>
+  <span class="area-note">the list below follows the map &mdash; zoom or pan anywhere and the best
+  views in the visible area rank themselves automatically</span>
   <div id="area-results"></div>
 </div>
 
@@ -168,10 +174,20 @@ map.on('zoomend', () => {
   }
 });
 
+// --- auto-updating "best views in this area" -------------------------------
+// The list follows the map. Updates are debounced with an adaptive delay that
+// tracks the measured cost of an update (VS Code-style adaptive debounce):
+// delay = clamp(150ms, 2 x EMA(update duration), 1000ms). A single deliberate
+// pan after a quiet spell updates immediately (leading edge); only rapid-fire
+// move events are held back.
 const resultsLayer = L.layerGroup().addTo(map);
-document.getElementById('area-btn').addEventListener('click', () => {
-  ensureAllPoints();
-  if (!map.hasLayer(allLayer)) map.addLayer(allLayer);
+const FULL_ENGLAND = { center: [52.8, -1.7], zoom: 6 };
+
+function updateArea() {
+  if (map.getZoom() >= 8) {
+    ensureAllPoints();
+    if (!map.hasLayer(allLayer) && map.getZoom() >= 10) map.addLayer(allLayer);
+  }
   const b = map.getBounds();
   const hits = allPointsData().filter(r => b.contains([r[0], r[1]]));
   hits.sort((x, y) => y[2] - x[2]);
@@ -190,7 +206,6 @@ document.getElementById('area-btn').addEventListener('click', () => {
     pin.bindPopup(popupFor(r[4], r[2], r[5], r[0], r[1]));
     resultsLayer.addLayer(pin);
   });
-  if (top.length > 0) resultsLayer.getLayers()[0].openPopup();
   let rows = top.map((r, i) => {
     const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + r[4] + '</a>' : r[4];
     const link = ' <a href="https://maps.google.com/?q=' + r[0] + ',' + r[1] + '">map</a>';
@@ -202,6 +217,34 @@ document.getElementById('area-btn').addEventListener('click', () => {
     ? '<p class="note">No candidate viewpoints in this view — zoom or pan to a land area of England.</p>'
     : '<p class="note">' + label + ':</p><table class="rank">' +
       '<tr><th>#</th><th>Place</th><th class="num">Score</th></tr>' + rows + '</table>';
+}
+
+let updateEmaMs = 30;   // running estimate of one update's cost
+let areaTimer = null;
+let lastRunAt = -1e9;
+function runAreaUpdate() {
+  areaTimer = null;
+  const t0 = performance.now();
+  updateArea();
+  const took = performance.now() - t0;
+  updateEmaMs = 0.7 * updateEmaMs + 0.3 * took;
+  lastRunAt = performance.now();
+}
+function scheduleAreaUpdate() {
+  const delay = Math.min(1000, Math.max(150, 2 * updateEmaMs));
+  if (areaTimer !== null) clearTimeout(areaTimer);
+  if (performance.now() - lastRunAt > delay + 600) {
+    runAreaUpdate();          // map was at rest: respond instantly
+  } else {
+    areaTimer = setTimeout(runAreaUpdate, delay);
+  }
+}
+map.on('moveend', scheduleAreaUpdate);   // moveend also fires after every zoomend
+
+document.getElementById('england-btn').addEventListener('click', () => {
+  map.setView(FULL_ENGLAND.center, FULL_ENGLAND.zoom);
 });
+
+runAreaUpdate();
 </script>
 {% endblock %}

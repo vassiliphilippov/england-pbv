@@ -17,6 +17,14 @@ def _polyline(points: list[tuple[float, float]]) -> str:
     return " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
 
 
+def _reach_shade(t: float) -> str:
+    """Hex shade for a 0..1 visibility reach: light grey (near) -> deep blue (far)."""
+    r = int(226 - 170 * t)
+    g = int(232 - 130 * t)
+    b = int(240 - 60 * t)
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
 def horizon_panorama_svg(
     horizon_deg: NDArray[np.float32],
     horizon_veg_deg: NDArray[np.float32] | None,
@@ -38,7 +46,7 @@ def horizon_panorama_svg(
     def y_at(value: float) -> float:
         return MARGIN_T + (y_max - value) / (y_max - y_min) * inner_h
 
-    skyline = [(x_at(i), y_at(float(horizon_deg[i]))) for i in range(0, n, 2)]
+    skyline = [(x_at(i), y_at(float(horizon_deg[i]))) for i in range(0, n, 5)]
     skyline.append((x_at(n), y_at(float(horizon_deg[0]))))
     base_y = y_at(y_min)
     fill_path = (
@@ -57,29 +65,26 @@ def horizon_panorama_svg(
         f'<line x1="{MARGIN_L}" y1="{zero_y:.1f}" x2="{CHART_W - MARGIN_R}" '
         f'y2="{zero_y:.1f}" class="zero-line"/>'
     )
+    # The filled silhouette is stroked via CSS; a separate outline polyline would
+    # double the largest blob on 10,000+ pages.
     parts.append(f'<path d="{fill_path}" class="terrain-fill"/>')
-    parts.append(f'<polyline points="{_polyline(skyline)}" class="terrain-line" fill="none"/>')
 
     if horizon_veg_deg is not None:
-        veg = [(x_at(i), y_at(float(horizon_veg_deg[i]))) for i in range(0, n, 2)]
+        veg = [(x_at(i), y_at(float(horizon_veg_deg[i]))) for i in range(0, n, 5)]
         veg.append((x_at(n), y_at(float(horizon_veg_deg[0]))))
         parts.append(f'<polyline points="{_polyline(veg)}" class="veg-line" fill="none"/>')
 
-    # distance strip: colour each azimuth by how far the ground is visible (thinned 3x)
+    # distance strip: colour each azimuth by how far the ground is visible (thinned 12x)
     strip_y = CHART_H - MARGIN_B + 8
     strip_h = 8
-    thin = 3
+    thin = 12
     step = inner_w / n * thin
     for i in range(0, n, thin):
         dist = float(np.max(d_far_km[i : i + thin]))
         t = min(1.0, dist / 50.0)
-        # light grey (near) -> deep blue (far)
-        r = int(226 - 170 * t)
-        g = int(232 - 130 * t)
-        b = int(240 - 60 * t)
         parts.append(
-            f'<rect x="{x_at(i):.1f}" y="{strip_y}" width="{step + 0.5:.2f}" height="{strip_h}" '
-            f'fill="rgb({r},{g},{b})"/>'
+            f'<rect x="{x_at(i):.0f}" y="{strip_y}" width="{step + 0.5:.1f}" height="{strip_h}" '
+            f'fill="{_reach_shade(t)}"/>'
         )
 
     # compass labels and axis
@@ -116,7 +121,7 @@ def polar_reach_svg(d_far_km: NDArray[np.float32], max_km: float = 60.0) -> str:
             f'<text x="{cx + 3:.1f}" y="{cy - r - 2:.1f}" '
             f'class="polar-ring-label">{ring_km}km</text>'
         )
-    thin = 3
+    thin = 12
     step = 2.0 * math.pi / n * thin
     for i in range(0, n, thin):
         dist = min(float(np.max(d_far_km[i : i + thin])), max_km)
@@ -127,13 +132,9 @@ def polar_reach_svg(d_far_km: NDArray[np.float32], max_km: float = 60.0) -> str:
         a1 = a0 + step * 1.05
         x0, y0 = cx + r * math.cos(a0), cy + r * math.sin(a0)
         x1, y1 = cx + r * math.cos(a1), cy + r * math.sin(a1)
-        t = dist / max_km
-        rr = int(226 - 170 * t)
-        gg = int(232 - 130 * t)
-        bb = int(240 - 60 * t)
         parts.append(
-            f'<path d="M{cx},{cy} L{x0:.1f},{y0:.1f} A{r:.1f},{r:.1f} 0 0 1 {x1:.1f},{y1:.1f} Z" '
-            f'fill="rgb({rr},{gg},{bb})"/>'
+            f'<path d="M{cx},{cy} L{x0:.0f},{y0:.0f} A{r:.0f},{r:.0f} 0 0 1 {x1:.0f},{y1:.0f} Z" '
+            f'fill="{_reach_shade(dist / max_km)}"/>'
         )
     for angle, label in [(0, "N"), (90, "E"), (180, "S"), (270, "W")]:
         a = math.radians(angle) - math.pi / 2.0
