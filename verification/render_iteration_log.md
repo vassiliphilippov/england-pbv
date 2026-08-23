@@ -263,6 +263,22 @@ palette — consider saturation lift on satellite pixels); (2) check remaining p
 scene-date seams; (3) built-up mauve sprawl; (4) photo set 3 — the set-2 pairs are now
 structurally close across the board.
 
+## Cycle 12 — corduroy gate on both octaves, satellite saturation, photo set 3 — ACCEPTED
+
+Changes: (1) BOTH near-ground noise octaves now gated by view incidence (the fine 4.5 m
+octave still striped High Shield's grazing foreground after c10 only gated the coarse
+one); (2) satellite pixels get a ×1.35 saturation lift around luma before the gain (TCI
+reflectance reads paler than the graded palette); (3) seam check across coastal/Pennine
+pairs — no visible scene-date seams; Porlock's headland gains real bracken belts.
+
+Residual noted: High Shield's bottom strip shows span terracing from a very close
+roadside obstacle (not noise — the incidence gate cannot affect it); its Whin Sill
+cliff face is within the 150 m rock fade — both bounded.
+
+Also this cycle: photo set 3 sourced by a find+validate workflow (ten new regions:
+Dartmoor, Cornwall coast, Beachy Head, High Cup Nick, Howgills, Bowland, Cotswold
+scarp, Dedham Vale, Isle of Wight, Cheddar) for the next generalization check.
+
 ## Failures ledger (do not repeat)
 
 - (from pre-loop) Fixed march steps near the observer paint terrace bands — step must scale
