@@ -6,10 +6,12 @@
 {% block title %}{{ vp.name }} — view potential {{ "%.1f"|format(vp.score) }}{% endblock %}
 {% block description %}Objective view metrics for {{ vp.name }}: {{ "%.0f"|format(vp.visible_area) }} km² visible, farthest sightline {{ "%.0f"|format(vp.d_max) }} km{% endblock %}
 {% block content %}
+{% import "_badges.j2" as badges %}
 <p class="crumb"><a href="{{ root }}index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>{{ vp.name }}</h1>
-  <span class="rankline">#{{ vp.rank }} in England &middot; {% if vp.regional_pct >= 99.5 %}the best view in its area{% else %}top {{ "%.0f"|format(100 - vp.regional_pct) }}% of its area beats it{% endif %} &middot; {{ vp.region }}</span>
+  <span class="rankline">#{{ vp.rank }} in England &middot; {% if vp.regional_pct >= 99.5 %}the best view in its area{% else %}top {{ "%.0f"|format(100 - vp.regional_pct) }}% of its area beats it{% endif %} &middot; {{ vp.region }}
+  &middot; {{ badges.access_badge(vp.access_code, vp.access_path_m) }}</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -41,6 +43,19 @@
   <p class="note">
     The exact computed spot ({{ vp.grid_ref }}).{% if vp.views %} Green wedges show where the
     rendered camera views below look.{% endif %} Click the marker for map links.
+  </p>
+  <p class="note">
+    {% if vp.access_code == 0 %}<b>Public access:</b> this spot lies on mapped open-access land
+    (CRoW Act 2000) &mdash; you may roam here on foot.
+    {% elif vp.access_code == 1 %}<b>Public access:</b> a public right of way passes within
+    {{ vp.access_path_m }}&nbsp;m of this spot.
+    {% elif vp.access_code == 2 %}<b>Public access:</b> the nearest public right of way is about
+    {{ vp.access_path_m }}&nbsp;m away &mdash; the final stretch may cross private land.
+    {% else %}<b>Public access:</b> no public right of way or access land is recorded at this
+    exact spot &mdash; it may be on private land.
+    {% endif %}
+    Computed from Natural England's CRoW access layer and OpenStreetMap rights of way &mdash;
+    not the legal definitive map. Always verify locally.
   </p>
 </div>
 

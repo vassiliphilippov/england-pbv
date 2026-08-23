@@ -1,0 +1,14 @@
+{# Public-access badge. Codes (ACCESS_CODES in site/build.py, mirrored by
+   accessBadgeHtml in listmode.js): 0 open-access land, 1 on a public path,
+   2 path nearby, 3 no recorded access. #}
+{% macro access_badge(code, path_m) -%}
+{%- if code == 0 -%}
+<span class="access-pill access-open" title="Open-access land (CRoW Act 2000) &mdash; right to roam on foot. Computed from Natural England open data; check local restrictions.">open access</span>
+{%- elif code == 1 -%}
+<span class="access-pill access-path" title="A public right of way passes within {{ path_m }} m (OpenStreetMap). Computed &mdash; verify locally.">footpath</span>
+{%- elif code == 2 -%}
+<span class="access-pill access-near" title="Nearest public right of way about {{ path_m }} m away (OpenStreetMap). The last stretch may cross private land.">path {{ path_m }}&nbsp;m</span>
+{%- else -%}
+<span class="access-pill access-none" title="No public right of way or access land recorded at this exact spot &mdash; it may be private land. Check before visiting.">access?</span>
+{%- endif -%}
+{%- endmacro %}

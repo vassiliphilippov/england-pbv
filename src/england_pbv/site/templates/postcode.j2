@@ -57,7 +57,8 @@
 <script src="data/points.js"></script>
 <script src="assets/traveltime.js"></script>
 <script>
-// ALL_POINTS rows: [lat, lon, score, water_fraction, name(html-escaped), slug].
+// ALL_POINTS rows: [lat, lon, score, water_fraction, name(html-escaped), slug,
+// access_code (0 open/1 path/2 near/3 none), path_m|null].
 const LOCAL_MAX_MINUTES = 32;
 const LADDER_MIN_GAIN = 0.5;
 const LADDER_MAX_ROWS = 15;
@@ -101,7 +102,7 @@ function thumbCardsHtml(items) {
     const t = (item.approx ? '~' : '') + Math.round(item.minutes) + ' min drive';
     const meta = '<div class="thumb-meta"><span class="thumb-name">' + (k + 1) + '. ' + esc(r[4]) +
       '</span><span class="score-pill">' + r[2].toFixed(1) + '</span></div>' +
-      '<div class="thumb-region">' + t + '</div>';
+      '<div class="thumb-region">' + t + ' ' + accessBadgeHtml(r[6], r[7]) + '</div>';
     if (r[5]) {
       return '<a class="thumb-card" href="viewpoints/' + r[5] + '.html">' +
         '<img loading="lazy" src="renders/' + r[5] + '.jpg"' +
@@ -152,7 +153,8 @@ function renderLadder() {
       const r = ALL_POINTS[row.i];
       const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + esc(r[4]) + '</a>' : esc(r[4]);
       const t = (row.routed ? '' : '~') + Math.round(row.minutes) + ' min';
-      return '<tr><td class="num">' + (k + 1) + '</td><td>' + name + '</td>' +
+      return '<tr><td class="num">' + (k + 1) + '</td><td>' + name + ' ' +
+        accessBadgeHtml(r[6], r[7]) + '</td>' +
         '<td class="num">' + t + '</td>' +
         '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
     }).join('');
@@ -191,7 +193,8 @@ function renderLocal() {
     const rows = top.map((i, k) => {
       const r = ALL_POINTS[i];
       const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + esc(r[4]) + '</a>' : esc(r[4]);
-      return '<tr><td class="num">' + (k + 1) + '</td><td>' + name + '</td>' +
+      return '<tr><td class="num">' + (k + 1) + '</td><td>' + name + ' ' +
+        accessBadgeHtml(r[6], r[7]) + '</td>' +
         '<td class="num">~' + Math.round(est[i]) + ' min</td>' +
         '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
     }).join('');

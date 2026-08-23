@@ -63,3 +63,22 @@ const ListMode = (function () {
 
   return { get: get, wireAll: wireAll, onChange: onChange };
 })();
+
+// Public-access badge for client-rendered lists. Mirrors the access_badge Jinja
+// macro (_badges.j2); codes come from points.js rows (r[6]=code, r[7]=path metres):
+// 0 open-access land, 1 on a public path, 2 path nearby, 3 no recorded access.
+function accessBadgeHtml(code, pathM) {
+  // No data (degraded fallback rows, cached old points.js) -> no badge: a missing
+  // fact must not render as the definitive "no recorded access" claim.
+  if (code !== 0 && code !== 1 && code !== 2 && code !== 3) return '';
+  if (code === 0) {
+    return '<span class="access-pill access-open" title="Open-access land (CRoW Act 2000) — right to roam on foot. Computed from Natural England open data; check local restrictions.">open access</span>';
+  }
+  if (code === 1) {
+    return '<span class="access-pill access-path" title="A public right of way passes within ' + pathM + ' m (OpenStreetMap). Computed — verify locally.">footpath</span>';
+  }
+  if (code === 2) {
+    return '<span class="access-pill access-near" title="Nearest public right of way about ' + pathM + ' m away (OpenStreetMap). The last stretch may cross private land.">path ' + pathM + '&nbsp;m</span>';
+  }
+  return '<span class="access-pill access-none" title="No public right of way or access land recorded at this exact spot — it may be private land. Check before visiting.">access?</span>';
+}

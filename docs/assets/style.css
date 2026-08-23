@@ -254,3 +254,14 @@ a.thumb-card:hover { border-color: var(--accent); }
 
 /* --- per-viewpoint location map -------------------------------------------- */
 #vp-map { height: 340px; border-radius: var(--radius); box-shadow: var(--shadow); z-index: 0; }
+
+/* --- public-access badges --------------------------------------------------- */
+.access-pill {
+  display: inline-block; font-size: 11.5px; font-weight: 650; line-height: 1;
+  padding: 4px 8px; border-radius: 999px; vertical-align: 1px;
+  white-space: nowrap; cursor: help;
+}
+.access-open { color: var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); }
+.access-path { color: var(--far-blue); background: color-mix(in srgb, var(--far-blue) 14%, transparent); }
+.access-near { color: var(--gold); background: color-mix(in srgb, var(--gold) 16%, transparent); }
+.access-none { color: var(--ink-soft); background: color-mix(in srgb, var(--ink-soft) 13%, transparent); }

@@ -51,7 +51,9 @@ fully-offshore squares are simply absent (treat as sea level).
 All EA endpoints are reverse-engineered from the live app (undocumented, `subscription-key=dspui`);
 expect to re-verify when scripts break. Licence OGL, "© Environment Agency copyright".
 
-**Natural England CRoW Access Layer** (legal-access flag, phase 2): ArcGIS Hub bulk GeoJSON
+**Natural England CRoW Access Layer** (USED since 2026-08-24 by `england_pbv.data.access`:
+public-access flags with OSM `designation`-tagged rights of way; see access classes in that
+module's docstring): ArcGIS Hub bulk GeoJSON
 `https://hub.arcgis.com/api/v3/datasets/6ce15f2cd06c4536983d315694dad16b_0/downloads/data?format=geojson&spatialRefId=4326`
 (42,059 polygons; OGL).
 

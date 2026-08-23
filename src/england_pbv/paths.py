@@ -22,6 +22,10 @@ DOBIH_CSV: Path = RAW_DIR / "dobih_hills.csv"
 CALIBRATION_PATHS_JSON: Path = RAW_DIR / "calibration_paths.json"
 CALIBRATION_HABITATS_JSON: Path = RAW_DIR / "calibration_habitats.json"
 CALIBRATION_ROCKS_JSON: Path = RAW_DIR / "calibration_rocks.json"
+CROW_ACCESS_GEOJSON: Path = RAW_DIR / "crow_access_land.geojson"
+PROW_WAYS_DIR: Path = RAW_DIR / "prow_tiles"
+CROW_MASK_NPY: Path = GRID_DIR / "crow_access_50m.npy"
+ACCESS_FLAGS_JSON: Path = OUTPUTS_DIR / "access_flags.json"
 ENGLAND_BOUNDARY_GEOJSON: Path = RAW_DIR / "england_boundary.geojson"
 
 # National grids (EPSG:27700, 50 m)

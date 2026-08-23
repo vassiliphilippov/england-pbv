@@ -14,6 +14,7 @@ function thumbFallback(img) {
 <script src="assets/listmode.js"></script>
 {% endblock %}
 {% block content %}
+{% import "_badges.j2" as badges %}
 {% macro mode_toggle() %}
   <span class="view-toggle" role="group" aria-label="How to show this list">
     <button class="mode-list active" aria-pressed="true">List</button><button
@@ -30,7 +31,8 @@ function thumbFallback(img) {
       <tr>
         <td class="num">{{ loop.index }}</td>
         <td>{% if row.slug %}<a href="viewpoints/{{ row.slug }}.html">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}
-            {% if row.is_discovery %}<span class="tag">discovery</span>{% endif %}</td>
+            {% if row.is_discovery %}<span class="tag">discovery</span>{% endif %}
+            {{ badges.access_badge(row.access_code, row.path_m) }}</td>
         <td>{{ row.region }}</td>
         {% if show_nat_rank %}<td class="num">{{ row.rank }}</td>{% endif %}
         <td class="num"><span class="score-pill">{{ "%.1f"|format(row.score) }}</span></td>
@@ -48,7 +50,7 @@ function thumbFallback(img) {
           <span class="thumb-name">{{ loop.index }}. {{ row.name }}</span>
           <span class="score-pill">{{ "%.1f"|format(row.score) }}</span>
         </div>
-        <div class="thumb-region">{{ row.region }}</div>
+        <div class="thumb-region">{{ row.region }} {{ badges.access_badge(row.access_code, row.path_m) }}</div>
       </a>
       {% else %}
       <div class="thumb-card">
@@ -56,7 +58,7 @@ function thumbFallback(img) {
           <span class="thumb-name">{{ loop.index }}. {{ row.name }}</span>
           <span class="score-pill">{{ "%.1f"|format(row.score) }}</span>
         </div>
-        <div class="thumb-region">{{ row.region }}</div>
+        <div class="thumb-region">{{ row.region }} {{ badges.access_badge(row.access_code, row.path_m) }}</div>
       </div>
       {% endif %}
       {% endfor %}
@@ -160,7 +162,7 @@ inland.addTo(map); coastal.addTo(map);
 L.control.layers(null, {'Inland views': inland, 'Coastal views': coastal}, {collapsed: false}).addTo(map);
 
 // ALL_POINTS (data/points.js): every deduplicated candidate, for local exploration.
-// Rows: [lat, lon, score, water_fraction, name, slug].
+// Rows: [lat, lon, score, water_fraction, name, slug, access_code, path_m|null].
 const allLayer = L.layerGroup();
 let allLoaded = false;
 function allPointsData() {
@@ -228,7 +230,8 @@ function updateArea() {
   if (ListMode.get('area') === 'thumbs') {
     body = '<div class="thumb-grid">' + top.map((r, i) => {
       const meta = '<div class="thumb-meta"><span class="thumb-name">' + (i + 1) + '. ' + r[4] +
-        '</span><span class="score-pill">' + r[2].toFixed(1) + '</span></div>';
+        '</span><span class="score-pill">' + r[2].toFixed(1) + '</span></div>' +
+        '<div class="thumb-region">' + accessBadgeHtml(r[6], r[7]) + '</div>';
       if (r[5]) {
         // Panorama, not _view1: micro-tier pages (most rural slugs) have no camera
         // view, and each map move rebuilds this HTML — a _view1 attempt would re-404
@@ -245,7 +248,8 @@ function updateArea() {
     const rows = top.map((r, i) => {
       const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + r[4] + '</a>' : r[4];
       const link = ' <a href="https://maps.google.com/?q=' + r[0] + ',' + r[1] + '">map</a>';
-      return '<tr><td class="num">' + (i + 1) + '</td><td>' + name + link + '</td>' +
+      return '<tr><td class="num">' + (i + 1) + '</td><td>' + name + ' ' +
+        accessBadgeHtml(r[6], r[7]) + link + '</td>' +
         '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
     }).join('');
     body = '<table class="rank"><tr><th>#</th><th>Place</th><th class="num">Score</th></tr>' + rows + '</table>';

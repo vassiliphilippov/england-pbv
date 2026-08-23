@@ -37,6 +37,7 @@ uv run python -m england_pbv.pipeline.build_grid    # national 50 m DEM + land c
 uv run python -m england_pbv.pipeline.screening     # candidate generation
 uv run python -m england_pbv.pipeline.compute_metrics  # horizon sweep on candidates
 uv run python -m england_pbv.pipeline.scoring       # percentiles + composite scores
+uv run python -m england_pbv.data.access            # public-access flags (CRoW + PRoW)
 uv run python -m england_pbv.verification.evaluate  # verification report
 uv run python -m england_pbv.site.build             # static site into docs/
 ```

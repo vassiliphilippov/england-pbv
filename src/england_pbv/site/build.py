@@ -104,6 +104,11 @@ def compass_point(bearing_deg: float) -> str:
     return COMPASS_POINTS[int(round(bearing_deg / 22.5)) % 16]
 
 
+# Access class -> compact code shared with the client JS (accessBadgeHtml in
+# listmode.js): 0 open-access land, 1 on a public path, 2 path nearby, 3 none known.
+ACCESS_CODES: dict[str, int] = {"open": 0, "path": 1, "near": 2, "none": 3}
+
+
 @dataclass(frozen=True, slots=True)
 class ListRow:
     name: str
@@ -112,6 +117,8 @@ class ListRow:
     rank: int
     slug: str | None
     is_discovery: bool
+    access_code: int
+    path_m: int | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -136,7 +143,9 @@ def _is_discovery(item: ScoredViewpoint) -> bool:
     return item.candidate.source.value == "screening" and item.candidate.name is None
 
 
-def _list_row(item: ScoredViewpoint, slugs: dict[str, str]) -> ListRow:
+def _list_row(
+    item: ScoredViewpoint, slugs: dict[str, str], access: tuple[int, int | None]
+) -> ListRow:
     return ListRow(
         name=item.display_name,
         region=_region_of(item),
@@ -144,6 +153,8 @@ def _list_row(item: ScoredViewpoint, slugs: dict[str, str]) -> ListRow:
         rank=item.national_rank,
         slug=slugs.get(item.candidate.candidate_id),
         is_discovery=_is_discovery(item),
+        access_code=access[0],
+        path_m=access[1],
     )
 
 
@@ -347,6 +358,35 @@ def build_site(
     if photo_source.exists():
         coombe_photo = "coombe-hill.jpg"
 
+    # Public-access flags (england_pbv.data.access): candidate_id -> {cls, path_m}.
+    # ACCESS_CODES order is shared with the client JS (accessBadgeHtml). The site
+    # makes definitive access claims from these ("no recorded public access"), so a
+    # missing or stale file must FAIL the build, not silently publish false claims.
+    assert paths.ACCESS_FLAGS_JSON.exists(), (
+        "outputs/access_flags.json missing — run `python -m england_pbv.data.access` "
+        "before building the site"
+    )
+    access_flags: dict[str, dict[str, object]] = json.loads(
+        paths.ACCESS_FLAGS_JSON.read_text(encoding="utf-8")
+    )
+    covered = sum(1 for v in deduped if v.candidate.candidate_id in access_flags)
+    coverage = covered / len(deduped)
+    assert coverage >= 0.99, (
+        f"access flags cover only {coverage:.1%} of candidates — stale file? "
+        "re-run `python -m england_pbv.data.access` after re-scoring"
+    )
+    print(f"access flags loaded ({covered}/{len(deduped)} candidates covered)")
+
+    def access_of(candidate_id: str) -> tuple[int, int | None]:
+        entry = access_flags.get(candidate_id)
+        if entry is None:
+            return ACCESS_CODES["none"], None
+        path_m = entry.get("path_m")
+        return (
+            ACCESS_CODES[str(entry["cls"])],
+            int(path_m) if isinstance(path_m, (int, float)) else None,
+        )
+
     # --- shared data blobs ---
     map_points = []
     for item in deduped[:N_MAP_POINTS]:
@@ -362,17 +402,22 @@ def build_site(
             }
         )
     # Full deduplicated dataset for the "best views in this area" selector.
-    all_rows = [
-        [
-            round(item.candidate.lat, 5),
-            round(item.candidate.lon, 5),
-            item.view_potential,
-            round(item.metrics.water_fraction, 2),
-            html.escape(item.display_name),
-            slugs.get(item.candidate.candidate_id) or "",
-        ]
-        for item in deduped
-    ]
+    # Row: [lat, lon, score, water, name, slug, access_code, path_m|null].
+    all_rows = []
+    for item in deduped:
+        code, path_m = access_of(item.candidate.candidate_id)
+        all_rows.append(
+            [
+                round(item.candidate.lat, 5),
+                round(item.candidate.lon, 5),
+                item.view_potential,
+                round(item.metrics.water_fraction, 2),
+                html.escape(item.display_name),
+                slugs.get(item.candidate.candidate_id) or "",
+                code,
+                path_m,
+            ]
+        )
     points_js = (
         "const ALL_POINTS="
         + json.dumps(all_rows, separators=(",", ":")).replace("</", "<\\/")
@@ -406,10 +451,18 @@ def build_site(
         n_all_points=f"{len(all_rows):,}",
         # "</" escaped so a name can never terminate the <script> element.
         map_points_json=json.dumps(map_points, separators=(",", ":")).replace("</", "<\\/"),
-        top_overall=[_list_row(v, slugs) for v in deduped[:N_TOP_LIST]],
-        top_inland=[_list_row(v, slugs) for v in inland[:N_SUBLIST]],
-        top_coastal=[_list_row(v, slugs) for v in coastal[:N_SUBLIST]],
-        hidden_gems=[_list_row(v, slugs) for v in gems[:N_SUBLIST]],
+        top_overall=[
+            _list_row(v, slugs, access_of(v.candidate.candidate_id)) for v in deduped[:N_TOP_LIST]
+        ],
+        top_inland=[
+            _list_row(v, slugs, access_of(v.candidate.candidate_id)) for v in inland[:N_SUBLIST]
+        ],
+        top_coastal=[
+            _list_row(v, slugs, access_of(v.candidate.candidate_id)) for v in coastal[:N_SUBLIST]
+        ],
+        hidden_gems=[
+            _list_row(v, slugs, access_of(v.candidate.candidate_id)) for v in gems[:N_SUBLIST]
+        ],
     )
     (site_dir / "index.html").write_text(index_html, encoding="utf-8")
     print("index.html written")
@@ -560,12 +613,15 @@ def build_site(
                 slug_list=all_slugs,
                 self_index=index_of[item.candidate.candidate_id],
             )
+            page_access_code, page_path_m = access_of(item.candidate.candidate_id)
             vp = {
                 "name": item.display_name,
                 "region": _region_of(item),
                 "rank": item.national_rank,
                 "regional_pct": item.regional_percentile,
                 "score": item.view_potential,
+                "access_code": page_access_code,
+                "access_path_m": page_path_m,
                 "components": components,
                 "horizon_svg": horizon_panorama_svg(
                     horizon_deg, horizon_veg_deg=horizon_veg_deg, d_far_km=d_far_veg_km
