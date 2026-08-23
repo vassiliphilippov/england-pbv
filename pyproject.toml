@@ -35,6 +35,7 @@ dependencies = [
     "requests>=2.32",
     "scipy>=1.14",
     "tqdm>=4.66",
+    "pillow>=12.3.0",
 ]
 
 [project.urls]

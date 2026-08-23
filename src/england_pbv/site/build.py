@@ -11,6 +11,7 @@ from dataclasses import dataclass
 
 import numpy as np
 from jinja2 import Environment, FileSystemLoader
+from PIL import Image
 
 from england_pbv import paths
 from england_pbv.models import ScoredViewpoint, VerificationReport, VerificationViewpoint
@@ -27,6 +28,7 @@ from england_pbv.site.svg import horizon_panorama_svg, polar_reach_svg
 from england_pbv.terrain.grid import load_dem_grid, load_uint8_grid
 from england_pbv.verification.evaluate import load_scored
 from england_pbv.viewshed.horizon import build_sampling_plan, sweep_batch
+from england_pbv.viewshed.render import render_panorama
 
 N_MAP_POINTS: int = 1500
 N_PAGES: int = 250
@@ -115,7 +117,12 @@ def build_site() -> None:
         # Slugs change between runs; stale pages must not accumulate.
         shutil.rmtree(viewpoints_dir)
     viewpoints_dir.mkdir(parents=True, exist_ok=True)
+    renders_dir = site_dir / "renders"
+    if renders_dir.exists():
+        shutil.rmtree(renders_dir)
+    renders_dir.mkdir(parents=True, exist_ok=True)
     (site_dir / "assets").mkdir(parents=True, exist_ok=True)
+    (site_dir / "data").mkdir(parents=True, exist_ok=True)
     shutil.copy(paths.TEMPLATES_DIR / "style.css", site_dir / "assets" / "style.css")
 
     coombe_photo: str | None = None
@@ -137,6 +144,26 @@ def build_site() -> None:
                 "w": round(item.metrics.water_fraction, 3),
             }
         )
+    # Full deduplicated dataset for the "best views in this area" selector.
+    all_rows = [
+        [
+            round(item.candidate.lat, 5),
+            round(item.candidate.lon, 5),
+            item.view_potential,
+            round(item.metrics.water_fraction, 2),
+            html.escape(item.display_name),
+            slugs.get(item.candidate.candidate_id) or "",
+        ]
+        for item in deduped
+    ]
+    points_js = (
+        "const ALL_POINTS="
+        + json.dumps(all_rows, separators=(",", ":")).replace("</", "<\\/")
+        + ";"
+    )
+    (site_dir / "data" / "points.js").write_text(points_js, encoding="utf-8")
+    print(f"points.js written ({len(all_rows)} points)")
+
     inland = [v for v in deduped if v.metrics.water_fraction < COASTAL_WATER_FRACTION]
     coastal = [v for v in deduped if v.metrics.water_fraction >= COASTAL_WATER_FRACTION]
     gems = [v for v in deduped if _is_discovery(v)]
@@ -145,6 +172,7 @@ def build_site() -> None:
         root="",
         n_candidates=f"{len(scored):,}",
         n_map_points=len(map_points),
+        n_all_points=f"{len(all_rows):,}",
         # "</" escaped so a name can never terminate the <script> element.
         map_points_json=json.dumps(map_points, separators=(",", ":")).replace("</", "<\\/"),
         top_overall=[_list_row(v, slugs) for v in deduped[:N_TOP_LIST]],
@@ -167,6 +195,14 @@ def build_site() -> None:
     template = env.get_template("viewpoint.j2")
     for index, item in enumerate(pages):
         metrics = item.metrics
+        slug = slugs[item.candidate.candidate_id]
+        panorama = render_panorama(
+            dem,
+            landcover,
+            easting=item.candidate.easting,
+            northing=item.candidate.northing,
+        )
+        Image.fromarray(panorama).save(renders_dir / f"{slug}.jpg", quality=82)
         horizon_deg = np.rad2deg(sweep.horizon_rad[index])
         horizon_veg_deg = np.rad2deg(sweep.horizon_veg_rad[index])
         d_far_veg_km = sweep.d_far_veg_m[index] / 1000.0
@@ -218,8 +254,8 @@ def build_site() -> None:
             "osm": openstreetmap_url(item.candidate.lat, item.candidate.lon),
             "peakfinder": peakfinder_url(item.candidate.lat, item.candidate.lon),
             "geograph": geograph_square_url(item.candidate.easting, item.candidate.northing),
+            "render_file": f"{slug}.jpg",
         }
-        slug = slugs[item.candidate.candidate_id]
         page_html = template.render(root="../", vp=vp)
         (site_dir / "viewpoints" / f"{slug}.html").write_text(page_html, encoding="utf-8")
     print(f"{len(pages)} viewpoint pages written")

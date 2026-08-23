@@ -25,7 +25,14 @@
   <span class="dot" style="background:#7fae72"></span>70
   <span class="dot" style="background:#2f6f4f"></span>80
   <span class="dot" style="background:#1d4436"></span>90+
-  &middot; click a point for details &middot; showing the top {{ n_map_points }} deduplicated viewpoints
+  &middot; click a point for details &middot; zoomed out: the national top {{ n_map_points }};
+  zoom in (or press the button) and every one of the {{ n_all_points }} candidate viewpoints appears.
+</div>
+<div class="area-panel">
+  <button id="area-btn">Best views in this area</button>
+  <span class="area-note">ranks every candidate inside the current map view &mdash; local champions,
+  even where nothing makes the national list</span>
+  <div id="area-results"></div>
 </div>
 
 <div class="grid-2">
@@ -95,6 +102,7 @@
   </table>
 </section>
 
+<script src="data/points.js"></script>
 <script>
 const points = {{ map_points_json|safe }};
 const map = L.map('map').setView([52.8, -1.7], 6);
@@ -108,18 +116,68 @@ function colorFor(s) {
   if (s >= 70) return '#7fae72';
   return '#c9c39b';
 }
+const canvas = L.canvas({ padding: 0.3 });
+function popupFor(name, score, slug) {
+  let h = '<b>' + name + '</b><br>view potential ' + score.toFixed(1);
+  if (slug) h += '<br><a href="viewpoints/' + slug + '.html">details &rarr;</a>';
+  return h;
+}
 const inland = L.layerGroup(), coastal = L.layerGroup();
 points.forEach(p => {
   const m = L.circleMarker([p.la, p.lo], {
+    renderer: canvas,
     radius: p.s >= 85 ? 7 : (p.s >= 75 ? 5.5 : 4),
     fillColor: colorFor(p.s), color: '#ffffff', weight: 1, fillOpacity: 0.88
   });
-  let html = '<b>' + p.n + '</b><br>view potential ' + p.s.toFixed(1);
-  if (p.u) html += '<br><a href="viewpoints/' + p.u + '.html">details &rarr;</a>';
-  m.bindPopup(html);
+  m.bindPopup(popupFor(p.n, p.s, p.u));
   (p.w > 0.08 ? coastal : inland).addLayer(m);
 });
 inland.addTo(map); coastal.addTo(map);
 L.control.layers(null, {'Inland views': inland, 'Coastal views': coastal}, {collapsed: false}).addTo(map);
+
+// ALL_POINTS (data/points.js): every deduplicated candidate, for local exploration.
+// Rows: [lat, lon, score, water_fraction, name, slug].
+const allLayer = L.layerGroup();
+let allLoaded = false;
+function ensureAllPoints() {
+  if (allLoaded) return;
+  allLoaded = true;
+  ALL_POINTS.forEach(r => {
+    const m = L.circleMarker([r[0], r[1]], {
+      renderer: canvas, radius: 3.2,
+      fillColor: colorFor(r[2]), color: 'rgba(255,255,255,0.6)', weight: 0.7, fillOpacity: 0.75
+    });
+    m.bindPopup(popupFor(r[4], r[2], r[5]));
+    allLayer.addLayer(m);
+  });
+}
+map.on('zoomend', () => {
+  if (map.getZoom() >= 10) {
+    ensureAllPoints();
+    if (!map.hasLayer(allLayer)) map.addLayer(allLayer);
+  } else if (map.hasLayer(allLayer)) {
+    map.removeLayer(allLayer);
+  }
+});
+
+document.getElementById('area-btn').addEventListener('click', () => {
+  ensureAllPoints();
+  if (!map.hasLayer(allLayer)) map.addLayer(allLayer);
+  const b = map.getBounds();
+  const hits = ALL_POINTS.filter(r => b.contains([r[0], r[1]]));
+  hits.sort((x, y) => y[2] - x[2]);
+  const top = hits.slice(0, 15);
+  let rows = top.map((r, i) => {
+    const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + r[4] + '</a>' : r[4];
+    const link = ' <a href="https://maps.google.com/?q=' + r[0] + ',' + r[1] + '">map</a>';
+    return '<tr><td class="num">' + (i + 1) + '</td><td>' + name + link + '</td>' +
+      '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
+  }).join('');
+  const label = hits.length + ' candidate viewpoints in view; local top ' + top.length;
+  document.getElementById('area-results').innerHTML = hits.length === 0
+    ? '<p class="note">No candidate viewpoints in this view — zoom or pan to a land area of England.</p>'
+    : '<p class="note">' + label + ':</p><table class="rank">' +
+      '<tr><th>#</th><th>Place</th><th class="num">Score</th></tr>' + rows + '</table>';
+});
 </script>
 {% endblock %}

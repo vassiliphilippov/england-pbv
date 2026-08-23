@@ -24,6 +24,17 @@
 </div>
 
 <div class="card">
+  <h3 style="margin-top:0">The view, rendered</h3>
+  <img class="render-img" src="{{ root }}renders/{{ vp.render_file }}" alt="Synthetic 360-degree render of the view from {{ vp.name }}" loading="lazy">
+  <div class="compass-ruler"><span>N</span><span>E</span><span>S</span><span>W</span><span>N</span></div>
+  <p class="note">
+    A 360&deg; render of this exact spot computed from the terrain model, tree cover and land
+    cover &mdash; summer colours, afternoon light, calibrated against photographs of famous
+    viewpoints. Real trees, hedges and buildings will differ in detail.
+  </p>
+</div>
+
+<div class="card">
   <h3 style="margin-top:0">The panorama</h3>
   {{ vp.horizon_svg|safe }}
   <p class="note">
