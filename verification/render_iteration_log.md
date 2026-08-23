@@ -185,6 +185,27 @@ domes remain the weakest structural element); (3) rock material for tors/limesto
 (Valley of Rocks, Conistone Pie); (4) woods seen from above render as smooth dark aprons
 (Surprise View foreground) — canopy-top texture at steep down-angles.
 
+## Cycle 9 — canopy texture overhaul + two-scale ground mottling — ACCEPTED
+
+Changes: (1) crown fine-roughness amplitude grows near the camera (0.36 + 0.50·e^(−r/250))
+— uniform across each crown per the c8 lesson, but strong enough close-up to fragment the
+contour rings; (2) per-clump height range narrowed 0.6–1.4 → 0.75–1.3 (saw-tooth wood
+silhouettes came from neighbouring crowns jumping 2x); (3) per-clump species colour
+variation (±15% red / ±9% green) — one green for every crown read as plastic; (4) ground
+mottling gains a second coarser octave (~18 m tussock/rush patches to 1.5 km) so
+own-slope foregrounds stop reading as polished domes.
+
+Verdict: accept. Wye Downs' scrub mass is the showcase — species-varied, wavy, ring-free
+crowns that finally match the photo's chaos; Mam Tor's crest breaks into tussocky
+blotches; Swaledale calms its tree cutouts; Latrigg keeps its structure with richer woods.
+
+Queued for cycle 10: (1) rock material for tors/limestone from OSM natural=bare_rock/
+cliff/scree (Valley of Rocks' Castle Rock, Conistone Pie); (2) worn-path near-field
+confinement paints dashed arcs on grazing fields (Latrigg bottom-right) — consider
+painting by distance-to-polyline instead of cell-centre; (3) review the set-2 pairs not
+recently inspected (High Shield, Old Stell Crag, Porlock, Lawley, Wrekin); (4) built-up
+mauve sprawl (Keswick) still reads as speckle, not town.
+
 ## Failures ledger (do not repeat)
 
 - (from pre-loop) Fixed march steps near the observer paint terrace bands — step must scale

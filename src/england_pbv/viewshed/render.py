@@ -297,12 +297,15 @@ def _render_kernel(
                         # 0.15 turns them into fortress walls
                     # Fine foliage roughness (~3 m scale) fragments the dome's smooth
                     # height contours, which otherwise paint as concentric terrace
-                    # rings when a crown sits close below the camera. Keep it UNIFORM:
-                    # tapering it by dome height brings the rings back at crown
-                    # shoulders (see failures ledger, c8).
+                    # rings when a crown sits close below the camera. Keep it UNIFORM
+                    # across the crown (see failures ledger, c8) but let its amplitude
+                    # grow near the camera, where ±18% was too weak to break the rings.
+                    # Clump height range 0.75–1.3 (was 0.6–1.4): neighbouring crowns
+                    # jumping 2x in height cut saw-tooth wood silhouettes.
+                    rough_amp = 0.36 + 0.50 * math.exp(-r / 250.0)
                     z_surf = z + TREE_HEIGHT_M * math.sqrt(dome_sq) * (
-                        0.6 + 0.8 * _cell_noise(x + 17.0, y + 31.0, 35.0)
-                    ) * (0.82 + 0.36 * _smooth_noise(x * 0.31, y * 0.31))
+                        0.75 + 0.55 * _cell_noise(x + 17.0, y + 31.0, 35.0)
+                    ) * (1.0 - 0.5 * rough_amp + rough_amp * _smooth_noise(x * 0.31, y * 0.31))
             elif lc_bin == 5:
                 z_surf = z + clearing * BUILT_HEIGHT_M * (0.5 + _cell_noise(x, y, 45.0))
 
@@ -385,10 +388,17 @@ def _render_kernel(
                 grain = 0.94 + 0.12 * _cell_noise(xc, yc, 18.0)
                 if lc_color == 1:
                     grain = 0.78 + 0.44 * _cell_noise(xc, yc, 22.0)
-                elif r < 1200.0:
-                    # Fine grass/crop mottling so the near foreground is not a smooth wall.
-                    near_amp = 0.14 * math.exp(-r / 500.0)
+                elif r < 1500.0:
+                    # Fine grass/crop mottling so the near foreground is not a smooth wall,
+                    # plus a coarser tussock/rush patch layer (~18 m) — real hillsides are
+                    # blotchy at two scales, and the single fine octave left Mam Tor's and
+                    # Conistone's own-slope reading as polished domes.
+                    near_amp = 0.16 * math.exp(-r / 500.0)
                     grain *= 1.0 + near_amp * (2.0 * _smooth_noise(x * 0.22, y * 0.22) - 1.0)
+                    patch_amp = 0.10 * math.exp(-r / 700.0)
+                    grain *= 1.0 + patch_amp * (
+                        2.0 * _smooth_noise(x * 0.055 + 91.0, y * 0.055) - 1.0
+                    )
                 shade *= field * grain
 
                 # Hedgerow hint: darken the strip where the field cell changes.
@@ -409,6 +419,13 @@ def _render_kernel(
                 red = base_colors[lc_color, 0]
                 green = base_colors[lc_color, 1]
                 blue = base_colors[lc_color, 2]
+                if lc_color == 1:
+                    # Per-clump species variation: one green for every crown reads as
+                    # plastic; real woods mix olive, dark holly-green and yellow-green.
+                    species = _cell_noise(x + 53.0, y + 71.0, 35.0) - 0.5
+                    red *= 1.0 + 0.30 * species
+                    green *= 1.0 + 0.18 * species
+                    blue *= 1.0 + 0.10 * species
                 if lc_color == 1 and lc_bin == 1 and not tree_here:
                     # Ground between the scattered near trees reads as rough scrub.
                     red = red + (base_colors[3, 0] - red) * 0.45
