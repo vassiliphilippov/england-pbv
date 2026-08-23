@@ -37,7 +37,7 @@ from england_pbv.viewshed.render import (
 N_MAP_POINTS: int = 1500
 N_PAGES_NATIONAL: int = 600
 REGIONAL_CELL_M: float = 25000.0
-REGIONAL_PAGES_PER_CELL: int = 3
+REGIONAL_PAGES_PER_CELL: int = 5
 N_TOP_LIST: int = 50
 N_SUBLIST: int = 20
 COASTAL_WATER_FRACTION: float = 0.08
