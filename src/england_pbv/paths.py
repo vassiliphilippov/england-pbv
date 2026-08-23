@@ -23,6 +23,7 @@ ENGLAND_BOUNDARY_GEOJSON: Path = RAW_DIR / "england_boundary.geojson"
 
 # National grids (EPSG:27700, 50 m)
 DEM_GRID_NPY: Path = GRID_DIR / "gb_dem_50m.npy"
+DEM10_GRID_NPY: Path = GRID_DIR / "england_dem_10m.npy"
 LANDCOVER_GRID_NPY: Path = GRID_DIR / "gb_landcover_50m.npy"
 ENGLAND_MASK_NPY: Path = GRID_DIR / "england_mask_50m.npy"
 

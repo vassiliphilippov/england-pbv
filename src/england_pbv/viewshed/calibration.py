@@ -13,6 +13,7 @@ import json
 import math
 from pathlib import Path
 
+import numpy as np
 import requests
 from PIL import Image, ImageDraw
 
@@ -53,6 +54,10 @@ def main() -> None:
     )
     dem = load_dem_grid(paths.DEM_GRID_NPY)
     landcover = load_uint8_grid(paths.LANDCOVER_GRID_NPY)
+    dem10 = None
+    if paths.DEM10_GRID_NPY.exists():
+        dem10 = np.load(paths.DEM10_GRID_NPY, mmap_mode="r")
+        print("England 10 m DTM overlay active")
 
     for entry in entries:
         key = entry["key"]
@@ -74,6 +79,7 @@ def main() -> None:
             height=height,
             pitch_deg=0.0,
             horizon_fraction=float(entry["horizon"]),
+            dem10=dem10,
         )
 
         photo = Image.open(photo_path).convert("RGB")

@@ -28,6 +28,25 @@ stronger diffuse washes relative texture; boost close-range grain. (b) Terrain f
 remain the dominant structural error → 10 m EA DTM (download in progress). (c) Trees still
 cuboid. (d) Villages still mauve mist.
 
+## Cycle 2 — England 10 m terrain — ACCEPTED
+
+Changes: EA 10 m national DTM (5.3 GB zip -> int16 decimetre grid, 7.6 GB, row 0 = south,
+nodata for sea/Wales/Scotland) sampled by the renderer with bilinear + fall-back to the
+50 m GB grid (`_sample_elev`); used for targets, lateral normals, crest snap and eye height.
+
+Verdict: major structural win. Uffington: the Manger coombe (the photo's entire subject,
+absent at 50 m) renders with its folds. Coaley: scarp woods cascade correctly, Cam Long
+Down present, foreground blobs gone. Mam Tor: sharper valley sides above the brow; the brow
+itself persists — the 10 m profile confirms the crest genuinely descends ~30 m/250 m, and
+the remaining mismatch is camera-position sensitivity at a break of slope (a 10 m nudge
+changes the foreground drastically).
+
+Carry-over for next cycles: (a) "photographer steps to the brow": nudge the render camera
+up to ~15 m along the view bearing when ground immediately ahead falls — photographers
+stand at the edge, grid refs quantize to 10 m; (b) land cover still 50 m — trees/fields
+should sample native 10 m WorldCover (restores hedgerow oaks); (c) near-foreground still
+silk-smooth under the new sun; (d) villages remain mauve mist (OSM buildings).
+
 ## Failures ledger (do not repeat)
 
 - (from pre-loop) Fixed march steps near the observer paint terrace bands — step must scale

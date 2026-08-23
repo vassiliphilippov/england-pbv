@@ -57,6 +57,13 @@ HEDGE_SHADE: float = 0.74  # darkening applied to the one-sample strip at a fiel
 PROJECTION_PANORAMA: int = 0
 PROJECTION_RECTILINEAR: int = 1
 
+# England 10 m DTM overlay (int16 decimetres, row 0 = south); values <= threshold are
+# nodata (sea, Wales, Scotland) and fall back to the 50 m national grid.
+DEM10_X0: float = 80000.0
+DEM10_Y0: float = 4000.0
+DEM10_CELL: float = 10.0
+DEM10_INVALID: int = -30000
+
 # Land-cover base colours (RGB 0..255); index = WorldCover code // 10.
 _BASE_COLORS: NDArray[np.float32] = np.array(
     [
@@ -85,6 +92,41 @@ _CLOUD_COLOR: NDArray[np.float32] = np.array([249, 250, 251], dtype=np.float32)
 class ViewDirection:
     azimuth_deg: float
     quality: float  # mean capped visible distance over the window (km)
+
+
+@njit(cache=True, inline="always")
+def _sample_elev(
+    dem50: NDArray[np.float32],
+    dem10: NDArray[np.int16],
+    has10: bool,
+    x: float,
+    y: float,
+) -> float:
+    """Elevation from the England 10 m grid, falling back to the 50 m national grid."""
+    if has10:
+        fc = (x - DEM10_X0) / DEM10_CELL - 0.5
+        fr = (y - DEM10_Y0) / DEM10_CELL - 0.5
+        h10, w10 = dem10.shape
+        if fc >= 0.0 and fc < w10 - 1.0 and fr >= 0.0 and fr < h10 - 1.0:
+            c0 = int(fc)
+            r0 = int(fr)
+            a = dem10[r0, c0]
+            b = dem10[r0, c0 + 1]
+            c = dem10[r0 + 1, c0]
+            d = dem10[r0 + 1, c0 + 1]
+            if a > DEM10_INVALID and b > DEM10_INVALID and c > DEM10_INVALID and d > DEM10_INVALID:
+                fx = fc - c0
+                fy = fr - r0
+                return float(
+                    0.1
+                    * (
+                        a * (1.0 - fx) * (1.0 - fy)
+                        + b * fx * (1.0 - fy)
+                        + c * (1.0 - fx) * fy
+                        + d * fx * fy
+                    )
+                )
+    return _bilinear(dem50, x, y)
 
 
 @njit(cache=True, inline="always")
@@ -126,6 +168,8 @@ def _cloud_density(azimuth_deg: float, elev_deg: float, seed_u: float, seed_v: f
 @njit(cache=True, parallel=True, fastmath=True)
 def _render_kernel(
     dem: NDArray[np.float32],
+    dem10: NDArray[np.int16],
+    has10: bool,
     landcover: NDArray[np.uint8],
     obs_e: float,
     obs_n: float,
@@ -173,7 +217,7 @@ def _render_kernel(
         while r < MAX_RENDER_DISTANCE_M:
             x = obs_e + dx * r
             y = obs_n + dy * r
-            z = _bilinear(dem, x, y)
+            z = _sample_elev(dem, dem10, has10, x, y)
             lc_bin = _landcover_at(landcover, x, y)
             clearing = (r - CLEARING_RAMP_START_M) / (CLEARING_RAMP_FULL_M - CLEARING_RAMP_START_M)
             if clearing < 0.0:
@@ -212,8 +256,8 @@ def _render_kernel(
                 prev_visible = True
                 # Lateral slope completes the true surface normal for sun modelling.
                 lat_w = 15.0 if step < 15.0 else step
-                z_left = _bilinear(dem, x - dy * lat_w, y + dx * lat_w)
-                z_right = _bilinear(dem, x + dy * lat_w, y - dx * lat_w)
+                z_left = _sample_elev(dem, dem10, has10, x - dy * lat_w, y + dx * lat_w)
+                z_right = _sample_elev(dem, dem10, has10, x + dy * lat_w, y - dx * lat_w)
                 lateral_raw = (z_right - z_left) / (2.0 * lat_w)
                 lateral = 0.5 * lateral_raw + 0.5 * prev_lateral
                 prev_lateral = lateral
@@ -407,7 +451,11 @@ CREST_SNAP_MIN_GAIN_M: float = 2.5
 
 
 def _crest_snap(
-    dem: NDArray[np.float32], easting: float, northing: float
+    dem: NDArray[np.float32],
+    dem10: NDArray[np.int16],
+    has10: bool,
+    easting: float,
+    northing: float,
 ) -> tuple[float, float, float]:
     """Move the camera to the local crest only when clearly below it.
 
@@ -415,11 +463,11 @@ def _crest_snap(
     from slope tops and escarpment brows, where the cell behind is always slightly
     higher and snapping would add 50 m of foreground field to every render.
     """
-    origin_ground = _bilinear(dem, easting, northing)
+    origin_ground = _sample_elev(dem, dem10, has10, easting, northing)
     best_e, best_n, ground = easting, northing, origin_ground
     for de in (-50.0, 0.0, 50.0):
         for dn in (-50.0, 0.0, 50.0):
-            z_here = _bilinear(dem, easting + de, northing + dn)
+            z_here = _sample_elev(dem, dem10, has10, easting + de, northing + dn)
             if z_here > ground:
                 ground = z_here
                 best_e, best_n = easting + de, northing + dn
@@ -430,6 +478,8 @@ def _crest_snap(
 
 def _run_kernel(
     dem: NDArray[np.float32],
+    dem10: NDArray[np.int16],
+    has10: bool,
     landcover: NDArray[np.uint8],
     easting: float,
     northing: float,
@@ -442,11 +492,13 @@ def _run_kernel(
     cy_px: float,
     pitch_rad: float,
 ) -> NDArray[np.uint8]:
-    easting, northing, ground = _crest_snap(dem, easting, northing)
+    easting, northing, ground = _crest_snap(dem, dem10, has10, easting, northing)
     eye_z = ground + EYE_HEIGHT_M + EYE_BOOST_M
     image = np.zeros((height, len(col_azimuth), 3), dtype=np.uint8)
     _render_kernel(
         dem,
+        dem10,
+        has10,
         landcover,
         easting,
         northing,
@@ -471,6 +523,15 @@ def _run_kernel(
     return image
 
 
+_DEM10_STUB: NDArray[np.int16] = np.full((1, 1), -32768, dtype=np.int16)
+
+
+def _dem10_or_stub(dem10: NDArray[np.int16] | None) -> tuple[NDArray[np.int16], bool]:
+    if dem10 is None:
+        return _DEM10_STUB, False
+    return dem10, True
+
+
 def _downsample(image: NDArray[np.uint8], width: int, height: int) -> Image.Image:
     result = Image.fromarray(image).resize((width, height), Image.Resampling.LANCZOS)
     # Photographs are more saturated and contrasty than raw painted colour.
@@ -484,13 +545,17 @@ def render_panorama(
     landcover: NDArray[np.uint8],
     easting: float,
     northing: float,
+    dem10: NDArray[np.int16] | None = None,
 ) -> Image.Image:
     scale = SUPERSAMPLE
     width = PANORAMA_WIDTH * scale
     height = PANORAMA_HEIGHT * scale
     col_azimuth = 2.0 * math.pi * (np.arange(width, dtype=np.float64) + 0.5) / width
+    dem10_arr, has10 = _dem10_or_stub(dem10)
     image = _run_kernel(
         dem,
+        dem10_arr,
+        has10,
         landcover,
         easting,
         northing,
@@ -517,6 +582,7 @@ def render_view(
     height: int = VIEW_HEIGHT,
     pitch_deg: float = VIEW_PITCH_DEG,
     horizon_fraction: float = VIEW_HORIZON_FRACTION,
+    dem10: NDArray[np.int16] | None = None,
 ) -> Image.Image:
     """Rectilinear 'camera' view toward one bearing.
 
@@ -536,8 +602,11 @@ def render_view(
     f_v = f_h  # square pixels
     top_rad = math.atan(cy / f_v) + pitch
     bottom_rad = math.atan((cy - render_h) / f_v) + pitch
+    dem10_arr, has10 = _dem10_or_stub(dem10)
     image = _run_kernel(
         dem,
+        dem10_arr,
+        has10,
         landcover,
         easting,
         northing,
