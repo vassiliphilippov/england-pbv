@@ -13,6 +13,47 @@ function thumbFallback(img) {
 </script>
 {% endblock %}
 {% block content %}
+{% macro place_rows(rows) %}
+    {# One ranked list in both representations; the List/Thumbnails toggle picks
+       which is visible via body.thumbs-mode. #}
+    <div class="mode-list-only">
+    <table class="rank">
+      <tr><th>#</th><th>Place</th><th>Region</th><th class="num">Score</th></tr>
+      {% for row in rows %}
+      <tr>
+        <td class="num">{{ loop.index }}</td>
+        <td>{% if row.slug %}<a href="viewpoints/{{ row.slug }}.html">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}
+            {% if row.is_discovery %}<span class="tag">discovery</span>{% endif %}</td>
+        <td>{{ row.region }}</td>
+        <td class="num"><span class="score-pill">{{ "%.1f"|format(row.score) }}</span></td>
+      </tr>
+      {% endfor %}
+    </table>
+    </div>
+    <div class="thumb-grid mode-thumbs-only">
+      {% for row in rows %}
+      {% if row.slug %}
+      <a class="thumb-card" href="viewpoints/{{ row.slug }}.html">
+        <img loading="lazy" src="renders/{{ row.slug }}_view1.jpg" data-slug="{{ row.slug }}"
+             onerror="thumbFallback(this)" alt="Rendered view from {{ row.name }}">
+        <div class="thumb-meta">
+          <span class="thumb-name">{{ loop.index }}. {{ row.name }}</span>
+          <span class="score-pill">{{ "%.1f"|format(row.score) }}</span>
+        </div>
+        <div class="thumb-region">{{ row.region }}</div>
+      </a>
+      {% else %}
+      <div class="thumb-card">
+        <div class="thumb-meta">
+          <span class="thumb-name">{{ loop.index }}. {{ row.name }}</span>
+          <span class="score-pill">{{ "%.1f"|format(row.score) }}</span>
+        </div>
+        <div class="thumb-region">{{ row.region }}</div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+{% endmacro %}
 <section class="hero">
   <h1>Every hill in England, measured for its view</h1>
   <p class="lede">
@@ -54,77 +95,21 @@ function thumbFallback(img) {
   <div id="area-results"></div>
 </div>
 
-<div class="grid-2">
-  <section>
-    <h2>Top 50 in England</h2>
-    <div class="mode-list-only">
-    <table class="rank">
-      <tr><th>#</th><th>Place</th><th>Region</th><th class="num">Score</th></tr>
-      {% for row in top_overall %}
-      <tr>
-        <td class="num">{{ loop.index }}</td>
-        <td>{% if row.slug %}<a href="viewpoints/{{ row.slug }}.html">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}
-            {% if row.is_discovery %}<span class="tag">discovery</span>{% endif %}</td>
-        <td>{{ row.region }}</td>
-        <td class="num"><span class="score-pill">{{ "%.1f"|format(row.score) }}</span></td>
-      </tr>
-      {% endfor %}
-    </table>
-    </div>
-    <div class="thumb-grid mode-thumbs-only">
-      {% for row in top_overall %}
-      {% if row.slug %}
-      <a class="thumb-card" href="viewpoints/{{ row.slug }}.html">
-        <img loading="lazy" src="renders/{{ row.slug }}_view1.jpg" data-slug="{{ row.slug }}"
-             onerror="thumbFallback(this)" alt="Rendered view from {{ row.name }}">
-        <div class="thumb-meta">
-          <span class="thumb-name">{{ loop.index }}. {{ row.name }}</span>
-          <span class="score-pill">{{ "%.1f"|format(row.score) }}</span>
-        </div>
-        <div class="thumb-region">{{ row.region }}</div>
-      </a>
-      {% else %}
-      <div class="thumb-card">
-        <div class="thumb-meta">
-          <span class="thumb-name">{{ loop.index }}. {{ row.name }}</span>
-          <span class="score-pill">{{ "%.1f"|format(row.score) }}</span>
-        </div>
-        <div class="thumb-region">{{ row.region }}</div>
-      </div>
-      {% endif %}
-      {% endfor %}
-    </div>
-  </section>
-  <section>
-    <h2>Best inland patchwork views</h2>
-    <p class="note">The Coombe Hill kind: escarpments and hills over farmland vales (little visible sea).</p>
-    <table class="rank">
-      <tr><th>#</th><th>Place</th><th>Region</th><th class="num">Score</th></tr>
-      {% for row in top_inland %}
-      <tr>
-        <td class="num">{{ loop.index }}</td>
-        <td>{% if row.slug %}<a href="viewpoints/{{ row.slug }}.html">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}
-            {% if row.is_discovery %}<span class="tag">discovery</span>{% endif %}</td>
-        <td>{{ row.region }}</td>
-        <td class="num"><span class="score-pill">{{ "%.1f"|format(row.score) }}</span></td>
-      </tr>
-      {% endfor %}
-    </table>
+<section>
+  <h2>Top 50 in England</h2>
+  {{ place_rows(top_overall) }}
+</section>
 
-    <h2>Best coastal panoramas</h2>
-    <table class="rank">
-      <tr><th>#</th><th>Place</th><th>Region</th><th class="num">Score</th></tr>
-      {% for row in top_coastal %}
-      <tr>
-        <td class="num">{{ loop.index }}</td>
-        <td>{% if row.slug %}<a href="viewpoints/{{ row.slug }}.html">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}</td>
-        <td>{{ row.region }}</td>
-        <td class="num"><span class="score-pill">{{ "%.1f"|format(row.score) }}</span></td>
-      </tr>
-      {% endfor %}
-    </table>
-  </section>
-</div>
+<section>
+  <h2>Best inland patchwork views</h2>
+  <p class="note">The Coombe Hill kind: escarpments and hills over farmland vales (little visible sea).</p>
+  {{ place_rows(top_inland) }}
+</section>
+
+<section>
+  <h2>Best coastal panoramas</h2>
+  {{ place_rows(top_coastal) }}
+</section>
 
 <section>
   <h2>Hidden gems</h2>
