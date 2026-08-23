@@ -13,6 +13,8 @@ listed per source. Downloads land in `data/raw/` via `england_pbv.data.download`
 | **DoBIH** | Surveyed hill summits + prominence (candidate seeding, naming) | `https://www.hill-bagging.co.uk/dobih-downloads/hillcsv.zip` (canonical, rejects some networks) with fallback `https://www.hills-database.co.uk/hillcsv.zip` | 2.3 MB | CC-BY 4.0, attribute "Database of British and Irish Hills" |
 | **ONS Countries Dec 2024 (BGC)** | England boundary mask (20 m generalised) | ONS ArcGIS FeatureServer, `Countries_December_2024_Boundaries_UK_BGC`, `CTRY24NM='England'`, GeoJSON | 4.3 MB | OGL |
 | **ScenicOrNot dump** | Archived for future square-level validation (not used in scoring) | `http://scenicornot.datasciencelab.co.uk/votes.tsv` | 19.5 MB | ODbL (per current host FAQ) |
+| **NE Priority Habitats Inventory** | Where moorland vegetation actually is (render palette: moor grass / bracken / heather flags on the 10 m grid) | ArcGIS FeatureServer `https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/Priority_Habitats_Inventory_England/FeatureServer/0/query`, native EPSG:27700, field `MainHabs`, 2000-feature pages, `f=geojson` | fetched per site (~3 km envelopes) | OGL, © Natural England |
+| **OSM footpaths (calibration sites)** | Worn-path lines in renders (depth cue) | Overpass, `highway~path\|footway\|track\|bridleway\|steps` within 2.5 km of each calibration site (mirror: `overpass.kumi.systems`) | ~6 MB | ODbL |
 
 ### OS Terrain 50 archive structure (verified)
 

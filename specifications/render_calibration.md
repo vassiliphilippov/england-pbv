@@ -56,6 +56,22 @@ scaling height (which grew a staircase of canopy fronts); colour is sampled at a
 world-anchored jittered position near the observer so 50 m cell borders dither into organic
 shapes; standing trees always take foliage colour.
 
+## 10 m land-cover flag scheme (paths + habitats)
+
+The England 10 m land-cover grid carries per-cell flags in the code's last digit (WorldCover
+codes end in 0, so `code % 10` is free): `+1` = OSM footpath within the cell
+(`england_pbv.data.calibration_paths`), `+2` = Natural England Priority Habitats Inventory
+moor-class habitat — heathland, blanket/raised bog, purple moor-grass, maritime cliff and
+slope, upland flushes (`england_pbv.data.habitats`). The path flag wins where both apply.
+
+The renderer paints paths as pale worn lines (sampled at the raw march position; within
+500 m confined to the middle of the cell so a grazing-projected cell reads as a trodden
+line, not a 10 m swathe). The habitat flag drives the moorland palette — tawny moor grass,
+bracken russet on slopes, heather dusk on shrub — *where 10 m data exists*; the old
+altitude thresholds survive only as fallback where it doesn't (Wales). Altitude alone gets
+moorland wrong in both directions: Mam Tor's 517 m crest is grazed green sward, and Valley
+of Rocks' bracken heath sits near sea level.
+
 ## Known remaining gaps (honest)
 
 - 50 m facets still band on smooth near domes; field boundaries are noise-driven, not mapped.

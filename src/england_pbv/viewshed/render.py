@@ -411,19 +411,36 @@ def _render_kernel(
                     red = red + (base_colors[3, 0] - red) * 0.45
                     green = green + (base_colors[3, 1] - green) * 0.45
                     blue = blue + (base_colors[3, 2] - blue) * 0.45
-                if lc_color == 3 and z > MOOR_GRASS_START_M:
-                    moor = (z - MOOR_GRASS_START_M) / (MOOR_GRASS_FULL_M - MOOR_GRASS_START_M)
-                    if moor > 1.0:
-                        moor = 1.0
+                # Priority Habitats Inventory flag (code % 10 == 2) says where moorland
+                # vegetation actually is; altitude proxies only fill in where 10 m data
+                # is absent (Wales, offshore) — altitude alone paints Mam Tor's grazed
+                # green crest tawny and misses Valley of Rocks' sea-level bracken.
+                code10 = _landcover_code10(landcover10, has10_lc, x, y)
+                habitat_known = code10 >= 0
+                habitat_moor = habitat_known and code10 % 10 == 2
+                if lc_color == 3 and (
+                    habitat_moor or (not habitat_known and z > MOOR_GRASS_START_M)
+                ):
+                    if habitat_moor:
+                        moor = 0.55 + 0.45 * _cell_noise(x, y, 130.0)
+                    else:
+                        moor = (z - MOOR_GRASS_START_M) / (MOOR_GRASS_FULL_M - MOOR_GRASS_START_M)
+                        if moor > 1.0:
+                            moor = 1.0
                     red = red + (152.0 - red) * moor
                     green = green + (142.0 - green) * moor
                     blue = blue + (92.0 - blue) * moor
                 if lc_color == 3 or lc_color == 2:
-                    # Bracken russet on steep upland slopes (the orange fellsides of
-                    # every Lakeland photo); heather dusk on high shrub.
+                    # Bracken russet on moor-habitat slopes (the orange fellsides of
+                    # every Lakeland photo); heather dusk on moor-habitat shrub.
                     slope_mag = math.sqrt(grad_x * grad_x + grad_y * grad_y)
                     bracken = 0.0
-                    if z > 280.0 and slope_mag > 0.17:
+                    if habitat_moor and slope_mag > 0.08:
+                        steep = (slope_mag - 0.08) * 5.0
+                        if steep > 1.0:
+                            steep = 1.0
+                        bracken = steep * (0.25 + 0.45 * _cell_noise(x, y, 90.0))
+                    elif not habitat_known and z > 280.0 and slope_mag > 0.17:
                         bracken = (z - 280.0) / 200.0
                         if bracken > 1.0:
                             bracken = 1.0
@@ -435,15 +452,17 @@ def _render_kernel(
                         red = red + (164.0 - red) * bracken
                         green = green + (118.0 - green) * bracken
                         blue = blue + (66.0 - blue) * bracken
-                    if lc_color == 2 and z > 300.0:
-                        heather = (z - 300.0) / 200.0
-                        if heather > 1.0:
-                            heather = 1.0
+                    if lc_color == 2 and (habitat_moor or (not habitat_known and z > 300.0)):
+                        if habitat_moor:
+                            heather = 0.8
+                        else:
+                            heather = (z - 300.0) / 200.0
+                            if heather > 1.0:
+                                heather = 1.0
                         red = red + (122.0 - red) * heather * 0.7
                         green = green + (98.0 - green) * heather * 0.7
                         blue = blue + (104.0 - blue) * heather * 0.7
-                path_code = _landcover_code10(landcover10, has10_lc, x, y)
-                if path_code >= 0 and path_code % 10 == 1 and lc_color != 8 and r < 2500.0:
+                if habitat_known and code10 % 10 == 1 and lc_color != 8 and r < 2500.0:
                     # A worn footpath line: pale trodden earth, fading with distance.
                     # Sampled at the RAW march position — colour jitter (up to 30 m) smears
                     # a 10 m path cell into swirling 30 m blobs across a near foreground.

@@ -132,6 +132,30 @@ moorland / upland heath / improved pasture properly instead of altitude proxies;
 (3) hillside cameras still show much own-slope (Swaledale) — bounded, maybe accept;
 (4) cumulus density still sparse vs photos on some pairs.
 
+## Cycle 7 — habitat-driven moorland palette (Priority Habitats Inventory) — ACCEPTED
+
+Change: Natural England Priority Habitats Inventory polygons (ArcGIS FeatureServer, native
+EPSG:27700) fetched for all 20 calibration sites and burned as a +2 flag on the 10 m
+land-cover grid (1.56 M cells; `england_pbv.data.habitats`). The renderer's moor grass /
+bracken / heather palette now fires on the habitat flag instead of altitude; altitude
+thresholds remain only as fallback where no 10 m data exists. The per-site moor-class
+counts alone validated the idea: chalk sites (Coombe, Coaley, Uffington, Devil's Dyke, Wye
+Downs) correctly 0, Surprise View 425, High Shield 762, Valley of Rocks 110.
+
+Verdict: clear accept. Mam Tor's crest turns grazed green (the altitude ramp painted its
+517 m top tawny) while Kinder's moors behind band russet+heather like the photo. Valley of
+Rocks transforms — sea-level bracken slopes in russet with green paths winding through,
+where altitude gating had left uniform green. Wensleydale's foreground pasture goes green;
+Swaledale's dale-edge moor banding appears. One accepted tradeoff: PHI misses bracken on
+non-priority land (Latrigg's plantation-edge bracken band goes green).
+
+Queued for cycle 8: (1) hillside/crag cameras (Surprise View's rim camera slides back onto
+the plateau — the photo stands at the crag lip; Swaledale/Conistone own-slope): consider a
+"cliff-edge" camera rule using the 10 m DEM's max forward drop; (2) canopy clump-edge
+fortress walls; (3) distant moor tops too pale (Swaledale far rim vs photo's dark heather
+line); (4) rock material for tors/limestone pavement (Valley of Rocks' Castle Rock,
+Conistone Pie) — OSM natural=bare_rock/cliff as a data source.
+
 ## Failures ledger (do not repeat)
 
 - (from pre-loop) Fixed march steps near the observer paint terrace bands — step must scale
