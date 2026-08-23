@@ -1,0 +1,53 @@
+{% extends "base.j2" %}
+{% block title %}Verification — does the algorithm find known great views?{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Does it actually work?</h1>
+  <p class="lede">
+    The ranking was tested against {{ n_positive }} famous, widely-celebrated English viewpoints
+    (it should rank them highly) and {{ n_negative }} adversarial negative controls &mdash; forested
+    summits, flat fens, valley floors directly below famous viewpoints, plateau tops with altitude
+    but no prospect (it should rank them low). Every positive's photo was visually checked against
+    the target view type. Human judgements were used only to <em>test</em> the ranking, never to build it.
+  </p>
+  <p class="lede">
+    <b>{{ pos_pass }}/{{ n_positive }}</b> famous viewpoints pass
+    (top-25% nationally or top-10% of their region) &middot;
+    <b>{{ neg_pass }}/{{ n_negative }}</b> negative controls pass (bottom half nationally).
+  </p>
+</section>
+
+<h2>Famous viewpoints</h2>
+<table class="rank">
+  <tr><th>Viewpoint</th><th>Region</th><th class="num">Nat. %ile</th><th class="num">Reg. %ile</th><th>Photo check</th><th></th></tr>
+  {% for r in positives %}
+  <tr>
+    <td>{% if r.photo_page %}<a href="{{ r.photo_page }}">{{ r.name }}</a>{% else %}{{ r.name }}{% endif %}</td>
+    <td>{{ r.region }}</td>
+    <td class="num">{{ r.nat }}</td>
+    <td class="num">{{ r.reg }}</td>
+    <td class="verdict">{{ r.photo }}</td>
+    <td class="{{ 'pass' if r.passed else 'fail' }}">{{ 'PASS' if r.passed else 'fail' }}</td>
+  </tr>
+  {% endfor %}
+</table>
+<p class="note">
+  Photo checks link to Geograph photographs (&copy; their photographers, CC&nbsp;BY-SA 2.0).
+  "Fail" rows are discussed honestly in the <a href="methodology.html#limitations">limitations</a>:
+  most are cliff lips finer than the 50 m terrain model, or viewpoints whose fame rests on
+  accessibility and framing rather than raw geometry.
+</p>
+
+<h2>Negative controls</h2>
+<table class="rank">
+  <tr><th>Control</th><th>Why it must score low</th><th class="num">Nat. %ile</th><th></th></tr>
+  {% for r in negatives %}
+  <tr>
+    <td>{{ r.name }}</td>
+    <td class="verdict">{{ r.why }}</td>
+    <td class="num">{{ r.nat }}</td>
+    <td class="{{ 'pass' if r.passed else 'fail' }}">{{ 'PASS' if r.passed else 'fail' }}</td>
+  </tr>
+  {% endfor %}
+</table>
+{% endblock %}

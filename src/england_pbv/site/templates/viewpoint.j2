@@ -1,0 +1,85 @@
+{% extends "base.j2" %}
+{% block title %}{{ vp.name }} — view potential {{ "%.1f"|format(vp.score) }}{% endblock %}
+{% block description %}Objective view metrics for {{ vp.name }}: {{ "%.0f"|format(vp.visible_area) }} km² visible, farthest sightline {{ "%.0f"|format(vp.d_max) }} km{% endblock %}
+{% block content %}
+<p class="crumb"><a href="{{ root }}index.html">&larr; all viewpoints</a></p>
+<div class="viewpoint-head">
+  <h1>{{ vp.name }}</h1>
+  <span class="rankline">#{{ vp.rank }} in England &middot; top {{ "%.0f"|format(100 - vp.regional_pct) }}% locally beats it &middot; {{ vp.region }}</span>
+</div>
+
+<div class="card">
+  <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
+    <div class="big-score">{{ "%.1f"|format(vp.score) }}<small>view potential (percentile composite)</small></div>
+    <div class="components" style="flex:1; min-width:340px;">
+      {% for comp in vp.components %}
+      <div class="component">
+        <div class="value">{{ "%.0f"|format(comp.value) }}</div>
+        <div class="bar"><i style="width:{{ "%.0f"|format(comp.value) }}%"></i></div>
+        <div class="name">{{ comp.name }}</div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">The panorama</h3>
+  {{ vp.horizon_svg }}
+  <p class="note">
+    Grey silhouette: terrain skyline in each direction (720 bearings, Earth curvature and
+    refraction included). Dashed green: skyline with trees (+15&nbsp;m) and buildings (+8&nbsp;m) as
+    obstacles. Blue strip: how far the ground is visible on each bearing.
+  </p>
+</div>
+
+<div class="two-col-cards">
+  <div class="card" style="display:flex; gap:18px; align-items:center;">
+    {{ vp.polar_svg }}
+    <div>
+      <h3 style="margin-top:0">Where the view opens</h3>
+      <p class="note">Wedge length = distance to the farthest visible ground on that bearing
+      (vegetation-aware). Rings at 10, 25 and 50&nbsp;km.</p>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">What fills the view</h3>
+    <div class="lc-bar">
+      {% for seg in vp.landcover %}
+      <div style="width:{{ "%.2f"|format(seg.pct) }}%; background:{{ seg.color }}" title="{{ seg.label }} {{ "%.0f"|format(seg.pct) }}%"></div>
+      {% endfor %}
+    </div>
+    <p class="lc-legend">
+      {% for seg in vp.landcover %}{% if seg.pct >= 1 %}<b>{{ "%.0f"|format(seg.pct) }}%</b> {{ seg.label }}{% if not loop.last %} &middot; {% endif %}{% endif %}{% endfor %}
+    </p>
+    <p class="note">Angular shares of the visible panorama (visual magnitude), not map area.
+    Landscape diversity {{ "%.2f"|format(vp.shannon) }} (0&ndash;1 Shannon).</p>
+  </div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Key numbers</h3>
+  <div class="facts">
+    <div class="fact"><div class="k">Elevation</div><div class="v">{{ "%.0f"|format(vp.elevation) }} m</div></div>
+    <div class="fact"><div class="k">Visible land</div><div class="v">{{ "%.0f"|format(vp.visible_area) }} <small>km²</small></div></div>
+    <div class="fact"><div class="k">Farthest sightline</div><div class="v">{{ "%.0f"|format(vp.d_max) }} <small>km</small></div></div>
+    <div class="fact"><div class="k">Open arc beyond 10 km</div><div class="v">{{ "%.0f"|format(vp.arc) }}&deg;</div></div>
+    <div class="fact"><div class="k">Drop to the vale</div><div class="v">{{ "%.0f"|format(vp.drop) }} <small>m</small></div></div>
+    <div class="fact"><div class="k">Downward view angle</div><div class="v">{{ "%.1f"|format(vp.depression) }}&deg;</div></div>
+    <div class="fact"><div class="k">Leaf-on retention</div><div class="v">{{ "%.0f"|format(vp.retention * 100) }}<small>%</small></div></div>
+    <div class="fact"><div class="k">Grid reference</div><div class="v" style="font-size:15px">{{ vp.grid_ref }}</div></div>
+  </div>
+</div>
+
+<div class="links-row">
+  <a href="{{ vp.gmaps }}">Google Maps</a>
+  <a href="{{ vp.osmaps }}">OS Maps</a>
+  <a href="{{ vp.osm }}">OpenStreetMap</a>
+  <a href="{{ vp.peakfinder }}">PeakFinder panorama</a>
+  <a href="{{ vp.geograph }}">Photos of this square (Geograph)</a>
+</div>
+<p class="note" style="margin-top:14px">
+  {{ vp.lat }}, {{ vp.lon }} &middot; source: {{ vp.source }} &middot; position refined by local search.
+  Computed location &mdash; check access rights before visiting.
+</p>
+{% endblock %}

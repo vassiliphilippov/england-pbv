@@ -64,6 +64,7 @@ class SweepResult:
     alpha0_rad: NDArray[np.float32]  # (n, n_az) angle to nearest sampled ground
     d_far_m: NDArray[np.float32]  # (n, n_az) farthest visible terrain distance (bare)
     d_far_veg_m: NDArray[np.float32]  # (n, n_az) farthest ground visible past trees/buildings
+    horizon_veg_rad: NDArray[np.float32]  # (n, n_az) horizon with tree/building obstacles
     tree_blocked: NDArray[np.uint8]  # (n, n_az) near ring dominated by tree cover
     plan_area: NDArray[np.float32]  # (n, n_bands) sum of r*dr for visible samples (bare)
     plan_area_veg: NDArray[np.float32]  # (n, n_bands) same with tree/building blockers
@@ -173,6 +174,7 @@ def _sweep_kernel(  # noqa: PLR0913
     alpha0_rad: NDArray[np.float32],
     d_far_m: NDArray[np.float32],
     d_far_veg_m: NDArray[np.float32],
+    horizon_veg_rad: NDArray[np.float32],
     tree_blocked: NDArray[np.uint8],
     plan_area: NDArray[np.float32],
     plan_area_veg: NDArray[np.float32],
@@ -256,6 +258,7 @@ def _sweep_kernel(  # noqa: PLR0913
             alpha0_rad[i, j] = alpha0
             d_far_m[i, j] = far
             d_far_veg_m[i, j] = far_veg
+            horizon_veg_rad[i, j] = max_ang_veg
             tree_blocked[i, j] = 1 if tree_near * 2 >= near_sample_count else 0
 
         vis_z_min[i] = z_min
@@ -298,6 +301,7 @@ def sweep_batch(
         alpha0_rad=np.zeros((n_obs, N_AZIMUTHS), dtype=np.float32),
         d_far_m=np.zeros((n_obs, N_AZIMUTHS), dtype=np.float32),
         d_far_veg_m=np.zeros((n_obs, N_AZIMUTHS), dtype=np.float32),
+        horizon_veg_rad=np.zeros((n_obs, N_AZIMUTHS), dtype=np.float32),
         tree_blocked=np.zeros((n_obs, N_AZIMUTHS), dtype=np.uint8),
         plan_area=np.zeros((n_obs, n_bands), dtype=np.float32),
         plan_area_veg=np.zeros((n_obs, n_bands), dtype=np.float32),
@@ -326,6 +330,7 @@ def sweep_batch(
         result.alpha0_rad,
         result.d_far_m,
         result.d_far_veg_m,
+        result.horizon_veg_rad,
         result.tree_blocked,
         result.plan_area,
         result.plan_area_veg,

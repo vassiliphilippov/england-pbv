@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Potentially Beautiful Views of England{% endblock %}</title>
+<meta name="description" content="{% block description %}Objective, terrain-computed discovery of panoramic viewpoints in England{% endblock %}">
+<link rel="stylesheet" href="{{ root }}assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
+{% block head %}{% endblock %}
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="{{ root }}index.html">Potentially Beautiful <span>Views of England</span></a>
+    <nav>
+      <a href="{{ root }}index.html">Map &amp; rankings</a>
+      <a href="{{ root }}verification.html">Verification</a>
+      <a href="{{ root }}methodology.html">Methodology</a>
+      <a href="https://github.com/vassiliphilippov/england-pbv">GitHub</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+{% block content %}{% endblock %}
+</main>
+<footer class="site">
+  <div class="wrap">
+    Computed from open data: OS Terrain 50 (contains OS data &copy; Crown copyright and database right 2026)
+    &middot; ESA WorldCover 2021 (CC-BY 4.0) &middot; OpenStreetMap (ODbL) &middot; Database of British and Irish Hills (CC-BY 4.0).
+    Scores describe measurable view geometry ("view potential"), never beauty itself.
+    Locations are computed &mdash; always check access rights, paths and safety before visiting.
+  </div>
+</footer>
+</body>
+</html>

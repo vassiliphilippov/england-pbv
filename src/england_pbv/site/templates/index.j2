@@ -1,0 +1,125 @@
+{% extends "base.j2" %}
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Every hill in England, measured for its view</h1>
+  <p class="lede">
+    This site searched the whole of England &mdash; 52 million terrain cells &mdash; for places with the
+    geometry of a great panorama: a steep drop at your feet, a wide unobstructed horizon, long
+    sightlines over lower country, and a varied visible landscape. No ratings, no likes &mdash; only
+    physics: {{ n_candidates }} candidate spots ranked by objective <em>view&nbsp;potential</em>.
+  </p>
+  <p class="fine">
+    Inspired by the view from Coombe Hill Monument. Each viewpoint was fine-tuned with a
+    12.5-metre local search to find the exact best place to stand.
+  </p>
+</section>
+
+<div id="map"></div>
+<div class="map-legend">
+  Colour = view potential:
+  <span class="dot" style="background:#c9c39b"></span>60
+  <span class="dot" style="background:#7fae72"></span>70
+  <span class="dot" style="background:#2f6f4f"></span>80
+  <span class="dot" style="background:#1d4436"></span>90+
+  &middot; click a point for details &middot; showing the top {{ n_map_points }} deduplicated viewpoints
+</div>
+
+<div class="grid-2">
+  <section>
+    <h2>Top 50 in England</h2>
+    <table class="rank">
+      <tr><th>#</th><th>Place</th><th>Region</th><th class="num">Score</th></tr>
+      {% for row in top_overall %}
+      <tr>
+        <td class="num">{{ loop.index }}</td>
+        <td>{% if row.slug %}<a href="viewpoints/{{ row.slug }}.html">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}
+            {% if row.is_discovery %}<span class="tag">discovery</span>{% endif %}</td>
+        <td>{{ row.region }}</td>
+        <td class="num"><span class="score-pill">{{ "%.1f"|format(row.score) }}</span></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </section>
+  <section>
+    <h2>Best inland patchwork views</h2>
+    <p class="note">The Coombe Hill kind: escarpments and hills over farmland vales (little visible sea).</p>
+    <table class="rank">
+      <tr><th>#</th><th>Place</th><th>Region</th><th class="num">Score</th></tr>
+      {% for row in top_inland %}
+      <tr>
+        <td class="num">{{ loop.index }}</td>
+        <td>{% if row.slug %}<a href="viewpoints/{{ row.slug }}.html">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}
+            {% if row.is_discovery %}<span class="tag">discovery</span>{% endif %}</td>
+        <td>{{ row.region }}</td>
+        <td class="num"><span class="score-pill">{{ "%.1f"|format(row.score) }}</span></td>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <h2>Best coastal panoramas</h2>
+    <table class="rank">
+      <tr><th>#</th><th>Place</th><th>Region</th><th class="num">Score</th></tr>
+      {% for row in top_coastal %}
+      <tr>
+        <td class="num">{{ loop.index }}</td>
+        <td>{% if row.slug %}<a href="viewpoints/{{ row.slug }}.html">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}</td>
+        <td>{{ row.region }}</td>
+        <td class="num"><span class="score-pill">{{ "%.1f"|format(row.score) }}</span></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </section>
+</div>
+
+<section>
+  <h2>Hidden gems</h2>
+  <p class="note">
+    High-scoring spots with no marked viewpoint, no named hill &mdash; places the algorithm found on its
+    own that nobody has tagged on a map. Potentially beautiful, genuinely unheralded.
+  </p>
+  <table class="rank">
+    <tr><th>#</th><th>Location</th><th>Region</th><th class="num">Nat. rank</th><th class="num">Score</th></tr>
+    {% for row in hidden_gems %}
+    <tr>
+      <td class="num">{{ loop.index }}</td>
+      <td>{% if row.slug %}<a href="viewpoints/{{ row.slug }}.html">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}</td>
+      <td>{{ row.region }}</td>
+      <td class="num">{{ row.rank }}</td>
+      <td class="num"><span class="score-pill">{{ "%.1f"|format(row.score) }}</span></td>
+    </tr>
+    {% endfor %}
+  </table>
+</section>
+
+<script>
+const points = {{ map_points_json }};
+const map = L.map('map').setView([52.8, -1.7], 6);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 17,
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+function colorFor(s) {
+  if (s >= 90) return '#1d4436';
+  if (s >= 80) return '#2f6f4f';
+  if (s >= 70) return '#7fae72';
+  return '#c9c39b';
+}
+const inland = L.layerGroup(), coastal = L.layerGroup();
+points.forEach(p => {
+  const m = L.circleMarker([p.la, p.lo], {
+    radius: p.s >= 85 ? 7 : (p.s >= 75 ? 5.5 : 4),
+    fillColor: colorFor(p.s), color: '#ffffff', weight: 1, fillOpacity: 0.88
+  });
+  let html = '<b>' + p.n + '</b><br>view potential ' + p.s.toFixed(1);
+  if (p.u) html += '<br><a href="viewpoints/' + p.u + '.html">details &rarr;</a>';
+  m.bindPopup(html);
+  (p.w > 0.08 ? coastal : inland).addLayer(m);
+});
+inland.addTo(map); coastal.addTo(map);
+L.control.layers(null, {'Inland views': inland, 'Coastal views': coastal}, {collapsed: false}).addTo(map);
+</script>
+{% endblock %}

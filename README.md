@@ -23,9 +23,11 @@ website.
 4. **Scoring** — each metric becomes a national percentile; six component scores average into a
    transparent "view potential" ranking, plus regional percentiles so a Chilterns escarpment can
    stand out without competing against the Lake District.
-5. **Verification** — a curated dataset of famous English viewpoints (and adversarial negative
-   controls) checks that the algorithm finds known great views and rejects forested summits and
-   flat fens. See `verification/`.
+5. **Verification** — a curated dataset of 60 famous English viewpoints (photo-verified) and 20
+   adversarial negative controls checks that the algorithm finds known great views and rejects
+   forested summits, flat fens and valley floors. Current result: **49/60 positives and 17/20
+   negatives pass**; Coombe Hill Monument scores in the 95th percentile nationally and beats its
+   own vale floor by 58 view-potential points. See `specifications/verification_protocol.md`.
 6. **Website** — a static site (map + per-viewpoint pages with horizon panoramas) is generated
    into `docs/` for GitHub Pages.
 

@@ -1,0 +1,93 @@
+{% extends "base.j2" %}
+{% block title %}Methodology — how the views are computed{% endblock %}
+{% block content %}
+<section class="hero methodology">
+  <h1>How every view was computed</h1>
+  <p class="lede">
+    This project began with one evening at Coombe Hill Monument in the Chilterns: open grass,
+    a steep drop, and the whole Vale of Aylesbury spread out like a quilt to a hazy horizon.
+    What makes a place feel like that &mdash; and can you find every such place in England from
+    terrain data alone, with no ratings and no opinions?
+  </p>
+</section>
+
+{% if coombe_photo %}
+<figure class="photo-figure card" style="padding:10px">
+  <img src="{{ root }}assets/{{ coombe_photo }}" alt="The view from Coombe Hill over the Vale of Aylesbury">
+  <figcaption>The archetype: the view from Coombe Hill Monument over the Vale of Aylesbury (author's photo, August 2026).</figcaption>
+</figure>
+{% endif %}
+
+<section class="methodology">
+<h2>The theory</h2>
+<p>
+A great view is not about absolute height. It is about <b>angular dominance</b>: the terrain
+falls away from you steeply and stays below your sightline over a wide arc, so an enormous
+sweep of lower country becomes visible &mdash; and stays visible for tens of kilometres. That is
+geometry, and geometry can be measured. Four properties recur at celebrated viewpoints:
+</p>
+<ul>
+  <li><b>Drop</b> &mdash; the ground plunges right at your feet (an escarpment edge, a lone summit);</li>
+  <li><b>Openness</b> &mdash; a wide, continuous arc of the horizon is unobstructed;</li>
+  <li><b>Depth</b> &mdash; foreground, middle ground and a far horizon are all present at once;</li>
+  <li><b>Variety</b> &mdash; the visible scene is a patchwork (fields, woods, villages, water), not a monotone.</li>
+</ul>
+
+<h2>The pipeline</h2>
+<ol>
+  <li><b>Terrain.</b> All of Great Britain on a 50&nbsp;m grid (OS Terrain 50), with ESA WorldCover
+      land cover resampled onto the same grid. Wales and Scotland are kept as terrain so views
+      across the border are honest; candidates are England-only.</li>
+  <li><b>Screening.</b> Multi-scale Topographic Position Index (how much a point stands above its
+      500&nbsp;m / 2&nbsp;km / 10&nbsp;km surroundings) keeps the top tenth of England's cells, thinned to local
+      maxima. Every OSM viewpoint and peak, and every surveyed hill in the Database of British
+      and Irish Hills, is added so nothing named is missed.</li>
+  <li><b>The sweep.</b> For each of ~46,000 candidates, 720 rays are cast to 60&nbsp;km with Earth
+      curvature and atmospheric refraction. Along each ray the rising record of elevation angle
+      determines what is visible; the record increments <em>are</em> the angular size of terrain in the
+      panorama, which weights everything the way an eye would. A second pass adds trees (+15&nbsp;m)
+      and buildings (+8&nbsp;m) as obstacles &mdash; crucially, woods on the slope <em>below</em> an
+      escarpment edge do not block the view, while a wooded summit blocks everything.</li>
+  <li><b>Scoring.</b> Six components &mdash; prospect, openness, drop, depth, diversity, clearness &mdash;
+      each a national percentile of raw metrics; their unweighted mean is the
+      <em>view potential</em>. Equal weights are a stated convention, not a discovered law.</li>
+  <li><b>Refinement.</b> Around every promising site the algorithm walks a fine grid (down to
+      12.5&nbsp;m steps) to find the exact best place to stand &mdash; the difference between a car park
+      and the lip of the scarp 100&nbsp;m away.</li>
+  <li><b>Verification.</b> 60 famous viewpoints (photo-verified) and 20 adversarial negative
+      controls test the ranking; see <a href="verification.html">verification</a>.</li>
+</ol>
+
+<h2>What the score is — and is not</h2>
+<p>
+The score measures <b>view geometry</b>: how much you can see, how far, how wide, how steeply
+down, and how varied it is. It does not measure beauty &mdash; no algorithm can, without smuggling
+in someone's taste. The claim is deliberately modest and precisely testable: <em>places that
+score highly have the measurable structure that famous viewpoints share.</em> Weather, light,
+season, foreground furniture and the walk up are yours to judge.
+</p>
+
+<h2 id="limitations">Honest limitations</h2>
+<ul>
+  <li><b>50 m terrain smooths cliffs.</b> Gritstone edges (Stanage, Curbar) and features like
+      Malham Cove under-score because their drama lives in the first 30 metres, below the grid's
+      resolution. The Environment Agency's 1 m LiDAR is the planned refinement.</li>
+  <li><b>Towers are scored at ground level.</b> Leith Hill Tower and Broadway Tower earn their
+      views on the platform; the algorithm stands on the grass.</li>
+  <li><b>Trees are a model.</b> A uniform 15 m woodland from a 10 m land-cover map, not each real
+      hedge and copse. Winter views through bare branches don't exist here.</li>
+  <li><b>The sea counts.</b> Clifftops legitimately top the national list; the inland list on the
+      front page is filtered for the Coombe Hill kind.</li>
+  <li><b>Fame is more than geometry.</b> Some beloved viewpoints (Lake District balconies like
+      Latrigg) are outcompeted by every fell around them &mdash; the metric honestly reports that
+      better geometric views exist nearby; it cannot measure the tea room.</li>
+</ul>
+
+<h2>Reproduce it</h2>
+<p>
+Everything &mdash; data downloads, the numba viewshed engine, scoring, verification and this site
+&mdash; is open source: <a href="https://github.com/vassiliphilippov/england-pbv">github.com/vassiliphilippov/england-pbv</a>.
+The full pipeline runs from public data in under an hour on a laptop.
+</p>
+</section>
+{% endblock %}

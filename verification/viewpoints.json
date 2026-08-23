@@ -14,7 +14,9 @@
       "main_view_direction": "NW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/4490195",
       "confidence": "high",
-      "notes": "Monument stands right on the scarp edge; viewpoint and monument are the same spot."
+      "notes": "Monument stands right on the scarp edge; viewpoint and monument are the same spot.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] View from the summit over the Vale of Aylesbury: patchwork fields, a village below, long hazy sightlines to the horizon over a scrubby treetop foreground. Confirms the archetype exactly — this is the reference escarpment-edge panorama."
     },
     {
       "name": "Ivinghoe Beacon",
@@ -29,7 +31,9 @@
       "main_view_direction": "NW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/3142987",
       "confidence": "high",
-      "notes": "Summit trig and viewpoint coincide; open in nearly all directions, steepest drop N/NW."
+      "notes": "Summit trig and viewpoint coincide; open in nearly all directions, steepest drop N/NW.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 3/5] Downward view from the grassy beacon slope over a large green field, a road, and hedged farmland stretching to a hazy plain. Elevated, open, long sightlines — archetype confirmed, though this particular frame is dominated by one big plain field rather than a rich patchwork."
     },
     {
       "name": "Dunstable Downs",
@@ -44,7 +48,9 @@
       "main_view_direction": "W",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/7367323",
       "confidence": "high",
-      "notes": "Coordinate is the open crest above the London Gliding Club; visitor-centre lawn viewpoint ~450 m N at 51.8680,-0.5405."
+      "notes": "Coordinate is the open crest above the London Gliding Club; visitor-centre lawn viewpoint ~450 m N at 51.8680,-0.5405.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 3/5] Mostly parched summer grass with a person in a camping chair, but the upper part shows the drop-off and a wide spread of harvested fields and hedgerows below — an elevated open viewpoint over the vale, confirming the archetype even if this photo undersells it."
     },
     {
       "name": "Uffington White Horse Hill",
@@ -59,7 +65,9 @@
       "main_view_direction": "N",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/2747142",
       "confidence": "high",
-      "notes": "Trig on Uffington Castle rampart; The Manger and Dragon Hill (51.57987,-1.56753) in the foreground of the N view."
+      "notes": "Trig on Uffington Castle rampart; The Manger and Dragon Hill (51.57987,-1.56753) in the foreground of the N view.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] Looking down across the chalk White Horse figure and the steep scarp into the Vale of White Horse, a green patchwork running to the horizon. Strong archetype match with the bonus of the hill figure; flat overcast light in this shot, but the place is clearly dramatic."
     },
     {
       "name": "Combe Gibbet (Gallows Down / Inkpen Hill)",
@@ -74,7 +82,9 @@
       "main_view_direction": "N",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/3208431",
       "confidence": "high",
-      "notes": "Walbury Hill trig (297 m) 900 m SE at 51.35246,-1.46505 (OSM peak 8088274; Wikipedia agrees)."
+      "notes": "Walbury Hill trig (297 m) 900 m SE at 51.35246,-1.46505 (OSM peak 8088274; Wikipedia agrees).",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] Grass-and-sheep foreground dropping steeply to a wide quilt of green fields, hedgerows and woods rolling to distant downs. Classic escarpment-edge panorama — archetype confirmed."
     },
     {
       "name": "Beacon Hill, Burghclere",
@@ -89,7 +99,9 @@
       "main_view_direction": "NW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/7684614",
       "confidence": "high",
-      "notes": "Steep open slopes on all sides; hillfort rampart rim is the viewing area."
+      "notes": "Steep open slopes on all sides; hillfort rampart rim is the viewing area.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 3/5] View from the summit fence line over wooded slopes toward a distant plain (Highclere Castle a speck mid-frame). Elevated and open with long sightlines, but the near ground is heavily wooded rather than an open steep drop, so the panorama reads softer than the Coombe Hill archetype."
     },
     {
       "name": "Westbury White Horse viewpoint (Bratton Camp)",
@@ -104,7 +116,9 @@
       "main_view_direction": "NW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/5640590",
       "confidence": "high",
-      "notes": "Westbury Hill top (230 m, OSM peak 6184881950) 500 m SE; viewing spot is the scarp lip above the horse."
+      "notes": "Westbury Hill top (230 m, OSM peak 6184881950) 500 m SE; viewing spot is the scarp lip above the horse.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] Sweeping view from the chalk escarpment over a steep grassy combe onto a huge patchwork of arable and pasture fields fading to the horizon. Textbook archetype match."
     },
     {
       "name": "Cleeve Hill (Cleeve Cloud escarpment)",
@@ -119,7 +133,9 @@
       "main_view_direction": "NW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/296072",
       "confidence": "high",
-      "notes": "Highest point of the Cotswolds (330 m trig, 51.91986,-2.00586) is 1.7 km SE on the flat common; the celebrated view spot is this escarpment edge."
+      "notes": "Highest point of the Cotswolds (330 m trig, 51.91986,-2.00586) is 1.7 km SE on the flat common; the celebrated view spot is this escarpment edge.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] From the open common the ground falls away to the Severn Vale with Cheltenham below and the Malvern Hills on the horizon; grass foreground shows some tractor-rutted rough pasture. Elevated, open, layered depth — archetype confirmed."
     },
     {
       "name": "Broadway Tower",
@@ -134,7 +150,9 @@
       "main_view_direction": "NW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/1640077",
       "confidence": "high",
-      "notes": "Broadway Hill summit (310 m peak node) 110 m S; open sheep pasture foreground with steep drop NW to Broadway village."
+      "notes": "Broadway Hill summit (310 m peak node) 110 m S; open sheep pasture foreground with steep drop NW to Broadway village.",
+      "photo_verified": false,
+      "photo_verdict": "[view-from, beauty 3/5] An atmospheric misty shot looking down from the tower over grassy parkland slopes with walkers and bare trees — but the famous distant panorama is entirely lost in haze, so this particular photo does not confirm the wide-panorama archetype even though the elevation is evident."
     },
     {
       "name": "Coaley Peak (Frocester Hill) toposcope",
@@ -149,7 +167,9 @@
       "main_view_direction": "W",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/1630694",
       "confidence": "high",
-      "notes": "Grass slope drops steeply W; a second OSM viewpoint node sits at 51.70943,-2.29926."
+      "notes": "Grass slope drops steeply W; a second OSM viewpoint node sits at 51.70943,-2.29926.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 5/5] Steep autumn-colored scarp slope plunging to an immense patchwork of the Severn Vale stretching to a hazy horizon — grass foreground, steep drop, vast layered panorama. One of the strongest archetype matches in the set and a genuinely stunning view."
     },
     {
       "name": "Painswick Beacon",
@@ -164,7 +184,9 @@
       "main_view_direction": "NW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/861687",
       "confidence": "high",
-      "notes": "OSM peak node says 270 m but DoBIH height is 283 m - 283 used."
+      "notes": "OSM peak node says 270 m but DoBIH height is 283 m - 283 used.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] View from the grassy beacon summit over the Severn Vale with Gloucester below and the Malvern-line hills on the horizon; open turf foreground and long layered sightlines confirm the archetype, though this particular shot is a hazy, muted vintage scan."
     },
     {
       "name": "Leckhampton Hill (Devil's Chimney)",
@@ -179,7 +201,9 @@
       "main_view_direction": "NW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/4424317",
       "confidence": "high",
-      "notes": "Devil's Chimney itself stands just below the crest (~51.8639,-2.0790); the crest viewpoint used here."
+      "notes": "Devil's Chimney itself stands just below the crest (~51.8639,-2.0790); the crest viewpoint used here.",
+      "photo_verified": true,
+      "photo_verdict": "[hill-itself, beauty 4/5] The Devil's Chimney limestone pinnacle is the subject, photographed from the escarpment edge, but behind it spreads a genuine wide panorama of Cheltenham and patchwork fields far below — the steep drop and long sightlines clearly confirm the archetype."
     },
     {
       "name": "Dover's Hill",
@@ -194,7 +218,9 @@
       "main_view_direction": "NW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/1608515",
       "confidence": "high",
-      "notes": "OSM peak gives 225 m, NT/trig sources ~230 m; toposcope at the viewpoint."
+      "notes": "OSM peak gives 225 m, NT/trig sources ~230 m; toposcope at the viewpoint.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 3/5] The toposcope pillar on the open grassy scarp top with the Vale of Evesham stretching hazily beyond; it confirms an elevated open viewpoint over lower country, but the dull winter light, muddy puddles and modest visible sweep make the pictured scene only moderately attractive."
     },
     {
       "name": "Haresfield Beacon",
@@ -209,7 +235,9 @@
       "main_view_direction": "W",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/3867293",
       "confidence": "high",
-      "notes": "NT Shortwood topograph 1.8 km ESE at 51.77408,-2.25048 (OSM viewpoint 473800882) is the alternative famous spot."
+      "notes": "NT Shortwood topograph 1.8 km ESE at 51.77408,-2.25048 (OSM viewpoint 473800882) is the alternative famous spot.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] Lush rolling green slopes falling away to the vale around Stroud/Gloucester with a wooded escarpment ridge in the distance — layered depth and a wide sweep over lower patchwork country that fits the archetype well, though no dramatic bare-edge drop is in frame."
     },
     {
       "name": "Box Hill (Salomons Memorial viewpoint)",
@@ -224,7 +252,9 @@
       "main_view_direction": "S",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/7898233",
       "confidence": "high",
-      "notes": "Viewing terrace at ~172 m on the scarp lip; open grass foreground, near-vertical drop to the Mole."
+      "notes": "Viewing terrace at ~172 m on the scarp lip; open grass foreground, near-vertical drop to the Mole.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] The classic open grass slope below the viewpoint with picnickers, looking out over Dorking and the wooded Weald toward Leith Hill — an elevated open panorama over lower countryside that clearly confirms the archetype, shot here under flat overcast light."
     },
     {
       "name": "Leith Hill Tower",
@@ -239,7 +269,9 @@
       "main_view_direction": "S",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/658497",
       "confidence": "high",
-      "notes": "Greensand, not chalk: wooded summit with open S face; widest view from tower platform."
+      "notes": "Greensand, not chalk: wooded summit with open S face; widest view from tower platform.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] A hazy golden-hour telephoto view from the tower out across the Weald — misty layered fields receding to distant hills, confirming huge sightlines from the viewpoint, though the tower itself and any foreground are not shown."
     },
     {
       "name": "Newlands Corner",
@@ -254,7 +286,9 @@
       "main_view_direction": "S",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/283739",
       "confidence": "high",
-      "notes": "Elevation approximate (~165-170 m at viewpoint); car park/visitor centre on the crest just N."
+      "notes": "Elevation approximate (~165-170 m at viewpoint); car park/visitor centre on the crest just N.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 3/5] Open grassy downland slope looking south over a largely wooded Weald with fields in the middle distance; it is an elevated open viewpoint over lower country, but the view is softer and more tree-filled than the dramatic scarp-and-patchwork archetype — pleasant rather than stunning."
     },
     {
       "name": "Colley Hill (Inglis Memorial)",
@@ -269,7 +303,9 @@
       "main_view_direction": "S",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/2428165",
       "confidence": "high",
-      "notes": "Elevation approximate (~215-225 m); steep open grass slope directly below the memorial."
+      "notes": "Elevation approximate (~215-225 m); steep open grass slope directly below the memorial.",
+      "photo_verified": false,
+      "photo_verdict": "[other, beauty 2/5] The photo shows only the classical Inglis Memorial drinking-fountain pavilion against a wall of dense trees — a handsome structure, but no drop, no panorama and no open country visible, so it does not confirm the viewpoint archetype at all."
     },
     {
       "name": "Gibbet Hill, Hindhead",
@@ -284,7 +320,9 @@
       "main_view_direction": "NE",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/684148",
       "confidence": "high",
-      "notes": "Main drop is NW into the Devil's Punch Bowl; widest open outlook N-E."
+      "notes": "Main drop is NW into the Devil's Punch Bowl; widest open outlook N-E.",
+      "photo_verified": false,
+      "photo_verdict": "[hill-itself, beauty 3/5] The summit scene itself — Celtic cross, trig point, heather and bracken with a pine belt behind — with only a small sliver of hazy blue distance visible at the left edge; it shows an attractive open heathland top but does not itself confirm the wide panorama."
     },
     {
       "name": "Wye Downs (Devil's Kneading Trough)",
@@ -299,7 +337,9 @@
       "main_view_direction": "SW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/3761473",
       "confidence": "medium",
-      "notes": "Alternative celebrated spot: Wye Crown Millennium Stone 1.4 km N at 51.18134,0.96292 (OSM viewpoint 1212069369). Elevation approximate."
+      "notes": "Alternative celebrated spot: Wye Crown Millennium Stone 1.4 km N at 51.18134,0.96292 (OSM viewpoint 1212069369). Elevation approximate.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] View from the chalk scarp edge down a steep scrubby slope onto a bright patchwork of hedged green fields in the Stour valley running to distant downs — steep drop, long sightlines and vale patchwork that squarely confirm the archetype."
     },
     {
       "name": "Devil's Dyke",
@@ -314,7 +354,9 @@
       "main_view_direction": "NW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/5861963",
       "confidence": "high",
-      "notes": "Summit of the hill is 217 m; viewing spot ~200 m on the crest NW of the pub, drop to Fulking below."
+      "notes": "Summit of the hill is 217 m; viewing spot ~200 m on the crest NW of the pub, drop to Fulking below.",
+      "photo_verified": true,
+      "photo_verdict": "[hill-itself, beauty 3/5] Shows the open grassy summit plateau with a viewpoint telescope, toposcope slabs and a memorial bench, with the low Weald just visible at the left edge. It confirms this is a designated elevated open viewpoint, but the photo is of the summit furniture (plus a parked caravan) rather than the panorama itself."
     },
     {
       "name": "Ditchling Beacon",
@@ -329,7 +371,9 @@
       "main_view_direction": "N",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/1509059",
       "confidence": "high",
-      "notes": "DoBIH height 248 m; sheer open scarp drops N to Westmeston."
+      "notes": "DoBIH height 248 m; sheer open scarp drops N to Westmeston.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] Classic escarpment-edge view from the beacon: rough grass foreground dropping steeply to a wide hazy patchwork of Weald fields and woods stretching to the horizon, with the chalk scarp curving away at right. Strongly confirms the Coombe Hill archetype."
     },
     {
       "name": "Firle Beacon",
@@ -344,7 +388,9 @@
       "main_view_direction": "N",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/2652626",
       "confidence": "high",
-      "notes": "Trig on round barrow at summit; steep N scarp, gentle dip slope S to the coast."
+      "notes": "Trig on round barrow at summit; steep N scarp, gentle dip slope S to the coast.",
+      "photo_verified": true,
+      "photo_verdict": "[hill-itself, beauty 3/5] The trig pillar on the smooth grassy summit dominates the frame, but behind it the hazy low Weald plain and the rolling scarp are clearly visible, confirming an elevated open viewpoint over lower country even though the panorama itself is secondary in this shot."
     },
     {
       "name": "Butser Hill",
@@ -359,7 +405,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/3726945",
       "confidence": "high",
-      "notes": "Broad domed summit; steepest drops NW into Rake Bottom, sea views S."
+      "notes": "Broad domed summit; steepest drops NW into Rake Bottom, sea views S.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 3/5] View from the hillside over green rolling farmland and wooded hills under a heavy sky, but the foreground is dead scrub and bramble rather than open grass, and the sightlines are moderate rather than vast — a pleasant but not stunning confirmation of the archetype."
     },
     {
       "name": "Chanctonbury Ring",
@@ -374,7 +422,9 @@
       "main_view_direction": "N",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/7728044",
       "confidence": "high",
-      "notes": "Commonly cited height 238 m (Chanctonbury Hill); OSM node says 242. View N from the rampart outside the trees."
+      "notes": "Commonly cited height 238 m (Chanctonbury Hill); OSM node says 242. View N from the rampart outside the trees.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] A fine escarpment view northward over a rich patchwork of Weald fields, hedgerows and woods with long layered sightlines to a distant blue ridge; only a wire fence interrupts the grass foreground. Confirms the archetype well."
     },
     {
       "name": "Glastonbury Tor",
@@ -389,7 +439,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/825133",
       "confidence": "high",
-      "notes": "Perfect isolated-hill archetype - low absolute height but ~120 m drop to dead-flat levels on all sides."
+      "notes": "Perfect isolated-hill archetype - low absolute height but ~120 m drop to dead-flat levels on all sides.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] View from the Tor slopes over Glastonbury's rooftops and the utterly flat Somerset Levels running to a hazy horizon — a genuinely dramatic drop and immense sightlines over patchwork lowland, confirming the isolated-hill archetype despite the flat milky light in this photo."
     },
     {
       "name": "Crook Peak",
@@ -404,7 +456,9 @@
       "main_view_direction": "W",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/6971636",
       "confidence": "high",
-      "notes": "Rock outcrop summit; open steep slopes S and W; ridgeline E to Wavering Down (211 m trig)."
+      "notes": "Rock outcrop summit; open steep slopes S and W; ridgeline E to Wavering Down (211 m trig).",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] Rocky limestone summit in the foreground with a steep drop to the Somerset Levels' field patchwork and the distant Bristol Channel — exactly the archetype (rock foreground, wide panorama, layered depth), though the M5 motorway snakes prominently through the view and the day is grey."
     },
     {
       "name": "Win Green",
@@ -419,7 +473,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/3537885",
       "confidence": "high",
-      "notes": "Toposcope photo: geograph.org.uk/photo/7025358. Steep scarp drops N; near-complete panorama."
+      "notes": "Toposcope photo: geograph.org.uk/photo/7025358. Steep scarp drops N; near-complete panorama.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 3/5] A view out from under the summit beech clump, framed by dark tree trunks, over a vale of fields and a handsome steep chalk coombe with yellow rape beyond — confirms the elevated viewpoint over lower country, but this particular shot is half-blocked by silhouetted trees rather than an open panorama."
     },
     {
       "name": "Wittenham Clumps (Round Hill)",
@@ -434,7 +490,9 @@
       "main_view_direction": "NW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/2480955",
       "confidence": "high",
-      "notes": "Low absolute height but isolated ~65 m drop to the Thames; classic viewpoint bench on Round Hill's N side."
+      "notes": "Low absolute height but isolated ~65 m drop to the Thames; classic viewpoint bench on Round Hill's N side.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] Open grass slope falling away to a wide sunny panorama of the Thames valley — the river, water meadows, trees and villages spread across a green plain. Confirms the archetype, though the hill is modest and the drop gentle rather than steep."
     },
     {
       "name": "Tennyson Down (Tennyson Monument)",
@@ -449,7 +507,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/3392810",
       "confidence": "high",
-      "notes": "Semi-coastal: sheer chalk cliff on the S side, open down N; included as the Isle of Wight's canonical panoramic hill."
+      "notes": "Semi-coastal: sheer chalk cliff on the S side, open down N; included as the Isle of Wight's canonical panoramic hill.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] From the close-cropped down-top turf the view sweeps over the west Wight's fields, Freshwater and its estuary, out to a Solent dotted with sails and the faint mainland — a wide elevated panorama over lower land and sea that confirms the archetype, though this frame is mostly sky with somewhat parched summer grass."
     },
     {
       "name": "Worcestershire Beacon",
@@ -465,7 +525,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/2979805",
       "geograph_image_url": "https://s1.geograph.org.uk/geophotos/02/97/98/2979805_c6fc7b96.jpg",
       "confidence": "high",
-      "notes": "Summit trig + toposcope; open grass ridge with steep drops both sides."
+      "notes": "Summit trig + toposcope; open grass ridge with steep drops both sides.",
+      "photo_verified": false,
+      "photo_verdict": "[other, beauty 2/5] The photo is a nighttime shot of a bonfire with a silhouetted crowd (a beacon-lighting event), with no landscape visible at all. It tells us nothing about whether the summit offers the panoramic archetype."
     },
     {
       "name": "British Camp (Herefordshire Beacon)",
@@ -481,7 +543,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/8360783",
       "geograph_image_url": "https://s3.geograph.org.uk/geophotos/08/36/07/8360783_505b324f.jpg",
       "confidence": "high",
-      "notes": "Coordinates are the hillfort summit (highest rampart platform)."
+      "notes": "Coordinates are the hillfort summit (highest rampart platform).",
+      "photo_verified": true,
+      "photo_verdict": "[hill-itself, beauty 4/5] Shows the hill itself from a distance: a bare, dramatically terraced Iron Age hillfort summit rising well clear of the wooded slopes below, which strongly implies an elevated open viewpoint with steep drops. Striking place, though the panorama from the top is not itself pictured."
     },
     {
       "name": "The Wrekin",
@@ -496,7 +560,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/7078973",
       "geograph_image_url": "https://s1.geograph.org.uk/geophotos/07/07/89/7078973_3eac0439.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 3/5] Summit trig point with an open gravel top and a hazy but real view dropping away to patchwork fields in the vale below, confirming an elevated open viewpoint; the misty grey conditions mute the panorama in this particular shot."
     },
     {
       "name": "Pole Bank (Long Mynd)",
@@ -511,7 +577,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/6710312",
       "geograph_image_url": "https://s0.geograph.org.uk/geophotos/06/71/03/6710312_6a995fed.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 3/5] Open moorland summit plateau with walkers at the toposcope and long sightlines to layered blue hills on the horizon under a big sky, confirming an elevated open panorama; the immediate foreground is a muddy, puddled plateau rather than a dramatic steep drop."
     },
     {
       "name": "Manstone Rock (Stiperstones)",
@@ -526,7 +594,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/7680501",
       "geograph_image_url": "https://s1.geograph.org.uk/geophotos/07/68/05/7680501_80312db5.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] Taken on the ridge itself: a dramatic jagged quartzite tor in the foreground, heather moorland running to further tors, and the lowland plain visible far below on the left horizon — confirms an elevated, open, rocky ridge viewpoint with long sightlines."
     },
     {
       "name": "Lyth Hill",
@@ -542,7 +612,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/767562",
       "geograph_image_url": "https://s0.geograph.org.uk/photos/76/75/767562_4f29f613.jpg",
       "confidence": "medium",
-      "notes": "Viewpoint benches/toposcope lie within ~150m SW along the open ridge edge from this highest point."
+      "notes": "Viewpoint benches/toposcope lie within ~150m SW along the open ridge edge from this highest point.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 3/5] View from a grassy hillside over bright rapeseed and patchwork farmland stretching to a hazy plain — a genuine elevated open outlook, though the drop is modest and houses and a lane sit in the mid-ground; pleasant rather than dramatic."
     },
     {
       "name": "Mam Tor",
@@ -557,7 +629,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/3848913",
       "geograph_image_url": "https://s1.geograph.org.uk/geophotos/03/84/89/3848913_f60bf583.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": false,
+      "photo_verdict": "[other, beauty 2/5] A roadside shot from the foot of Mam Nick: tarmac, a dry-stone wall, and grassy lower slopes, with no panorama or summit view pictured. It does not confirm the archetype (Mam Tor's famous view is simply not in this frame)."
     },
     {
       "name": "Curbar Edge",
@@ -573,7 +647,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/5636723",
       "geograph_image_url": "https://s3.geograph.org.uk/geophotos/05/63/67/5636723_d0f52c97.jpg",
       "confidence": "high",
-      "notes": "Elevation from Copernicus DEM (edge crest ~325-350m)."
+      "notes": "Elevation from Copernicus DEM (edge crest ~325-350m).",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] Winter view from the gritstone edge itself: snow-dusted boulders in the foreground dropping away to walled fields, woods and the Derwent valley with layered hills beyond — a clear match for the elevated-edge wide-panorama archetype."
     },
     {
       "name": "Surprise View (Hathersage)",
@@ -589,7 +665,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/4404717",
       "geograph_image_url": "https://s1.geograph.org.uk/geophotos/04/40/47/4404717_6d44f9f2.jpg",
       "confidence": "high",
-      "notes": "Elevation from Copernicus DEM."
+      "notes": "Elevation from Copernicus DEM.",
+      "photo_verified": false,
+      "photo_verdict": "[other, beauty 3/5] Shows the famous abandoned millstones lying in bracken within enclosed birch woodland below the edge — atmospheric, but no elevated viewpoint or panorama is pictured, so it does not confirm the archetype."
     },
     {
       "name": "Bamford Edge (Great Tor)",
@@ -605,7 +683,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/3329127",
       "geograph_image_url": "https://s3.geograph.org.uk/geophotos/03/32/91/3329127_72b0f283.jpg",
       "confidence": "high",
-      "notes": "DEM reads 384m at the node; the celebrated overhanging ledge is on this tor. Photo shows the edge from across Ladybower."
+      "notes": "DEM reads 384m at the node; the celebrated overhanging ledge is on this tor. Photo shows the edge from across Ladybower.",
+      "photo_verified": false,
+      "photo_verdict": "[other, beauty 3/5] The photo is of the Ladybower Reservoir bellmouth overflow ('plughole') and dam, taken from water level; a gritstone-topped moorland edge appears only as a distant skyline. Interesting scene, but it shows neither the view from Bamford Edge nor the edge in any confirming detail."
     },
     {
       "name": "Stanage Edge (High Neb)",
@@ -621,7 +701,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/3325652",
       "geograph_image_url": "https://s0.geograph.org.uk/geophotos/03/32/56/3325652_adcb5ce4.jpg",
       "confidence": "high",
-      "notes": "The popular southern end above Hook's Car (~53.3465,-1.6290) is an equally famous photo spot."
+      "notes": "The popular southern end above Hook's Car (~53.3465,-1.6290) is an equally famous photo spot.",
+      "photo_verified": true,
+      "photo_verdict": "[hill-itself, beauty 2/5] Shows the gritstone escarpment as a distant crag line on the skyline, seen from a muddy valley track below with rough grass and puddles in the foreground. The edge visibly is an elevated crag above lower moorland, so the place fits the archetype, but this particular photo is a dreary wet-day approach shot, not the panorama from the top."
     },
     {
       "name": "The Roaches",
@@ -636,7 +718,9 @@
       "main_view_direction": "SW",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/7812897",
       "geograph_image_url": "https://s1.geograph.org.uk/geophotos/07/81/28/7812897_15e8f6f9.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] A wide open panorama from an elevated buttercup meadow over a green vale with patchwork fields and layered hills (Hen Cloud/Roaches skyline) in the middle distance. Confirms the archetype well: elevated, open, long sightlines over lower countryside, attractive flower-meadow foreground, though no steep rocky drop is visible in frame."
     },
     {
       "name": "Stormy Point (Alderley Edge)",
@@ -652,7 +736,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/5901192",
       "geograph_image_url": "https://s0.geograph.org.uk/geophotos/05/90/11/5901192_f10688bd.jpg",
       "confidence": "high",
-      "notes": "Elevation from Copernicus DEM."
+      "notes": "Elevation from Copernicus DEM.",
+      "photo_verified": false,
+      "photo_verdict": "[hill-itself, beauty 2/5] Shows a mossy sandstone outcrop overhanging a footpath, fully enclosed by woodland — no panorama or open drop at all. A pleasant wooded crag, but this photo does not confirm the open-panorama archetype."
     },
     {
       "name": "Pendle Hill",
@@ -667,7 +753,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/7269163",
       "geograph_image_url": "https://s3.geograph.org.uk/geophotos/07/26/91/7269163_e8511a1d.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": false,
+      "photo_verdict": "[hill-itself, beauty 2/5] A stony track climbing a featureless rounded moorland dome toward the summit under a flat grey sky — nothing but grass and cloud, no view outward. The photo shows the summit approach, not the panorama, and does not confirm the archetype."
     },
     {
       "name": "Rivington Pike",
@@ -682,7 +770,9 @@
       "main_view_direction": "W",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/4747509",
       "geograph_image_url": "https://s1.geograph.org.uk/geophotos/04/74/75/4747509_7ba34c75.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": true,
+      "photo_verdict": "[hill-itself, beauty 3/5] The tower-topped pike photographed from higher moorland (cotton-grass foreground), with a vast hazy Lancashire plain stretching behind it. It is a shot of the hill rather than the view from it, but it clearly shows the pike standing well above lowland with long sightlines — the place is evidently the kind of viewpoint we seek."
     },
     {
       "name": "Sutton Bank (Finest View)",
@@ -698,7 +788,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/2469067",
       "geograph_image_url": "https://s3.geograph.org.uk/geophotos/02/46/90/2469067_9696aab1.jpg",
       "confidence": "high",
-      "notes": "DEM reads 279m at the rim (edge smoothing); bank top ~295m."
+      "notes": "DEM reads 279m at the rim (edge smoothing); bank top ~295m.",
+      "photo_verified": false,
+      "photo_verdict": "[other, beauty 2/5] Shows the A170 road cutting climbing the bank, with cars and a rock face beside the carriageway — a road scene, not the famous escarpment panorama. Does not confirm the archetype; a better photo from the cliff-top viewpoint is needed."
     },
     {
       "name": "Roseberry Topping",
@@ -713,7 +805,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/4595798",
       "geograph_image_url": "https://s2.geograph.org.uk/geophotos/04/59/57/4595798_71f8bec5.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": true,
+      "photo_verdict": "[hill-itself, beauty 5/5] A striking shot of the distinctive half-cone summit with its craggy drop, zigzag paths, walkers at the trig point, and hazy lowland plain visible far below behind it. Photographed from elsewhere, but the hill unmistakably IS an isolated elevated viewpoint with steep drops over lower country — strongly confirms the archetype."
     },
     {
       "name": "Malham Cove (cliff top)",
@@ -729,7 +823,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/4884913",
       "geograph_image_url": "https://s1.geograph.org.uk/geophotos/04/88/49/4884913_cdf21f95.jpg",
       "confidence": "medium",
-      "notes": "Inland limestone cliff top (not coastal). DEM ~300-314m on the pavement."
+      "notes": "Inland limestone cliff top (not coastal). DEM ~300-314m on the pavement.",
+      "photo_verified": true,
+      "photo_verdict": "[hill-itself, beauty 4/5] An old black-and-white photo of the huge curved limestone amphitheatre seen from the valley floor, not the view from the cliff top. The sheer 70m wall makes clear the top is an elevated brink with a big drop and views down Malhamdale, so the place fits, but this image shows the cliff, not the panorama."
     },
     {
       "name": "Tan Hill Inn",
@@ -745,7 +841,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/7509660",
       "geograph_image_url": "https://s0.geograph.org.uk/geophotos/07/50/96/7509660_15f0f728.jpg",
       "confidence": "high",
-      "notes": "Broad moorland viewpoint, no steep foreground drop — weaker match to the escarpment archetype."
+      "notes": "Broad moorland viewpoint, no steep foreground drop — weaker match to the escarpment archetype.",
+      "photo_verified": false,
+      "photo_verdict": "[other, beauty 2/5] A red tractor with a snowplough and a Union Jack on a gravel pull-off beside the moorland road — essentially a car-park/novelty shot. Open rolling moor is visible behind but there is no drop or panorama over lower country; does not confirm the archetype."
     },
     {
       "name": "Castle Hill (Victoria Tower), Huddersfield",
@@ -760,7 +858,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/4357609",
       "geograph_image_url": "https://s1.geograph.org.uk/geophotos/04/35/76/4357609_51895010.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": true,
+      "photo_verdict": "[hill-itself, beauty 3/5] A dusk silhouette of Victoria Tower and a beacon brazier on the open hilltop, with distant lowland visible far below on the left horizon. Atmospheric and clearly an elevated open summit above surrounding country, but the darkness means the wide panorama itself is only hinted at, not shown."
     },
     {
       "name": "Surprise View (Otley Chevin)",
@@ -776,7 +876,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/360402",
       "geograph_image_url": "https://s0.geograph.org.uk/photos/36/04/360402_f60f2b2d.jpg",
       "confidence": "high",
-      "notes": "Elevation from Copernicus DEM (244m)."
+      "notes": "Elevation from Copernicus DEM (244m).",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] Taken from the Chevin's grassy edge looking down over Otley and Wharfedale: town, river valley, patchwork fields and distant moorland under a big sky, with autumn woods dropping away below. Confirms the elevated open escarpment-edge archetype well."
     },
     {
       "name": "Garrowby Hill (A166 crest)",
@@ -792,7 +894,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/1647952",
       "geograph_image_url": "https://s0.geograph.org.uk/geophotos/01/64/79/1647952_18903a74.jpg",
       "confidence": "low",
-      "notes": "Point is on the upper bend of the bank (~185m) where the vale view opens; the exact celebrated spot is a stretch of road, not a single marker. Verify against the Geograph photo 'View from Garrowby Hill' (SE8056)."
+      "notes": "Point is on the upper bend of the bank (~185m) where the vale view opens; the exact celebrated spot is a stretch of road, not a single marker. Verify against the Geograph photo 'View from Garrowby Hill' (SE8056).",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 2/5] A dark, underexposed roadside shot dominated by the A166 tarmac and a red 'Dangerous Hill - Test Your Brakes' warning sign; the vast flat Vale of York is faintly visible stretching to the horizon beyond a scrubby verge. It hints at a huge escarpment-edge panorama but the pictured scene itself is a gloomy road crest, so the archetype is only weakly confirmed."
     },
     {
       "name": "Orrest Head",
@@ -808,7 +912,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/4287285",
       "geograph_image_url": "https://s1.geograph.org.uk/geophotos/04/28/72/4287285_cedc3e77.jpg",
       "confidence": "high",
-      "notes": "Fully accessible path since 2021 — a classic road-accessible short-walk viewpoint."
+      "notes": "Fully accessible path since 2021 — a classic road-accessible short-walk viewpoint.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] From rocky/grassy summit ground the view sweeps over a beautiful pastoral vale of green fields, stone walls, farms and autumn woods to layered Lakeland fells in cloud. Windermere itself is not in frame, but this clearly confirms an elevated open summit with a wide panorama over lower country."
     },
     {
       "name": "Latrigg",
@@ -823,7 +929,9 @@
       "main_view_direction": "S",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/3248794",
       "geograph_image_url": "https://s2.geograph.org.uk/geophotos/03/24/87/3248794_f61c6811.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": false,
+      "photo_verdict": "[hill-itself, beauty 2/5] Shows only a stony path climbing a bare grassy summit ridge under thick grey mist; no panorama is visible at all. The photo does not confirm the archetype, though the open summit terrain is consistent with a viewpoint on a clear day."
     },
     {
       "name": "Surprise View (Derwentwater)",
@@ -839,7 +947,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/5924930",
       "geograph_image_url": "https://s2.geograph.org.uk/geophotos/05/92/49/5924930_60c97cb3.jpg",
       "confidence": "high",
-      "notes": "Crag-top over wooded slope; elevation from Copernicus DEM (195m)."
+      "notes": "Crag-top over wooded slope; elevation from Copernicus DEM (195m).",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 5/5] A stunning elevated view from the wooded crag high above Derwentwater: the whole lake with its islands, Keswick, and the Skiddaw massif under dramatic clouds. The steep drop and wide panorama over lower country are unmistakable — a top-tier viewpoint, though the foreground is treed crag rather than open grass."
     },
     {
       "name": "Hartside Top",
@@ -855,7 +965,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/2930093",
       "geograph_image_url": "https://s1.geograph.org.uk/geophotos/02/93/00/2930093_d77a97c7.jpg",
       "confidence": "high",
-      "notes": "DEM reads 562m at the node; signed pass elevation 580m."
+      "notes": "DEM reads 562m at the node; signed pass elevation 580m.",
+      "photo_verified": true,
+      "photo_verdict": "[view-from, beauty 4/5] From behind a low stone wall at the summit car park, the moorland escarpment falls away to the A686 hairpins and an immense sunlit patchwork of the Eden Valley fields stretching to distant hills. The wall/car-park foreground is utilitarian, but the vast escarpment-edge panorama clearly confirms the archetype."
     },
     {
       "name": "Winshield Crags",
@@ -871,7 +983,9 @@
       "geograph_photo_page": "https://www.geograph.org.uk/photo/3501186",
       "geograph_image_url": "https://s0.geograph.org.uk/geophotos/03/50/11/3501186_1a297d80.jpg",
       "confidence": "high",
-      "notes": "Short walk from Steel Rigg car park (OSM way 29485154)."
+      "notes": "Short walk from Steel Rigg car park (OSM way 29485154).",
+      "photo_verified": true,
+      "photo_verdict": "[hill-itself, beauty 3/5] Shows the trig point and Hadrian's Wall running along the open rocky crest, with hazy lower country visible to the north. Mostly a summit-itself shot in flat haze, but the open elevated crest with long sightlines over lower ground is evident, so the place plausibly fits the archetype even though the panorama is muted here."
     },
     {
       "name": "Simonside",
@@ -886,7 +1000,9 @@
       "main_view_direction": "N",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/2674321",
       "geograph_image_url": "https://s0.geograph.org.uk/geophotos/02/67/43/2674321_4e92aeef.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": false,
+      "photo_verdict": "[hill-itself, beauty 2/5] A gritstone outcrop on a heather slope photographed in thick fog with a white-out sky; no view over Coquetdale or anything else is visible. The photo shows the crag itself and does not confirm the panorama archetype."
     },
     {
       "name": "Old John Tower, Bradgate Park",
@@ -901,7 +1017,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/4653731",
       "geograph_image_url": "https://s3.geograph.org.uk/geophotos/04/65/37/4653731_8dd530a1.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": true,
+      "photo_verdict": "[hill-itself, beauty 3/5] Shows the castellated folly tower and craggy rock outcrops on an open grassy summit under blue sky, with a sliver of lower wooded country on the right horizon. It photographs the hilltop itself rather than the view, but the open elevated summit clearly is a viewpoint of the kind sought; charming scene, modest drama."
     },
     {
       "name": "Beacon Hill, Leicestershire",
@@ -916,7 +1034,9 @@
       "main_view_direction": "360",
       "geograph_photo_page": "https://www.geograph.org.uk/photo/4277342",
       "geograph_image_url": "https://s2.geograph.org.uk/geophotos/04/27/73/4277342_107c4be5.jpg",
-      "confidence": "high"
+      "confidence": "high",
+      "photo_verified": false,
+      "photo_verdict": "[other, beauty 2/5] Shows a carved wooden statue of a shepherd with a sheep beside a drystone wall and autumn trees on flat grass — a park feature, not a viewpoint. No elevation or panorama is visible, so this photo does not confirm the archetype at all."
     },
     {
       "name": "Haddington Hill summit (Wendover Woods)",

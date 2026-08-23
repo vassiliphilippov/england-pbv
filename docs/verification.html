@@ -1,0 +1,750 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verification — does the algorithm find known great views?</title>
+<meta name="description" content="Objective, terrain-computed discovery of panoramic viewpoints in England">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
+
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="index.html">Potentially Beautiful <span>Views of England</span></a>
+    <nav>
+      <a href="index.html">Map &amp; rankings</a>
+      <a href="verification.html">Verification</a>
+      <a href="methodology.html">Methodology</a>
+      <a href="https://github.com/vassiliphilippov/england-pbv">GitHub</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+
+<section class="hero">
+  <h1>Does it actually work?</h1>
+  <p class="lede">
+    The ranking was tested against 60 famous, widely-celebrated English viewpoints
+    (it should rank them highly) and 20 adversarial negative controls &mdash; forested
+    summits, flat fens, valley floors directly below famous viewpoints, plateau tops with altitude
+    but no prospect (it should rank them low). Every positive's photo was visually checked against
+    the target view type. Human judgements were used only to <em>test</em> the ranking, never to build it.
+  </p>
+  <p class="lede">
+    <b>49/60</b> famous viewpoints pass
+    (top-25% nationally or top-10% of their region) &middot;
+    <b>17/20</b> negative controls pass (bottom half nationally).
+  </p>
+</section>
+
+<h2>Famous viewpoints</h2>
+<table class="rank">
+  <tr><th>Viewpoint</th><th>Region</th><th class="num">Nat. %ile</th><th class="num">Reg. %ile</th><th>Photo check</th><th></th></tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/4490195">Coombe Hill Monument</a></td>
+    <td>Chilterns, Buckinghamshire</td>
+    <td class="num">95</td>
+    <td class="num">100</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/3142987">Ivinghoe Beacon</a></td>
+    <td>Chilterns, Buckinghamshire</td>
+    <td class="num">92</td>
+    <td class="num">99</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/7367323">Dunstable Downs</a></td>
+    <td>Chilterns, Bedfordshire</td>
+    <td class="num">70</td>
+    <td class="num">88</td>
+    <td class="verdict">view confirmed</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/2747142">Uffington White Horse Hill</a></td>
+    <td>North Wessex Downs, Oxfordshire</td>
+    <td class="num">86</td>
+    <td class="num">96</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/3208431">Combe Gibbet (Gallows Down / Inkpen Hill)</a></td>
+    <td>North Wessex Downs, Berkshire</td>
+    <td class="num">95</td>
+    <td class="num">100</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/7684614">Beacon Hill, Burghclere</a></td>
+    <td>North Wessex Downs, Hampshire</td>
+    <td class="num">96</td>
+    <td class="num">100</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/5640590">Westbury White Horse viewpoint (Bratton Camp)</a></td>
+    <td>West Wiltshire Downs (edge of Salisbury Plain), Wiltshire</td>
+    <td class="num">79</td>
+    <td class="num">88</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/296072">Cleeve Hill (Cleeve Cloud escarpment)</a></td>
+    <td>Cotswolds, Gloucestershire</td>
+    <td class="num">98</td>
+    <td class="num">96</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/1640077">Broadway Tower</a></td>
+    <td>Cotswolds, Worcestershire</td>
+    <td class="num">96</td>
+    <td class="num">97</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/1630694">Coaley Peak (Frocester Hill) toposcope</a></td>
+    <td>Cotswolds, Gloucestershire</td>
+    <td class="num">87</td>
+    <td class="num">91</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/861687">Painswick Beacon</a></td>
+    <td>Cotswolds, Gloucestershire</td>
+    <td class="num">98</td>
+    <td class="num">98</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/4424317">Leckhampton Hill (Devil's Chimney)</a></td>
+    <td>Cotswolds, Gloucestershire</td>
+    <td class="num">87</td>
+    <td class="num">86</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/1608515">Dover's Hill</a></td>
+    <td>Cotswolds, Gloucestershire</td>
+    <td class="num">86</td>
+    <td class="num">89</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/3867293">Haresfield Beacon</a></td>
+    <td>Cotswolds, Gloucestershire</td>
+    <td class="num">95</td>
+    <td class="num">97</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/7898233">Box Hill (Salomons Memorial viewpoint)</a></td>
+    <td>Surrey Hills / North Downs, Surrey</td>
+    <td class="num">63</td>
+    <td class="num">89</td>
+    <td class="verdict">view confirmed</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/658497">Leith Hill Tower</a></td>
+    <td>Surrey Hills (Greensand Ridge), Surrey</td>
+    <td class="num">84</td>
+    <td class="num">98</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/283739">Newlands Corner</a></td>
+    <td>Surrey Hills / North Downs, Surrey</td>
+    <td class="num">34</td>
+    <td class="num">67</td>
+    <td class="verdict">view confirmed</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/2428165">Colley Hill (Inglis Memorial)</a></td>
+    <td>Surrey Hills / North Downs, Surrey</td>
+    <td class="num">77</td>
+    <td class="num">94</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/684148">Gibbet Hill, Hindhead</a></td>
+    <td>Surrey Hills (Greensand), Surrey</td>
+    <td class="num">81</td>
+    <td class="num">90</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/3761473">Wye Downs (Devil's Kneading Trough)</a></td>
+    <td>Kent Downs (North Downs), Kent</td>
+    <td class="num">89</td>
+    <td class="num">88</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/5861963">Devil's Dyke</a></td>
+    <td>South Downs, West Sussex</td>
+    <td class="num">92</td>
+    <td class="num">82</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/1509059">Ditchling Beacon</a></td>
+    <td>South Downs, East Sussex</td>
+    <td class="num">99</td>
+    <td class="num">97</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/2652626">Firle Beacon</a></td>
+    <td>South Downs, East Sussex</td>
+    <td class="num">100</td>
+    <td class="num">100</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/3726945">Butser Hill</a></td>
+    <td>South Downs, Hampshire</td>
+    <td class="num">96</td>
+    <td class="num">98</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/7728044">Chanctonbury Ring</a></td>
+    <td>South Downs, West Sussex</td>
+    <td class="num">100</td>
+    <td class="num">100</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/825133">Glastonbury Tor</a></td>
+    <td>Somerset (Isle of Avalon, near Mendips)</td>
+    <td class="num">95</td>
+    <td class="num">99</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/6971636">Crook Peak</a></td>
+    <td>Mendip Hills, Somerset</td>
+    <td class="num">97</td>
+    <td class="num">98</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/3537885">Win Green</a></td>
+    <td>Cranborne Chase, Wiltshire/Dorset border</td>
+    <td class="num">96</td>
+    <td class="num">100</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/2480955">Wittenham Clumps (Round Hill)</a></td>
+    <td>Oxfordshire (Sinodun Hills, Thames Valley)</td>
+    <td class="num">88</td>
+    <td class="num">98</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/3392810">Tennyson Down (Tennyson Monument)</a></td>
+    <td>Isle of Wight</td>
+    <td class="num">93</td>
+    <td class="num">79</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/2979805">Worcestershire Beacon</a></td>
+    <td>Malvern Hills, Worcestershire</td>
+    <td class="num">100</td>
+    <td class="num">100</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/8360783">British Camp (Herefordshire Beacon)</a></td>
+    <td>Malvern Hills, Herefordshire</td>
+    <td class="num">100</td>
+    <td class="num">99</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/7078973">The Wrekin</a></td>
+    <td>Shropshire (Telford and Wrekin)</td>
+    <td class="num">99</td>
+    <td class="num">99</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/6710312">Pole Bank (Long Mynd)</a></td>
+    <td>Shropshire Hills AONB</td>
+    <td class="num">94</td>
+    <td class="num">93</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/7680501">Manstone Rock (Stiperstones)</a></td>
+    <td>Shropshire Hills AONB</td>
+    <td class="num">91</td>
+    <td class="num">87</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/767562">Lyth Hill</a></td>
+    <td>Shropshire (near Shrewsbury)</td>
+    <td class="num">84</td>
+    <td class="num">74</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/3848913">Mam Tor</a></td>
+    <td>Peak District (Derbyshire)</td>
+    <td class="num">86</td>
+    <td class="num">95</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/5636723">Curbar Edge</a></td>
+    <td>Peak District (Derbyshire, Eastern Edges)</td>
+    <td class="num">74</td>
+    <td class="num">88</td>
+    <td class="verdict">view confirmed</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/4404717">Surprise View (Hathersage)</a></td>
+    <td>Peak District (Derbyshire)</td>
+    <td class="num">51</td>
+    <td class="num">63</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/3329127">Bamford Edge (Great Tor)</a></td>
+    <td>Peak District (Derbyshire)</td>
+    <td class="num">67</td>
+    <td class="num">77</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/3325652">Stanage Edge (High Neb)</a></td>
+    <td>Peak District (Derbyshire/Sheffield border)</td>
+    <td class="num">83</td>
+    <td class="num">94</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/7812897">The Roaches</a></td>
+    <td>Peak District (Staffordshire Moorlands)</td>
+    <td class="num">92</td>
+    <td class="num">99</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/5901192">Stormy Point (Alderley Edge)</a></td>
+    <td>Cheshire (Alderley Edge, NT)</td>
+    <td class="num">82</td>
+    <td class="num">87</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/7269163">Pendle Hill</a></td>
+    <td>Lancashire (Forest of Bowland fringe)</td>
+    <td class="num">96</td>
+    <td class="num">100</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/4747509">Rivington Pike</a></td>
+    <td>Lancashire (West Pennine Moors)</td>
+    <td class="num">99</td>
+    <td class="num">100</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/2469067">Sutton Bank (Finest View)</a></td>
+    <td>North York Moors (Hambleton Hills)</td>
+    <td class="num">92</td>
+    <td class="num">91</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/4595798">Roseberry Topping</a></td>
+    <td>North York Moors (Cleveland)</td>
+    <td class="num">99</td>
+    <td class="num">98</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/4884913">Malham Cove (cliff top)</a></td>
+    <td>Yorkshire Dales (Malhamdale)</td>
+    <td class="num">39</td>
+    <td class="num">33</td>
+    <td class="verdict">view confirmed</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/7509660">Tan Hill Inn</a></td>
+    <td>Yorkshire Dales (Swaledale/Stainmore)</td>
+    <td class="num">49</td>
+    <td class="num">35</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/4357609">Castle Hill (Victoria Tower), Huddersfield</a></td>
+    <td>West Yorkshire (Kirklees)</td>
+    <td class="num">83</td>
+    <td class="num">93</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/360402">Surprise View (Otley Chevin)</a></td>
+    <td>West Yorkshire (Chevin Forest Park, Otley)</td>
+    <td class="num">89</td>
+    <td class="num">99</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/1647952">Garrowby Hill (A166 crest)</a></td>
+    <td>Yorkshire Wolds (East Riding)</td>
+    <td class="num">91</td>
+    <td class="num">99</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/4287285">Orrest Head</a></td>
+    <td>Lake District (Windermere)</td>
+    <td class="num">90</td>
+    <td class="num">75</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/3248794">Latrigg</a></td>
+    <td>Lake District (Keswick)</td>
+    <td class="num">73</td>
+    <td class="num">41</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/5924930">Surprise View (Derwentwater)</a></td>
+    <td>Lake District (Borrowdale, above Ashness Bridge)</td>
+    <td class="num">61</td>
+    <td class="num">28</td>
+    <td class="verdict">view confirmed</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/2930093">Hartside Top</a></td>
+    <td>North Pennines (A686, Cumbria)</td>
+    <td class="num">73</td>
+    <td class="num">58</td>
+    <td class="verdict">view confirmed</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/3501186">Winshield Crags</a></td>
+    <td>Hadrian's Wall, Northumberland</td>
+    <td class="num">85</td>
+    <td class="num">88</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/2674321">Simonside</a></td>
+    <td>Northumberland (Coquetdale, near Rothbury)</td>
+    <td class="num">92</td>
+    <td class="num">89</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/4653731">Old John Tower, Bradgate Park</a></td>
+    <td>Leicestershire (Charnwood Forest)</td>
+    <td class="num">86</td>
+    <td class="num">97</td>
+    <td class="verdict">view confirmed</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td><a href="https://www.geograph.org.uk/photo/4277342">Beacon Hill, Leicestershire</a></td>
+    <td>Leicestershire (Charnwood Forest)</td>
+    <td class="num">95</td>
+    <td class="num">99</td>
+    <td class="verdict">photo shows the hill/monument</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+</table>
+<p class="note">
+  Photo checks link to Geograph photographs (&copy; their photographers, CC&nbsp;BY-SA 2.0).
+  "Fail" rows are discussed honestly in the <a href="methodology.html#limitations">limitations</a>:
+  most are cliff lips finer than the 50 m terrain model, or viewpoints whose fame rests on
+  accessibility and framing rather than raw geometry.
+</p>
+
+<h2>Negative controls</h2>
+<table class="rank">
+  <tr><th>Control</th><th>Why it must score low</th><th class="num">Nat. %ile</th><th></th></tr>
+  
+  <tr>
+    <td>Haddington Hill summit (Wendover Woods)</td>
+    <td class="verdict">'high but forested' — absolute altitude plus real escarpment prominence, but zero ground-level panorama. Adversarial pairing: it i</td>
+    <td class="num">5</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Blackdown trig point (Black Down summit)</td>
+    <td class="verdict">'high but forested' AND fine spatial discrimination — the genuinely famous viewpoint (Temple of the Winds, Tennyson's favourite) i</td>
+    <td class="num">56</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td>St Leonard's Forest plateau (Barnsnap, near Colgate)</td>
+    <td class="verdict">'locally highest but canopy-enclosed with gentle relief' — the hill has modest drops on all sides that a coarse DEM prominence mea</td>
+    <td class="num">0</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Haldon Forest high ridge (near Buller's Hill)</td>
+    <td class="verdict">'huge theoretical viewshed, zero actual view' — a bare-earth DTM sees from here to Dartmoor, Exmoor and the sea, but the plantatio</td>
+    <td class="num">60</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td>Buck Fell plantation interior, Kielder Forest</td>
+    <td class="verdict">'high but forested' at upland scale, plus remoteness bias — big elevation numbers and long bare-earth sightlines over the Border f</td>
+    <td class="num">1</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Thetford Forest interior (Fire Road 12, Santon Downham)</td>
+    <td class="verdict">(a): local 'high ground' (~60 m — genuinely among the higher cells of Breckland) inside Britain's largest lowland pine forest. Tes</td>
+    <td class="num">0</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Whittlesey Mere basin, Holme Fen</td>
+    <td class="verdict">'flat with huge theoretical viewshed' — on a flat DEM a point here can 'see' tens of km in every direction with zero terrain occlu</td>
+    <td class="num">1</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Padnal Fen near Prickwillow</td>
+    <td class="verdict">'flat with huge theoretical viewshed' plus the landmark-intervisibility trap — Ely Cathedral ('Ship of the Fens') is visible on th</td>
+    <td class="num">2</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Tealham Moor, Somerset Levels</td>
+    <td class="verdict">'flat with huge theoretical viewshed' and landmark intervisibility — Glastonbury Tor, Brent Knoll and the Mendip scarp all stand o</td>
+    <td class="num">22</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Holbeach St Johns fen, South Holland</td>
+    <td class="verdict">'flat with huge theoretical viewshed, far from any relief' — the purest flatland case in the set: no terrain occlusion, no terrain</td>
+    <td class="num">1</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Romney Marsh at St Mary in the Marsh</td>
+    <td class="verdict">'flat with huge theoretical viewshed' in a coastal setting — the sea (a big open-water viewshed bonus in naive scoring) lies just </td>
+    <td class="num">5</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Vale of Aylesbury floor at Ellesborough (below Coombe Hill)</td>
+    <td class="verdict">'in the celebrated scene, not viewing it' — the Chiltern scarp wall blocks the whole southeastern skyline, and the algorithm must </td>
+    <td class="num">1</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Hope Valley floor below Mam Tor (Dirty Lane, Castleton)</td>
+    <td class="verdict">'valley bottom directly beneath a famous viewpoint' — steep ground (Mam Tor face, the Great Ridge, Winnats/Treak Cliff) occludes m</td>
+    <td class="num">0</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Vale floor at Thirlby, below Sutton Bank</td>
+    <td class="verdict">'valley bottom directly below a famous viewpoint' — the cliff walls off the whole eastern skyline while the open vale lies behind </td>
+    <td class="num">28</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Severn vale at Guarlford, east of the Malverns</td>
+    <td class="verdict">'sees a landmark but is not a viewpoint' — the whole Malvern ridge towers photogenically over this field and westward sightlines t</td>
+    <td class="num">20</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Chiltern dip-slope plateau near Dunsmore (Icknield Way Trail)</td>
+    <td class="verdict">'absolute altitude without relative drop' — this is the sharpest paired control in the set: nearly identical elevation, same massi</td>
+    <td class="num">10</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Kinder Scout summit plateau (highest point)</td>
+    <td class="verdict">'summit altitude without prospect on a flat-topped massif' — the celebrated views are all at the plateau EDGES (Kinder Downfall, R</td>
+    <td class="num">63</td>
+    <td class="fail">fail</td>
+  </tr>
+  
+  <tr>
+    <td>Cranmere Pool, northern Dartmoor</td>
+    <td class="verdict">'high altitude with negative local prominence' — one of the highest test points in the whole set, yet a mid-basin bog with the sky</td>
+    <td class="num">3</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Cotswold high wold plateau, Buckle Street near Snowshill</td>
+    <td class="verdict">'escarpment altitude without the edge' — the algorithm must fire on the scarp lip (paired positives: Broadway Tower 2.5 km NW, Dov</td>
+    <td class="num">2</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+  <tr>
+    <td>Brindley Heath plateau, Cannock Chase interior</td>
+    <td class="verdict">'plateau interior with altitude but no prospect, partial conifer cover' — big regional prominence of the massif must not be inheri</td>
+    <td class="num">0</td>
+    <td class="pass">PASS</td>
+  </tr>
+  
+</table>
+
+</main>
+<footer class="site">
+  <div class="wrap">
+    Computed from open data: OS Terrain 50 (contains OS data &copy; Crown copyright and database right 2026)
+    &middot; ESA WorldCover 2021 (CC-BY 4.0) &middot; OpenStreetMap (ODbL) &middot; Database of British and Irish Hills (CC-BY 4.0).
+    Scores describe measurable view geometry ("view potential"), never beauty itself.
+    Locations are computed &mdash; always check access rights, paths and safety before visiting.
+  </div>
+</footer>
+</body>
+</html>
