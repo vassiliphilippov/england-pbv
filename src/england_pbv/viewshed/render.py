@@ -15,7 +15,7 @@ from dataclasses import dataclass
 import numpy as np
 from numba import njit, prange
 from numpy.typing import NDArray
-from PIL import Image
+from PIL import Image, ImageEnhance
 
 from england_pbv.constants import EARTH_RADIUS_M, EYE_HEIGHT_M, REFRACTION_K
 from england_pbv.viewshed.horizon import _bilinear, _landcover_at
@@ -39,10 +39,13 @@ TREE_HEIGHT_M: float = 15.0
 BUILT_HEIGHT_M: float = 8.0
 
 MAX_RENDER_DISTANCE_M: float = 60000.0
-HAZE_DISTANCE_M: float = 13000.0
+HAZE_DISTANCE_M: float = 16000.0
 SUN_AZIMUTH_DEG: float = 225.0
-SHADE_GAIN: float = 2.2
-SHADE_AMBIENT: float = 0.88
+SUN_ELEVATION_DEG: float = 38.0
+SHADE_AMBIENT: float = 0.52
+SHADE_DIFFUSE: float = 0.78
+CLOUD_SHADOW_SCALE_M: float = 1250.0
+CLOUD_SHADOW_STRENGTH: float = 0.30
 CLEARING_RAMP_START_M: float = 120.0
 CLEARING_RAMP_FULL_M: float = 260.0
 EYE_BOOST_M: float = 0.8
@@ -147,16 +150,19 @@ def _render_kernel(
     width = col_azimuth.shape[0]
     rad_per_row = (top_rad - bottom_rad) / height
     sun_az = math.radians(SUN_AZIMUTH_DEG)
+    sun_el = math.radians(SUN_ELEVATION_DEG)
+    sun_x = math.sin(sun_az) * math.cos(sun_el)
+    sun_y = math.cos(sun_az) * math.cos(sun_el)
+    sun_z = math.sin(sun_el)
 
     for col in prange(width):  # type: ignore[no-untyped-call, attr-defined]  # numba prange
         azimuth = col_azimuth[col]
         dx = math.sin(azimuth)
         dy = math.cos(azimuth)
-        sun_facing = math.cos(azimuth - sun_az)
-
         max_ang = bottom_rad
         prev_z = eye_z - EYE_HEIGHT_M
         prev_slope = 0.0
+        prev_lateral = 0.0
         prev_visible = True
         prev_field_ix = -(10**9)
         prev_field_iy = -(10**9)
@@ -204,6 +210,13 @@ def _render_kernel(
                     radial_slope = prev_slope
                 prev_slope = radial_slope
                 prev_visible = True
+                # Lateral slope completes the true surface normal for sun modelling.
+                lat_w = 15.0 if step < 15.0 else step
+                z_left = _bilinear(dem, x - dy * lat_w, y + dx * lat_w)
+                z_right = _bilinear(dem, x + dy * lat_w, y - dx * lat_w)
+                lateral_raw = (z_right - z_left) / (2.0 * lat_w)
+                lateral = 0.5 * lateral_raw + 0.5 * prev_lateral
+                prev_lateral = lateral
                 # Colour is sampled at a world-anchored jittered position near the
                 # observer, so 50 m cell borders dither into organic transitions
                 # instead of crisp terrace lines across the foreground.
@@ -219,13 +232,31 @@ def _render_kernel(
                 if tree_here:
                     # A standing tree is foliage regardless of what colour jitter found.
                     lc_color = 1
-                shade = SHADE_AMBIENT + SHADE_GAIN * radial_slope * sun_facing
+                # True-normal diffuse sun: gradient from radial + lateral slopes.
+                grad_x = radial_slope * dx - lateral * dy
+                grad_y = radial_slope * dy + lateral * dx
+                inv_len = 1.0 / math.sqrt(grad_x * grad_x + grad_y * grad_y + 1.0)
+                n_dot_sun = (-grad_x * sun_x - grad_y * sun_y + sun_z) * inv_len
+                if n_dot_sun < 0.0:
+                    n_dot_sun = 0.0
+                shade = SHADE_AMBIENT + SHADE_DIFFUSE * n_dot_sun
                 if lc_color == 8:
                     shade = 1.02
-                if shade < 0.6:
-                    shade = 0.6
-                elif shade > 1.15:
-                    shade = 1.15
+                # Cloud shadows dapple the ground the way every English photo shows.
+                cloud_shadow = 0.65 * _smooth_noise(
+                    x / CLOUD_SHADOW_SCALE_M + cloud_seed_u, y / CLOUD_SHADOW_SCALE_M + cloud_seed_v
+                ) + 0.35 * _smooth_noise(
+                    x / CLOUD_SHADOW_SCALE_M * 2.6 + 41.7, y / CLOUD_SHADOW_SCALE_M * 2.6 + 11.3
+                )
+                shadow_amount = (cloud_shadow - 0.52) * 2.8
+                if shadow_amount > 0.0:
+                    if shadow_amount > 1.0:
+                        shadow_amount = 1.0
+                    shade *= 1.0 - CLOUD_SHADOW_STRENGTH * shadow_amount
+                if shade < 0.45:
+                    shade = 0.45
+                elif shade > 1.22:
+                    shade = 1.22
                 field = 0.88 + 0.24 * _cell_noise(xc, yc, FIELD_CELL_M)
                 # The field you stand in is one field: patchwork contrast (and its
                 # vertical column banding) only makes sense beyond a few hundred metres.
@@ -269,6 +300,11 @@ def _render_kernel(
                     red = red + (152.0 - red) * moor
                     green = green + (142.0 - green) * moor
                     blue = blue + (92.0 - blue) * moor
+                if lc_color == 8:
+                    # Open water mirrors the sky's brightness.
+                    red = red + (sky_horizon[0] - red) * 0.45
+                    green = green + (sky_horizon[1] - green) * 0.45
+                    blue = blue + (sky_horizon[2] - blue) * 0.45
                 red *= shade
                 green *= shade
                 blue *= shade
@@ -436,7 +472,11 @@ def _run_kernel(
 
 
 def _downsample(image: NDArray[np.uint8], width: int, height: int) -> Image.Image:
-    return Image.fromarray(image).resize((width, height), Image.Resampling.LANCZOS)
+    result = Image.fromarray(image).resize((width, height), Image.Resampling.LANCZOS)
+    # Photographs are more saturated and contrasty than raw painted colour.
+    result = ImageEnhance.Color(result).enhance(1.16)
+    result = ImageEnhance.Contrast(result).enhance(1.07)
+    return result
 
 
 def render_panorama(
