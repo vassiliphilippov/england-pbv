@@ -19,6 +19,7 @@ OSM_VIEWPOINTS_JSON: Path = RAW_DIR / "osm_viewpoints.json"
 OSM_PEAKS_JSON: Path = RAW_DIR / "osm_peaks.json"
 OSM_PLACES_JSON: Path = RAW_DIR / "osm_places.json"
 DOBIH_CSV: Path = RAW_DIR / "dobih_hills.csv"
+CALIBRATION_PATHS_JSON: Path = RAW_DIR / "calibration_paths.json"
 ENGLAND_BOUNDARY_GEOJSON: Path = RAW_DIR / "england_boundary.geojson"
 
 # National grids (EPSG:27700, 50 m)

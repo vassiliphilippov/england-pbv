@@ -100,6 +100,38 @@ where the view opens", what photographers actually do); (2) OSM footpaths drawn 
 lines — the depth cue that makes descending foregrounds read as descending; (3)
 grazing-angle darkening to break the "lit dome" reading of convex foregrounds.
 
+## Cycle 6 — camera openness search, OSM footpaths, grazing shading, Wye Downs fix — ACCEPTED after retune
+
+Changes: (1) Wye Downs metadata corrected — the stored grid ref was the SUBJECT (coombe rim),
+not the camera (TR 0755 4526), 35 m apart and the difference between a green wall and the
+real vale panorama; (2) `_open_camera` — the render camera searches 5 along-bearing x 5
+lateral (±16 m) x 8 m offsets for the spot minimizing near-ground angular occupancy
+(`_foreground_block`: 5 bearings ±30°, r=8..150 m, move cost 0.00035/m) — "stand where the
+view opens", what photographers do; (3) OSM footpaths for the 20 calibration sites burned
+into the 10 m land-cover grid as +1 flags (157,240 cells) and rendered as pale worn lines
+fading to 2.5 km; (4) grazing-angle darkening on turf seen nearly edge-on.
+
+First attempt FAILED two ways (recorded): (a) the path colour was sampled at the JITTERED
+colour position (±30 m near the camera), smearing 10 m path cells into giant swirling blobs
+across Mam Tor's crest — fixed by sampling paths at the raw march position and, within
+500 m, confining paint to the middle of the cell (trodden line, not a 10 m swathe);
+(b) crown-dome height contours painted as huge concentric amphitheatre rings when a wood
+sat close below the Coombe camera — fixed with ~3 m fine foliage roughness (±18%) that
+fragments the contours (also kills the "broccoli onion-ring" arcs inside near crowns).
+
+Verdict after retune: Wye Downs transformed (worst pair → correct open-vale structure with
+scrub cascading below the rim); Swaledale sees more of the dale side (partial — own-slope
+still fills the lower half); Coombe's distant path reads as a believable chalk trail across
+the fields; Mam Tor's swirls gone, faint worn hint remains; no regressions on the rest.
+
+Queued for cycle 7: (1) palette — summer-tawny arable + the moor-grass ramp read wrong
+against green-field photos (Mam Tor's 517 m crest is grazed GREEN sward; the ramp paints it
+tawny); consider Natural England Priority Habitats Inventory (open data) to separate grass
+moorland / upland heath / improved pasture properly instead of altitude proxies;
+(2) canopy clump-edge vertical "fortress walls" — taper dome edges below the 0.15 clamp;
+(3) hillside cameras still show much own-slope (Swaledale) — bounded, maybe accept;
+(4) cumulus density still sparse vs photos on some pairs.
+
 ## Failures ledger (do not repeat)
 
 - (from pre-loop) Fixed march steps near the observer paint terrace bands — step must scale
@@ -112,3 +144,9 @@ grazing-angle darkening to break the "lit dome" reading of convex foregrounds.
   keep z>280 m and steep-slope gates; farmland vs fell needs a better discriminator.
 - (c4) World-plane cumulus with a hard 2-octave threshold = paper cutouts — always include
   a fine erosion octave and smoothstep the alpha.
+- (c6) Path colour looked up at the JITTERED colour-sample position smears a 10 m path cell
+  into 30 m swirling blobs near the camera — sample linear features at the raw march
+  position, and within ~500 m confine the paint to the middle of the cell.
+- (c6) Smooth crown-dome height contours paint giant concentric amphitheatre rings when a
+  wood sits close below the camera — canopy height needs fine (~3 m) roughness so the
+  contours fragment into foliage.

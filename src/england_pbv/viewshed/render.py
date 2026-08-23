@@ -130,6 +130,25 @@ def _sample_elev(
 
 
 @njit(cache=True, inline="always")
+def _landcover_code10(
+    lc10: NDArray[np.uint8],
+    has10: bool,
+    x: float,
+    y: float,
+) -> int:
+    """Raw 10 m land-cover code (path flag = code % 10 == 1), or -1 when unavailable."""
+    if has10:
+        c = int((x - DEM10_X0) / DEM10_CELL)
+        r = int((y - DEM10_Y0) / DEM10_CELL)
+        h10, w10 = lc10.shape
+        if c >= 0 and c < w10 and r >= 0 and r < h10:
+            code = int(lc10[r, c])
+            if code != 0:
+                return code
+    return -1
+
+
+@njit(cache=True, inline="always")
 def _landcover_at2(
     lc50: NDArray[np.uint8],
     lc10: NDArray[np.uint8],
@@ -138,17 +157,12 @@ def _landcover_at2(
     y: float,
 ) -> int:
     """Land-cover bin from the England 10 m grid, falling back to the 50 m grid."""
-    if has10:
-        c = int((x - DEM10_X0) / DEM10_CELL)
-        r = int((y - DEM10_Y0) / DEM10_CELL)
-        h10, w10 = lc10.shape
-        if c >= 0 and c < w10 and r >= 0 and r < h10:
-            code = int(lc10[r, c])
-            if code != 0:
-                bin_index = code // 10
-                if bin_index >= 11:
-                    bin_index = 10
-                return bin_index
+    code = _landcover_code10(lc10, has10, x, y)
+    if code >= 0:
+        bin_index = code // 10
+        if bin_index >= 11:
+            bin_index = 10
+        return bin_index
     return _landcover_at(lc50, x, y)
 
 
@@ -280,9 +294,12 @@ def _render_kernel(
                     dome_sq = 1.0 - 3.2 * (fx35 * fx35 + fy35 * fy35)
                     if dome_sq < 0.15:
                         dome_sq = 0.15
+                    # Fine foliage roughness (~3 m scale) fragments the dome's smooth
+                    # height contours, which otherwise paint as concentric terrace
+                    # rings when a crown sits close below the camera.
                     z_surf = z + TREE_HEIGHT_M * math.sqrt(dome_sq) * (
                         0.6 + 0.8 * _cell_noise(x + 17.0, y + 31.0, 35.0)
-                    )
+                    ) * (0.82 + 0.36 * _smooth_noise(x * 0.31, y * 0.31))
             elif lc_bin == 5:
                 z_surf = z + clearing * BUILT_HEIGHT_M * (0.5 + _cell_noise(x, y, 45.0))
 
@@ -331,6 +348,16 @@ def _render_kernel(
                 if n_dot_sun < 0.0:
                     n_dot_sun = 0.0
                 shade = SHADE_AMBIENT + SHADE_DIFFUSE * n_dot_sun
+                # Grazing-angle darkening: turf seen nearly edge-on (falling away from
+                # the eye) darkens slightly — the cue that separates a descending slope
+                # from a lit dome.
+                incidence = abs(ang - radial_slope) / math.sqrt(
+                    grad_x * grad_x + grad_y * grad_y + 1.0
+                )
+                graze = incidence * 9.0
+                if graze > 1.0:
+                    graze = 1.0
+                shade *= 0.84 + 0.16 * graze
                 if lc_color == 8:
                     shade = 1.02
                 # Cloud shadows dapple the ground the way every English photo shows.
@@ -415,6 +442,28 @@ def _render_kernel(
                         red = red + (122.0 - red) * heather * 0.7
                         green = green + (98.0 - green) * heather * 0.7
                         blue = blue + (104.0 - blue) * heather * 0.7
+                path_code = _landcover_code10(landcover10, has10_lc, x, y)
+                if path_code >= 0 and path_code % 10 == 1 and lc_color != 8 and r < 2500.0:
+                    # A worn footpath line: pale trodden earth, fading with distance.
+                    # Sampled at the RAW march position — colour jitter (up to 30 m) smears
+                    # a 10 m path cell into swirling 30 m blobs across a near foreground.
+                    worn = 0.65 * (1.0 - r / 2500.0)
+                    if r < 500.0:
+                        # Near the camera a whole 10 m cell projects huge at grazing
+                        # incidence: confine the paint to the middle of the cell so the
+                        # path reads as a trodden line, not a 10 m swathe.
+                        u = x / DEM10_CELL - math.floor(x / DEM10_CELL) - 0.5
+                        v = y / DEM10_CELL - math.floor(y / DEM10_CELL) - 0.5
+                        center_d = math.sqrt(u * u + v * v)
+                        edge = 1.0 - (center_d - 0.18) / 0.17
+                        if edge < 0.0:
+                            edge = 0.0
+                        elif edge > 1.0:
+                            edge = 1.0
+                        worn *= edge + (1.0 - edge) * (r / 500.0)
+                    red = red + (196.0 - red) * worn
+                    green = green + (184.0 - green) * worn
+                    blue = blue + (156.0 - blue) * worn
                 if lc_color == 8:
                     # Open water mirrors the sky's brightness.
                     red = red + (sky_horizon[0] - red) * 0.45
@@ -534,6 +583,71 @@ def _render_kernel(
 CREST_SNAP_MIN_GAIN_M: float = 2.5
 
 
+@njit(cache=True)
+def _foreground_block(
+    dem: NDArray[np.float32],
+    dem10: NDArray[np.int16],
+    has10: bool,
+    easting: float,
+    northing: float,
+    bearing_rad: float,
+) -> float:
+    """How much the first 150 m of ground blocks the frontal view (radians, lower=open).
+
+    Probes five bearings across the frontal 60-degree fan; for each, the highest
+    elevation angle formed by near ground is clamped at >=-6 deg so wide-open drops
+    don't over-reward; the mean is the blocking score."""
+    ground = _sample_elev(dem, dem10, has10, easting, northing)
+    eye = ground + EYE_HEIGHT_M + EYE_BOOST_M
+    total = 0.0
+    for k in range(5):
+        b = bearing_rad + (k - 2) * 0.2618  # +/-30 deg fan
+        dx = math.sin(b)
+        dy = math.cos(b)
+        worst = -0.35
+        r = 8.0
+        while r <= 150.0:
+            z = _sample_elev(dem, dem10, has10, easting + dx * r, northing + dy * r)
+            ang = math.atan((z - eye) / r)
+            if ang > worst:
+                worst = ang
+            r += 7.0
+        if worst < -0.105:
+            worst = -0.105  # cap the reward for an already-open drop (-6 deg)
+        total += worst
+    return total / 5.0
+
+
+@njit(cache=True)
+def _open_camera(
+    dem: NDArray[np.float32],
+    dem10: NDArray[np.int16],
+    has10: bool,
+    easting: float,
+    northing: float,
+    bearing_rad: float,
+) -> tuple[float, float, float]:
+    """Pick the most open standing spot within ~40 m along the view bearing."""
+    bx = math.sin(bearing_rad)
+    by = math.cos(bearing_rad)
+    best_e, best_n = easting, northing
+    best_score = _foreground_block(dem, dem10, has10, easting, northing, bearing_rad)
+    for step_index in range(1, 6):
+        for lateral_index in range(-2, 3):
+            offset = step_index * 8.0
+            lateral = lateral_index * 8.0
+            e2 = easting + bx * offset - by * lateral
+            n2 = northing + by * offset + bx * lateral
+            score = _foreground_block(dem, dem10, has10, e2, n2, bearing_rad)
+            # A small move-cost keeps the camera honest to the recorded position.
+            score += (offset + abs(lateral)) * 0.00035
+            if score < best_score - 0.002:
+                best_score = score
+                best_e, best_n = e2, n2
+    ground = _sample_elev(dem, dem10, has10, best_e, best_n)
+    return best_e, best_n, float(ground)
+
+
 def _crest_snap(
     dem: NDArray[np.float32],
     dem10: NDArray[np.int16],
@@ -581,18 +695,11 @@ def _run_kernel(
 ) -> NDArray[np.uint8]:
     easting, northing, ground = _crest_snap(dem, dem10, has10, easting, northing)
     if view_bearing_rad > -10.0:
-        # Photographers step to the edge: grid refs quantize to 10 m, and at a break
-        # of slope those metres decide whether the foreground hides the valley.
-        bx = math.sin(view_bearing_rad)
-        by = math.cos(view_bearing_rad)
-        for _ in range(4):
-            ahead = _sample_elev(dem, dem10, has10, easting + bx * 12.0, northing + by * 12.0)
-            if ahead < ground - 0.4:
-                easting += bx * 12.0
-                northing += by * 12.0
-                ground = ahead
-            else:
-                break
+        # Photographers stand where the view opens: search a short line along the view
+        # bearing for the position whose near foreground blocks the least of the frame.
+        easting, northing, ground = _open_camera(
+            dem, dem10, has10, easting, northing, view_bearing_rad
+        )
     eye_z = ground + EYE_HEIGHT_M + EYE_BOOST_M
     image = np.zeros((height, len(col_azimuth), 3), dtype=np.uint8)
     _render_kernel(
