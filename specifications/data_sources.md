@@ -15,6 +15,8 @@ listed per source. Downloads land in `data/raw/` via `england_pbv.data.download`
 | **ScenicOrNot dump** | Archived for future square-level validation (not used in scoring) | `http://scenicornot.datasciencelab.co.uk/votes.tsv` | 19.5 MB | ODbL (per current host FAQ) |
 | **NE Priority Habitats Inventory** | Where moorland vegetation actually is (render palette: moor grass / bracken / heather flags on the 10 m grid) | ArcGIS FeatureServer `https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/Priority_Habitats_Inventory_England/FeatureServer/0/query`, native EPSG:27700, field `MainHabs`, 2000-feature pages, `f=geojson` | fetched per site (~3 km envelopes) | OGL, © Natural England |
 | **OSM footpaths (calibration sites)** | Worn-path lines in renders (depth cue) | Overpass, `highway~path\|footway\|track\|bridleway\|steps` within 2.5 km of each calibration site (mirror: `overpass.kumi.systems`) | ~6 MB | ODbL |
+| **OSM rock features (calibration sites)** | Grey crag/tor/scree material (+3 flag) | Overpass, `natural~bare_rock\|scree\|cliff\|rock\|stone\|shingle` within 3 km of each site | ~2 MB | ODbL |
+| **Sentinel-2 L2A true colour (AWS Open Data)** | Real far-field ground texture (`england_satellite_10m.npy`, 10 m RGB on the BNG frame; renderer blends it in beyond 2 km) | STAC `https://earth-search.aws.element84.com/v1/search`, collection `sentinel-2-l2a`, anonymous, per-scene 8-bit `TCI.tif` COGs on `sentinel-cogs.s3.us-west-2.amazonaws.com`; least-cloudy May–Sep scene per MGRS tile (66 tiles) | ~17 GB fetched → 11.4 GB grid | Copernicus (CC BY-SA 3.0 IGO). Site must credit "Contains modified Copernicus Sentinel data [year]" |
 
 ### OS Terrain 50 archive structure (verified)
 

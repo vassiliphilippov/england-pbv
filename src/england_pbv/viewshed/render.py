@@ -54,6 +54,15 @@ MOOR_GRASS_FULL_M: float = 550.0
 FIELD_CELL_M: float = 260.0
 HEDGE_SHADE: float = 0.74  # darkening applied to the one-sample strip at a field boundary
 
+# Real Sentinel-2 imagery replaces procedural colour at distance: beyond SAT_NEAR_M the
+# blend ramps in (full by SAT_FULL_M) — nearer than that, grazing incidence collapses any
+# world-space texture (failures ledger, c10), so the procedural surface remains. TCI
+# true-colour runs dark; SAT_GAIN lifts it toward the painted palette's brightness.
+SAT_NEAR_M: float = 2000.0
+SAT_FULL_M: float = 3500.0
+SAT_STRENGTH: float = 0.85
+SAT_GAIN: float = 1.22
+
 PROJECTION_PANORAMA: int = 0
 PROJECTION_RECTILINEAR: int = 1
 
@@ -226,6 +235,8 @@ def _render_kernel(
     landcover: NDArray[np.uint8],
     landcover10: NDArray[np.uint8],
     has10_lc: bool,
+    satellite: NDArray[np.uint8],
+    has_sat: bool,
     obs_e: float,
     obs_n: float,
     eye_z: float,
@@ -383,6 +394,10 @@ def _render_kernel(
                     shade = 0.45
                 elif shade > 1.22:
                     shade = 1.22
+                # Sun+cloud shading alone (no procedural field/grain noise): this is
+                # what lights the real satellite texture — blending raw imagery after
+                # shading flattens distant hillsides into a washed plain.
+                sun_shade = shade
                 field = 0.88 + 0.24 * _cell_noise(xc, yc, FIELD_CELL_M)
                 # The field you stand in is one field: patchwork contrast (and its
                 # vertical column banding) only makes sense beyond a few hundred metres.
@@ -547,6 +562,27 @@ def _render_kernel(
                 red *= shade
                 green *= shade
                 blue *= shade
+                if has_sat and r > SAT_NEAR_M:
+                    sat_col = int((x - DEM10_X0) / DEM10_CELL)
+                    sat_row = int((y - DEM10_Y0) / DEM10_CELL)
+                    if (
+                        sat_col >= 0
+                        and sat_col < satellite.shape[1]
+                        and sat_row >= 0
+                        and sat_row < satellite.shape[0]
+                    ):
+                        sat_red = float(satellite[sat_row, sat_col, 0])
+                        sat_green = float(satellite[sat_row, sat_col, 1])
+                        sat_blue = float(satellite[sat_row, sat_col, 2])
+                        if sat_red + sat_green + sat_blue > 12.0:
+                            sat_w = (r - SAT_NEAR_M) / (SAT_FULL_M - SAT_NEAR_M)
+                            if sat_w > 1.0:
+                                sat_w = 1.0
+                            sat_w *= SAT_STRENGTH
+                            sat_light = SAT_GAIN * (1.0 + (sun_shade - 1.0) * (1.0 - 0.75 * haze))
+                            red = red + (sat_red * sat_light - red) * sat_w
+                            green = green + (sat_green * sat_light - green) * sat_w
+                            blue = blue + (sat_blue * sat_light - blue) * sat_w
                 red = red + (haze_color[0] - red) * haze
                 green = green + (haze_color[1] - green) * haze
                 blue = blue + (haze_color[2] - blue) * haze
@@ -756,6 +792,8 @@ def _run_kernel(
     landcover: NDArray[np.uint8],
     landcover10: NDArray[np.uint8],
     has10_lc: bool,
+    satellite: NDArray[np.uint8],
+    has_sat: bool,
     easting: float,
     northing: float,
     col_azimuth: NDArray[np.float64],
@@ -788,6 +826,8 @@ def _run_kernel(
         landcover,
         landcover10,
         has10_lc,
+        satellite,
+        has_sat,
         easting,
         northing,
         eye_z,
@@ -813,6 +853,13 @@ def _run_kernel(
 
 _DEM10_STUB: NDArray[np.int16] = np.full((1, 1), -32768, dtype=np.int16)
 _LC10_STUB: NDArray[np.uint8] = np.zeros((1, 1), dtype=np.uint8)
+_SAT_STUB: NDArray[np.uint8] = np.zeros((1, 1, 3), dtype=np.uint8)
+
+
+def _sat_or_stub(satellite10: NDArray[np.uint8] | None) -> tuple[NDArray[np.uint8], bool]:
+    if satellite10 is None:
+        return _SAT_STUB, False
+    return satellite10, True
 
 
 def _dem10_or_stub(dem10: NDArray[np.int16] | None) -> tuple[NDArray[np.int16], bool]:
@@ -842,6 +889,7 @@ def render_panorama(
     northing: float,
     dem10: NDArray[np.int16] | None = None,
     landcover10: NDArray[np.uint8] | None = None,
+    satellite10: NDArray[np.uint8] | None = None,
 ) -> Image.Image:
     scale = SUPERSAMPLE
     width = PANORAMA_WIDTH * scale
@@ -849,6 +897,7 @@ def render_panorama(
     col_azimuth = 2.0 * math.pi * (np.arange(width, dtype=np.float64) + 0.5) / width
     dem10_arr, has10 = _dem10_or_stub(dem10)
     lc10_arr, has10_lc = _lc10_or_stub(landcover10)
+    sat_arr, has_sat = _sat_or_stub(satellite10)
     image = _run_kernel(
         dem,
         dem10_arr,
@@ -856,6 +905,8 @@ def render_panorama(
         landcover,
         lc10_arr,
         has10_lc,
+        sat_arr,
+        has_sat,
         easting,
         northing,
         col_azimuth,
@@ -883,6 +934,7 @@ def render_view(
     horizon_fraction: float = VIEW_HORIZON_FRACTION,
     dem10: NDArray[np.int16] | None = None,
     landcover10: NDArray[np.uint8] | None = None,
+    satellite10: NDArray[np.uint8] | None = None,
 ) -> Image.Image:
     """Rectilinear 'camera' view toward one bearing.
 
@@ -904,6 +956,7 @@ def render_view(
     bottom_rad = math.atan((cy - render_h) / f_v) + pitch
     dem10_arr, has10 = _dem10_or_stub(dem10)
     lc10_arr, has10_lc = _lc10_or_stub(landcover10)
+    sat_arr, has_sat = _sat_or_stub(satellite10)
     image = _run_kernel(
         dem,
         dem10_arr,
@@ -911,6 +964,8 @@ def render_view(
         landcover,
         lc10_arr,
         has10_lc,
+        sat_arr,
+        has_sat,
         easting,
         northing,
         col_azimuth,

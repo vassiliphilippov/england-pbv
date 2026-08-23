@@ -65,6 +65,10 @@ def main() -> None:
     if paths.LANDCOVER10_GRID_NPY.exists():
         landcover10 = np.load(paths.LANDCOVER10_GRID_NPY, mmap_mode="r")
         print("England 10 m land-cover overlay active")
+    satellite10 = None
+    if paths.SATELLITE10_GRID_NPY.exists():
+        satellite10 = np.load(paths.SATELLITE10_GRID_NPY, mmap_mode="r")
+        print("England 10 m Sentinel-2 satellite overlay active")
 
     for entry in entries:
         key = entry["key"]
@@ -88,6 +92,7 @@ def main() -> None:
             horizon_fraction=float(entry["horizon"]),
             dem10=dem10,
             landcover10=landcover10,
+            satellite10=satellite10,
         )
 
         photo = Image.open(photo_path).convert("RGB")
