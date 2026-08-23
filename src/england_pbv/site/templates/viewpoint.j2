@@ -5,7 +5,7 @@
 <p class="crumb"><a href="{{ root }}index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>{{ vp.name }}</h1>
-  <span class="rankline">#{{ vp.rank }} in England &middot; top {{ "%.0f"|format(100 - vp.regional_pct) }}% locally beats it &middot; {{ vp.region }}</span>
+  <span class="rankline">#{{ vp.rank }} in England &middot; {% if vp.regional_pct >= 99.5 %}the best view in its area{% else %}top {{ "%.0f"|format(100 - vp.regional_pct) }}% of its area beats it{% endif %} &middot; {{ vp.region }}</span>
 </div>
 
 <div class="card">
@@ -33,6 +33,21 @@
     viewpoints. Real trees, hedges and buildings will differ in detail.
   </p>
 </div>
+
+{% if vp.views %}
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    {% for view in vp.views %}
+    <figure class="view-figure">
+      <img class="render-img" src="{{ root }}renders/{{ view.file }}" alt="Rendered view {{ view.label }} from {{ vp.name }}" loading="lazy">
+      <figcaption>{{ view.label }} ({{ view.azimuth }}&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    {% endfor %}
+  </div>
+  <p class="note">Rendered views along the best direction{{ 's' if vp.views|length > 1 else '' }} of this panorama.</p>
+</div>
+{% endif %}
 
 <div class="card">
   <h3 style="margin-top:0">The panorama</h3>

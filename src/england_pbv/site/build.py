@@ -11,7 +11,6 @@ from dataclasses import dataclass
 
 import numpy as np
 from jinja2 import Environment, FileSystemLoader
-from PIL import Image
 
 from england_pbv import paths
 from england_pbv.models import ScoredViewpoint, VerificationReport, VerificationViewpoint
@@ -28,10 +27,17 @@ from england_pbv.site.svg import horizon_panorama_svg, polar_reach_svg
 from england_pbv.terrain.grid import load_dem_grid, load_uint8_grid
 from england_pbv.verification.evaluate import load_scored
 from england_pbv.viewshed.horizon import build_sampling_plan, sweep_batch
-from england_pbv.viewshed.render import render_panorama
+from england_pbv.viewshed.render import (
+    best_view_directions,
+    compass_label,
+    render_panorama,
+    render_view,
+)
 
 N_MAP_POINTS: int = 1500
-N_PAGES: int = 250
+N_PAGES_NATIONAL: int = 600
+REGIONAL_CELL_M: float = 25000.0
+REGIONAL_PAGES_PER_CELL: int = 3
 N_TOP_LIST: int = 50
 N_SUBLIST: int = 20
 COASTAL_WATER_FRACTION: float = 0.08
@@ -100,7 +106,24 @@ def build_site() -> None:
     deduped = _dedupe_by_rank(scored)
     print(f"{len(scored)} scored -> {len(deduped)} deduplicated for presentation")
 
-    pages = deduped[:N_PAGES]
+    # Pages: the national top plus the local top of every 25 km cell, so the
+    # "best views in this area" list links to a page anywhere in England.
+    page_ids: set[str] = {v.candidate.candidate_id for v in deduped[:N_PAGES_NATIONAL]}
+    cell_counts: dict[tuple[int, int], int] = {}
+    for item in deduped:
+        cell = (
+            int(item.candidate.easting // REGIONAL_CELL_M),
+            int(item.candidate.northing // REGIONAL_CELL_M),
+        )
+        if cell_counts.get(cell, 0) >= REGIONAL_PAGES_PER_CELL:
+            continue
+        cell_counts[cell] = cell_counts.get(cell, 0) + 1
+        page_ids.add(item.candidate.candidate_id)
+    pages = [v for v in deduped if v.candidate.candidate_id in page_ids]
+    print(
+        f"pages: {len(pages)} ({N_PAGES_NATIONAL} national "
+        f"+ local top-{REGIONAL_PAGES_PER_CELL} per 25 km cell)"
+    )
     slugs: dict[str, str] = {}
     used: set[str] = set()
     for item in pages:
@@ -202,7 +225,27 @@ def build_site() -> None:
             easting=item.candidate.easting,
             northing=item.candidate.northing,
         )
-        Image.fromarray(panorama).save(renders_dir / f"{slug}.jpg", quality=82)
+        panorama.save(renders_dir / f"{slug}.jpg", quality=82)
+
+        directions = best_view_directions(sweep.d_far_veg_m[index])
+        view_cards = []
+        for view_index, direction in enumerate(directions, start=1):
+            view_image = render_view(
+                dem,
+                landcover,
+                easting=item.candidate.easting,
+                northing=item.candidate.northing,
+                center_azimuth_deg=direction.azimuth_deg,
+            )
+            view_file = f"{slug}_view{view_index}.jpg"
+            view_image.save(renders_dir / view_file, quality=84)
+            view_cards.append(
+                {
+                    "file": view_file,
+                    "label": f"Looking {compass_label(direction.azimuth_deg)}",
+                    "azimuth": round(direction.azimuth_deg),
+                }
+            )
         horizon_deg = np.rad2deg(sweep.horizon_rad[index])
         horizon_veg_deg = np.rad2deg(sweep.horizon_veg_rad[index])
         d_far_veg_km = sweep.d_far_veg_m[index] / 1000.0
@@ -255,9 +298,12 @@ def build_site() -> None:
             "peakfinder": peakfinder_url(item.candidate.lat, item.candidate.lon),
             "geograph": geograph_square_url(item.candidate.easting, item.candidate.northing),
             "render_file": f"{slug}.jpg",
+            "views": view_cards,
         }
         page_html = template.render(root="../", vp=vp)
         (site_dir / "viewpoints" / f"{slug}.html").write_text(page_html, encoding="utf-8")
+        if (index + 1) % 100 == 0:
+            print(f"{index + 1}/{len(pages)} pages rendered", flush=True)
     print(f"{len(pages)} viewpoint pages written")
 
     # --- verification page ---

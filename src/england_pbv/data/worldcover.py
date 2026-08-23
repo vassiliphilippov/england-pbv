@@ -40,9 +40,7 @@ def _grid_latlon() -> tuple[NDArray[np.float32], NDArray[np.float32]]:
 def build_landcover_grid(worldcover_dir: Path) -> NDArray[np.uint8]:
     print("computing grid cell lat/lon...")
     lats, lons = _grid_latlon()
-    landcover = np.full(
-        (GRID_HEIGHT_CELLS, GRID_WIDTH_CELLS), WORLDCOVER_NODATA, dtype=np.uint8
-    )
+    landcover = np.full((GRID_HEIGHT_CELLS, GRID_WIDTH_CELLS), WORLDCOVER_NODATA, dtype=np.uint8)
     tile_paths = sorted(worldcover_dir.glob("*.tif"))
     assert len(tile_paths) > 0, "WorldCover tiles are present"
     for tile_path in tile_paths:

@@ -52,15 +52,14 @@ ENGLAND_AREA_ID: int = 3600058447  # OSM relation 58447 (England) + 3600000000
 
 OVERPASS_QUERIES: dict[str, str] = {
     "viewpoints": (
-        f'[out:json][timeout:180];area({ENGLAND_AREA_ID})->.a;'
+        f"[out:json][timeout:180];area({ENGLAND_AREA_ID})->.a;"
         'nwr["tourism"="viewpoint"](area.a);out center;'
     ),
     "peaks": (
-        f'[out:json][timeout:180];area({ENGLAND_AREA_ID})->.a;'
-        'node["natural"="peak"](area.a);out;'
+        f'[out:json][timeout:180];area({ENGLAND_AREA_ID})->.a;node["natural"="peak"](area.a);out;'
     ),
     "places": (
-        f'[out:json][timeout:300];area({ENGLAND_AREA_ID})->.a;'
+        f"[out:json][timeout:300];area({ENGLAND_AREA_ID})->.a;"
         'node["place"~"^(city|town|village)$"](area.a);out;'
     ),
 }

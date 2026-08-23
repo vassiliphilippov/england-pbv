@@ -1,9 +1,12 @@
-"""Synthetic 3D panorama renderer: what the view from a point should look like.
+"""Synthetic renderers: 360-degree panoramas and rectilinear "camera" views.
 
 Ray-marches the leaf-on surface (terrain + tree canopies + buildings) per image column,
-painting visible spans with land-cover colours, sun-and-slope shading and atmospheric
-perspective. Calibrated by visual comparison against photographs of known viewpoints
-(Coombe Hill, Mam Tor, Sutton Bank, ...) — see specifications/render_calibration.md.
+painting visible spans with land-cover colours, sun-and-slope shading, per-pixel texture,
+hedgerow hints at field boundaries, procedural clouds and atmospheric perspective. Both
+projections share one kernel: panoramas map elevation linearly to rows; camera views use a
+rectilinear (tan) projection like a real lens. Everything renders at 2x and downsamples for
+anti-aliasing. Calibrated against photographs of known viewpoints — see
+specifications/render_calibration.md.
 """
 
 import math
@@ -12,43 +15,54 @@ from dataclasses import dataclass
 import numpy as np
 from numba import njit, prange
 from numpy.typing import NDArray
+from PIL import Image
 
 from england_pbv.constants import EARTH_RADIUS_M, EYE_HEIGHT_M, REFRACTION_K
 from england_pbv.viewshed.horizon import _bilinear, _landcover_at
 
 RENDER_CURVATURE: float = (1.0 - REFRACTION_K) / (2.0 * EARTH_RADIUS_M)
 
-PANORAMA_WIDTH: int = 1440  # 0.25 degree per column
+PANORAMA_WIDTH: int = 1440
 PANORAMA_HEIGHT: int = 400
-TOP_ANGLE_DEG: float = 8.0
-BOTTOM_ANGLE_DEG: float = -12.0
+PANO_TOP_DEG: float = 8.0
+PANO_BOTTOM_DEG: float = -12.0
+
+VIEW_WIDTH: int = 920
+VIEW_HEIGHT: int = 518
+VIEW_HFOV_DEG: float = 68.0
+VIEW_PITCH_DEG: float = -3.0  # camera tilted slightly down: more landscape, less sky
+VIEW_HORIZON_FRACTION: float = 0.42  # image row of the level horizon, from the top
+
+SUPERSAMPLE: int = 2
 
 TREE_HEIGHT_M: float = 15.0
 BUILT_HEIGHT_M: float = 8.0
 
 MAX_RENDER_DISTANCE_M: float = 60000.0
-HAZE_DISTANCE_M: float = 13000.0  # distance at which ~63% of surface colour is lost to haze
-SUN_AZIMUTH_DEG: float = 225.0  # afternoon sun from the south-west
+HAZE_DISTANCE_M: float = 13000.0
+SUN_AZIMUTH_DEG: float = 225.0
 SHADE_GAIN: float = 2.2
 SHADE_AMBIENT: float = 0.88
-# The viewpoint itself is a clearing: within this ring obstacle heights ramp from zero,
-# absorbing the ~50 m position uncertainty of the land-cover grid.
 CLEARING_RAMP_START_M: float = 120.0
 CLEARING_RAMP_FULL_M: float = 260.0
-EYE_BOOST_M: float = 0.8  # slight raise over the 1.7 m eye for canopy-edge robustness
-MOOR_GRASS_START_M: float = 350.0  # grassland turns tawny acid-moor colours above this
+EYE_BOOST_M: float = 0.8
+MOOR_GRASS_START_M: float = 350.0
 MOOR_GRASS_FULL_M: float = 550.0
+FIELD_CELL_M: float = 260.0
+HEDGE_SHADE: float = 0.74  # darkening applied to the one-sample strip at a field boundary
 
-# Land-cover base colours (RGB 0..255), tuned against Geograph photos of known views.
-# Index = WorldCover code // 10.
+PROJECTION_PANORAMA: int = 0
+PROJECTION_RECTILINEAR: int = 1
+
+# Land-cover base colours (RGB 0..255); index = WorldCover code // 10.
 _BASE_COLORS: NDArray[np.float32] = np.array(
     [
-        [176, 178, 168],  # 0 nodata -> neutral ground
+        [176, 178, 168],  # 0 nodata
         [86, 106, 56],  # 1 tree cover
         [126, 136, 84],  # 2 shrubland
-        [150, 156, 96],  # 3 grassland (warm summer green)
-        [192, 174, 116],  # 4 cropland (ripe straw)
-        [158, 140, 130],  # 5 built-up (warm brick-grey)
+        [150, 156, 96],  # 3 grassland
+        [192, 174, 116],  # 4 cropland
+        [158, 140, 130],  # 5 built-up
         [186, 172, 142],  # 6 bare/sparse
         [240, 244, 248],  # 7 snow/ice
         [138, 168, 190],  # 8 water
@@ -58,28 +72,52 @@ _BASE_COLORS: NDArray[np.float32] = np.array(
     dtype=np.float32,
 )
 
-# Sky gradient: zenith-ish blue at the top of the frame to pale warm haze at the horizon.
 _SKY_TOP: NDArray[np.float32] = np.array([150, 180, 215], dtype=np.float32)
 _SKY_HORIZON: NDArray[np.float32] = np.array([218, 228, 236], dtype=np.float32)
 _HAZE_COLOR: NDArray[np.float32] = np.array([201, 214, 227], dtype=np.float32)
+_CLOUD_COLOR: NDArray[np.float32] = np.array([249, 250, 251], dtype=np.float32)
 
 
 @dataclass(frozen=True, slots=True)
-class RenderSettings:
-    width: int = PANORAMA_WIDTH
-    height: int = PANORAMA_HEIGHT
-    top_angle_deg: float = TOP_ANGLE_DEG
-    bottom_angle_deg: float = BOTTOM_ANGLE_DEG
+class ViewDirection:
+    azimuth_deg: float
+    quality: float  # mean capped visible distance over the window (km)
+
+
+@njit(cache=True, inline="always")
+def _hash01(ix: int, iy: int) -> float:
+    h = (ix * 73856093) ^ (iy * 19349663)
+    h = (h ^ (h >> 13)) * 1274126177
+    return ((h ^ (h >> 16)) & 0xFFFF) / 65535.0
 
 
 @njit(cache=True, inline="always")
 def _cell_noise(x_m: float, y_m: float, scale_m: float) -> float:
-    """Deterministic 0..1 noise keyed to a world-space cell of the given scale."""
-    ix = int(x_m / scale_m)
-    iy = int(y_m / scale_m)
-    h = (ix * 73856093) ^ (iy * 19349663)
-    h = (h ^ (h >> 13)) * 1274126177
-    return ((h ^ (h >> 16)) & 0xFFFF) / 65535.0
+    return _hash01(int(x_m / scale_m), int(y_m / scale_m))
+
+
+@njit(cache=True, inline="always")
+def _smooth_noise(u: float, v: float) -> float:
+    """Bilinear value noise on the integer lattice of (u, v)."""
+    iu = int(math.floor(u))
+    iv = int(math.floor(v))
+    fu = u - iu
+    fv = v - iv
+    fu = fu * fu * (3.0 - 2.0 * fu)
+    fv = fv * fv * (3.0 - 2.0 * fv)
+    a = _hash01(iu, iv)
+    b = _hash01(iu + 1, iv)
+    c = _hash01(iu, iv + 1)
+    d = _hash01(iu + 1, iv + 1)
+    return a + (b - a) * fu + (c - a) * fv + (d - c - b + a) * fu * fv
+
+
+@njit(cache=True, inline="always")
+def _cloud_density(azimuth_deg: float, elev_deg: float, seed_u: float, seed_v: float) -> float:
+    """Two-octave stretched noise: cumulus clumps elongated along the horizon."""
+    u = azimuth_deg * 0.055 + seed_u
+    v = elev_deg * 0.55 + seed_v
+    return 0.65 * _smooth_noise(u, v) + 0.35 * _smooth_noise(u * 2.7 + 13.7, v * 2.7 + 71.3)
 
 
 @njit(cache=True, parallel=True, fastmath=True)
@@ -89,21 +127,29 @@ def _render_kernel(
     obs_e: float,
     obs_n: float,
     eye_z: float,
-    width: int,
+    col_azimuth: NDArray[np.float64],
+    projection: int,
     height: int,
     top_rad: float,
     bottom_rad: float,
+    f_v_px: float,
+    cy_px: float,
+    pitch_rad: float,
+    cloud_seed_u: float,
+    cloud_seed_v: float,
     base_colors: NDArray[np.float32],
     sky_top: NDArray[np.float32],
     sky_horizon: NDArray[np.float32],
     haze_color: NDArray[np.float32],
+    cloud_color: NDArray[np.float32],
     image: NDArray[np.uint8],
 ) -> None:
+    width = col_azimuth.shape[0]
     rad_per_row = (top_rad - bottom_rad) / height
     sun_az = math.radians(SUN_AZIMUTH_DEG)
 
     for col in prange(width):  # type: ignore[no-untyped-call, attr-defined]  # numba prange
-        azimuth = 2.0 * math.pi * col / width
+        azimuth = col_azimuth[col]
         dx = math.sin(azimuth)
         dy = math.cos(azimuth)
         sun_facing = math.cos(azimuth - sun_az)
@@ -111,6 +157,8 @@ def _render_kernel(
         max_ang = bottom_rad
         prev_z = eye_z - EYE_HEIGHT_M
         prev_slope = 0.0
+        prev_field_ix = -(10**9)
+        prev_field_iy = -(10**9)
         r = 60.0
         step = 12.0
         while r < MAX_RENDER_DISTANCE_M:
@@ -125,7 +173,6 @@ def _render_kernel(
                 clearing = 1.0
             z_surf = z
             if lc_bin == 1:
-                # Broken canopy: tree height varies per ~35 m clump for a natural skyline.
                 z_surf = z + clearing * TREE_HEIGHT_M * (0.55 + 0.9 * _cell_noise(x, y, 35.0))
             elif lc_bin == 5:
                 z_surf = z + clearing * BUILT_HEIGHT_M * (0.5 + _cell_noise(x, y, 45.0))
@@ -133,32 +180,44 @@ def _render_kernel(
             z_eff = z_surf - RENDER_CURVATURE * r * r
             ang = math.atan((z_eff - eye_z) / r)
             if ang > max_ang:
-                # Paint the newly revealed span [max_ang, ang) in this column.
                 radial_slope = 0.5 * (z - prev_z) / step + 0.5 * prev_slope
                 prev_slope = radial_slope
                 shade = SHADE_AMBIENT + SHADE_GAIN * radial_slope * sun_facing
                 if lc_bin == 8:
-                    shade = 1.02  # water keeps a flat sheen
+                    shade = 1.02
                 if shade < 0.6:
                     shade = 0.6
                 elif shade > 1.15:
                     shade = 1.15
-                # Field-scale patchwork variation plus fine ground texture.
-                field = 0.88 + 0.24 * _cell_noise(x, y, 260.0)
+                field = 0.88 + 0.24 * _cell_noise(x, y, FIELD_CELL_M)
                 grain = 0.94 + 0.12 * _cell_noise(x, y, 18.0)
                 if lc_bin == 1:
-                    grain = 0.78 + 0.44 * _cell_noise(x, y, 22.0)  # foliage sparkle
+                    grain = 0.78 + 0.44 * _cell_noise(x, y, 22.0)
+                elif r < 1200.0:
+                    # Fine grass/crop mottling so the near foreground is not a smooth wall.
+                    near_amp = 0.14 * math.exp(-r / 500.0)
+                    grain *= 1.0 + near_amp * (2.0 * _smooth_noise(x * 0.22, y * 0.22) - 1.0)
                 shade *= field * grain
 
+                # Hedgerow hint: darken the strip where the field cell changes.
+                field_ix = int(x / FIELD_CELL_M)
+                field_iy = int(y / FIELD_CELL_M)
+                if (
+                    (field_ix != prev_field_ix or field_iy != prev_field_iy)
+                    and prev_field_ix != -(10**9)
+                    and (lc_bin == 3 or lc_bin == 4)
+                ):
+                    shade *= HEDGE_SHADE
+                prev_field_ix = field_ix
+                prev_field_iy = field_iy
+
                 haze = 1.0 - math.exp(-r / HAZE_DISTANCE_M)
-                # Patchwork/grain contrast fades with distance so the horizon stays calm.
                 shade = 1.0 + (shade - 1.0) * (1.0 - 0.75 * haze)
 
                 red = base_colors[lc_bin, 0]
                 green = base_colors[lc_bin, 1]
                 blue = base_colors[lc_bin, 2]
                 if lc_bin == 3 and z > MOOR_GRASS_START_M:
-                    # Acid moorland grass above the enclosure line: tawny-olive tops.
                     moor = (z - MOOR_GRASS_START_M) / (MOOR_GRASS_FULL_M - MOOR_GRASS_START_M)
                     if moor > 1.0:
                         moor = 1.0
@@ -172,15 +231,18 @@ def _render_kernel(
                 green = green + (haze_color[1] - green) * haze
                 blue = blue + (haze_color[2] - blue) * haze
 
-                row_hi = int((top_rad - max_ang) / rad_per_row)
-                row_lo = int((top_rad - ang) / rad_per_row)
+                if projection == PROJECTION_PANORAMA:
+                    row_hi = int((top_rad - max_ang) / rad_per_row)
+                    row_lo = int((top_rad - ang) / rad_per_row)
+                else:
+                    row_hi = int(cy_px - f_v_px * math.tan(max_ang - pitch_rad))
+                    row_lo = int(cy_px - f_v_px * math.tan(ang - pitch_rad))
                 if row_lo < 0:
                     row_lo = 0
                 if row_hi > height:
                     row_hi = height
-                # Per-pixel texture keeps close spans from smearing into flat slabs;
-                # it fades with haze so the distance stays soft.
-                texture_amp = (1.0 - haze) * (0.16 if lc_bin != 1 else 0.30)
+                near_boost = 0.12 * math.exp(-r / 400.0)
+                texture_amp = (1.0 - haze) * ((0.16 + near_boost) if lc_bin != 1 else 0.30)
                 span_rows = row_hi - row_lo
                 for row in range(row_lo, row_hi):
                     hsh = ((col * 7919) ^ (row * 104729)) & 0x7FFFFFFF
@@ -188,7 +250,6 @@ def _render_kernel(
                     noise = ((hsh >> 8) & 0xFFFF) / 65535.0 - 0.5
                     tex = 1.0 + texture_amp * noise
                     if lc_bin == 1 and span_rows > 3:
-                        # Canopy lighting: sunlit tops, shadowed undersides.
                         depth_in_span = (row - row_lo) / span_rows
                         tex *= (1.14 - 0.42 * depth_in_span) * (1.0 - haze) + haze
                     rr = red * tex
@@ -207,36 +268,54 @@ def _render_kernel(
 
             prev_z = z
             r += step
-            # Angular step control: distance step grows so each step spans ~0.05 deg.
             step = r * 0.012
             if step < 12.0:
                 step = 12.0
             elif step > 400.0:
                 step = 400.0
 
-        # Sky above the final skyline, with haze pooling at the horizon.
-        horizon_row = int((top_rad - max_ang) / rad_per_row)
+        # Sky with procedural clouds above the final skyline.
+        if projection == PROJECTION_PANORAMA:
+            horizon_row = int((top_rad - max_ang) / rad_per_row)
+        else:
+            horizon_row = int(cy_px - f_v_px * math.tan(max_ang - pitch_rad))
         if horizon_row > height:
             horizon_row = height
+        az_deg = math.degrees(azimuth)
         for row in range(0, horizon_row):
-            t = row / max(1, height * 0.9)
-            f = math.exp(-2.2 * (1.0 - t))  # 0 near top, ~1 near horizon
-            for channel in range(3):
-                value = sky_top[channel] + (sky_horizon[channel] - sky_top[channel]) * f
-                image[row, col, channel] = np.uint8(value)
+            if projection == PROJECTION_PANORAMA:
+                elev = top_rad - row * rad_per_row
+            else:
+                elev = math.atan((cy_px - row) / f_v_px) + pitch_rad
+            elev_deg = math.degrees(elev)
+            elev_norm = elev / top_rad if top_rad > 0.0 else 0.0
+            if elev_norm < 0.0:
+                elev_norm = 0.0
+            elif elev_norm > 1.0:
+                elev_norm = 1.0
+            f = math.exp(-2.2 * elev_norm)
+            red = sky_top[0] + (sky_horizon[0] - sky_top[0]) * f
+            green = sky_top[1] + (sky_horizon[1] - sky_top[1]) * f
+            blue = sky_top[2] + (sky_horizon[2] - sky_top[2]) * f
+
+            cloud = _cloud_density(az_deg, elev_deg, cloud_seed_u, cloud_seed_v)
+            alpha = (cloud - 0.56) * 3.2
+            if alpha > 0.0:
+                if alpha > 1.0:
+                    alpha = 1.0
+                # Clouds thin towards the zenith and melt into the horizon haze.
+                alpha *= 0.30 + 0.45 * math.exp(-2.5 * elev_norm)
+                red = red + (cloud_color[0] - red) * alpha
+                green = green + (cloud_color[1] - green) * alpha
+                blue = blue + (cloud_color[2] - blue) * alpha
+            image[row, col, 0] = np.uint8(red)
+            image[row, col, 1] = np.uint8(green)
+            image[row, col, 2] = np.uint8(blue)
 
 
-def render_panorama(
-    dem: NDArray[np.float32],
-    landcover: NDArray[np.uint8],
-    easting: float,
-    northing: float,
-    settings: RenderSettings | None = None,
-) -> NDArray[np.uint8]:
-    if settings is None:
-        settings = RenderSettings()
-    # Snap the camera to the highest ground within ~75 m: renders should stand on the
-    # actual crest, not half a cell down the slope.
+def _crest_snap(
+    dem: NDArray[np.float32], easting: float, northing: float
+) -> tuple[float, float, float]:
     best_e, best_n, ground = easting, northing, _bilinear(dem, easting, northing)
     for de in (-50.0, 0.0, 50.0):
         for dn in (-50.0, 0.0, 50.0):
@@ -244,23 +323,163 @@ def render_panorama(
             if z_here > ground:
                 ground = z_here
                 best_e, best_n = easting + de, northing + dn
-    easting, northing = best_e, best_n
-    eye_z = float(ground) + EYE_HEIGHT_M + EYE_BOOST_M
-    image = np.zeros((settings.height, settings.width, 3), dtype=np.uint8)
+    return best_e, best_n, float(ground)
+
+
+def _run_kernel(
+    dem: NDArray[np.float32],
+    landcover: NDArray[np.uint8],
+    easting: float,
+    northing: float,
+    col_azimuth: NDArray[np.float64],
+    projection: int,
+    height: int,
+    top_rad: float,
+    bottom_rad: float,
+    f_v_px: float,
+    cy_px: float,
+    pitch_rad: float,
+) -> NDArray[np.uint8]:
+    easting, northing, ground = _crest_snap(dem, easting, northing)
+    eye_z = ground + EYE_HEIGHT_M + EYE_BOOST_M
+    image = np.zeros((height, len(col_azimuth), 3), dtype=np.uint8)
     _render_kernel(
         dem,
         landcover,
         easting,
         northing,
         eye_z,
-        settings.width,
-        settings.height,
-        math.radians(settings.top_angle_deg),
-        math.radians(settings.bottom_angle_deg),
+        col_azimuth,
+        projection,
+        height,
+        top_rad,
+        bottom_rad,
+        f_v_px,
+        cy_px,
+        pitch_rad,
+        easting * 0.00173,
+        northing * 0.00119,
         _BASE_COLORS,
         _SKY_TOP,
         _SKY_HORIZON,
         _HAZE_COLOR,
+        _CLOUD_COLOR,
         image,
     )
     return image
+
+
+def _downsample(image: NDArray[np.uint8], width: int, height: int) -> Image.Image:
+    return Image.fromarray(image).resize((width, height), Image.Resampling.LANCZOS)
+
+
+def render_panorama(
+    dem: NDArray[np.float32],
+    landcover: NDArray[np.uint8],
+    easting: float,
+    northing: float,
+) -> Image.Image:
+    scale = SUPERSAMPLE
+    width = PANORAMA_WIDTH * scale
+    height = PANORAMA_HEIGHT * scale
+    col_azimuth = 2.0 * math.pi * (np.arange(width, dtype=np.float64) + 0.5) / width
+    image = _run_kernel(
+        dem,
+        landcover,
+        easting,
+        northing,
+        col_azimuth,
+        PROJECTION_PANORAMA,
+        height,
+        math.radians(PANO_TOP_DEG),
+        math.radians(PANO_BOTTOM_DEG),
+        0.0,
+        0.0,
+        0.0,
+    )
+    return _downsample(image, PANORAMA_WIDTH, PANORAMA_HEIGHT)
+
+
+def render_view(
+    dem: NDArray[np.float32],
+    landcover: NDArray[np.uint8],
+    easting: float,
+    northing: float,
+    center_azimuth_deg: float,
+) -> Image.Image:
+    """Rectilinear 'camera' view toward one bearing (68-degree lens, slight down-tilt)."""
+    scale = SUPERSAMPLE
+    width = VIEW_WIDTH * scale
+    height = VIEW_HEIGHT * scale
+    f_h = (width / 2.0) / math.tan(math.radians(VIEW_HFOV_DEG) / 2.0)
+    center = math.radians(center_azimuth_deg)
+    offsets = (np.arange(width, dtype=np.float64) + 0.5) - width / 2.0
+    col_azimuth = center + np.arctan(offsets / f_h)
+
+    pitch = math.radians(VIEW_PITCH_DEG)
+    cy = height * VIEW_HORIZON_FRACTION
+    f_v = f_h  # square pixels
+    top_rad = math.atan(cy / f_v) + pitch
+    bottom_rad = math.atan((cy - height) / f_v) + pitch
+    image = _run_kernel(
+        dem,
+        landcover,
+        easting,
+        northing,
+        col_azimuth,
+        PROJECTION_RECTILINEAR,
+        height,
+        top_rad,
+        bottom_rad,
+        f_v,
+        cy,
+        pitch,
+    )
+    return _downsample(image, VIEW_WIDTH, VIEW_HEIGHT)
+
+
+def best_view_directions(
+    d_far_veg_m: NDArray[np.float32],
+    window_deg: float = 70.0,
+    max_directions: int = 2,
+    second_quality_fraction: float = 0.55,
+    min_separation_deg: float = 75.0,
+) -> list[ViewDirection]:
+    """Pick the 1-2 bearings whose window contains the most far-reaching visible ground."""
+    n = len(d_far_veg_m)
+    capped = np.minimum(d_far_veg_m.astype(np.float64), 40000.0) / 1000.0
+    half = int(round(window_deg / 2.0 / 360.0 * n))
+    kernel = np.ones(2 * half + 1) / (2 * half + 1)
+    padded = np.concatenate([capped[-half:], capped, capped[:half]])
+    quality = np.convolve(padded, kernel, mode="valid")
+    assert len(quality) == n, "circular window quality has one value per bearing"
+
+    directions: list[ViewDirection] = []
+    remaining = quality.copy()
+    min_sep = int(round(min_separation_deg / 360.0 * n))
+    for _ in range(max_directions):
+        index = int(np.argmax(remaining))
+        value = float(remaining[index])
+        if value <= 0.5:
+            break
+        if len(directions) > 0 and value < directions[0].quality * second_quality_fraction:
+            break
+        directions.append(ViewDirection(azimuth_deg=index / n * 360.0, quality=value))
+        for offset in range(-min_sep, min_sep + 1):
+            remaining[(index + offset) % n] = -1.0
+    return directions
+
+
+def compass_label(azimuth_deg: float) -> str:
+    names = [
+        "north",
+        "north-east",
+        "east",
+        "south-east",
+        "south",
+        "south-west",
+        "west",
+        "north-west",
+    ]
+    index = int((azimuth_deg + 22.5) // 45.0) % 8
+    return names[index]

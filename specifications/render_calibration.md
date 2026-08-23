@@ -27,6 +27,21 @@ errors) drove five iterations (v1→v5). Applied findings:
    sparkle.
 6. **Facet banding** reduced by radial-slope smoothing (2-sample average) + per-pixel texture.
 
+## v6 additions
+
+- **2× supersampling** with Lanczos downscale — kills skyline aliasing and distant speckle.
+- **Procedural clouds**: two-octave stretched value noise, seeded per viewpoint, thinning
+  toward the zenith and melting into horizon haze.
+- **Hedgerow hints**: a darkened strip wherever the 260 m field cell changes under
+  grass/cropland — distant patchwork reads as bounded fields.
+- **Near-ground texture**: distance-scaled micro-grain (4–5 m mottling within ~1 km) so
+  camera-view foregrounds aren't smooth walls.
+- **Rectilinear camera views** (`render_view`): 68° lens, slight down-tilt, horizon at 42%
+  frame height — shares the panorama kernel via a tan projection.
+- **Best-direction picker** (`best_view_directions`): 70° circular window maximising mean
+  capped visible distance (veg-aware); second direction kept when ≥55% of the best and ≥75°
+  apart.
+
 ## Known remaining gaps (honest)
 
 - 50 m facets still band on smooth near domes; field boundaries are noise-driven, not mapped.
