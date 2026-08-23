@@ -1,0 +1,18 @@
+# Downloaded datasets and computed artifacts (large, reproducible via the pipeline)
+data/
+outputs/
+
+# Original photos are kept local only; EXIF-stripped web copies live in docs/assets
+photos/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+
+# OS
+.DS_Store
