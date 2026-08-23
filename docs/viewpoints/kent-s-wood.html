@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Kent&#39;s Wood</h1>
-  <span class="rankline">#11843 in England &middot; top 5% of its area beats it &middot; near Nether Wallop</span>
+  <span class="rankline">#11473 in England &middot; top 4% of its area beats it &middot; near Nether Wallop</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -117,8 +117,13 @@
       <figcaption>Looking north-east (66&deg;) &mdash; 68&deg; lens</figcaption>
     </figure>
     
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/kent-s-wood_view2.jpg" alt="Rendered view Looking north from Kent&#39;s Wood" loading="lazy">
+      <figcaption>Looking north (351&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
   </div>
-  <p class="note">Rendered views along the best direction of this panorama.</p>
+  <p class="note">Rendered views along the best directions of this panorama.</p>
 </div>
 
 
@@ -194,9 +199,9 @@
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-stockbridge.html">Viewpoint near Stockbridge</a></td>
-      <td>E &middot; 10 km</td>
-      <td class="num">~20 min</td>
-      <td class="num"><span class="score-pill">64.3</span></td>
+      <td>E &middot; 11 km</td>
+      <td class="num">~21 min</td>
+      <td class="num"><span class="score-pill">63.3</span></td>
     </tr>
     
     <tr>
@@ -214,7 +219,7 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/beacon-hill-1981.html">Beacon Hill</a></td>
+      <td><a href="../viewpoints/beacon-hill-1976.html">Beacon Hill</a></td>
       <td>NE &middot; 30 km</td>
       <td class="num">~46 min</td>
       <td class="num"><span class="score-pill">76.7</span></td>
@@ -224,7 +229,7 @@
       <td><a href="../viewpoints/martinsell-viewpoint.html">Martinsell viewpoint</a></td>
       <td>NNW &middot; 31 km</td>
       <td class="num">~49 min</td>
-      <td class="num"><span class="score-pill">77.3</span></td>
+      <td class="num"><span class="score-pill">76.9</span></td>
     </tr>
     
     <tr>
@@ -279,6 +284,10 @@
   
   L.polygon([[lat, lon], ray(66 - 34, 2500), ray(66, 2900),
              ray(66 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
+  
+  L.polygon([[lat, lon], ray(351 - 34, 2500), ray(351, 2900),
+             ray(351 + 34, 2500)],
             { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();

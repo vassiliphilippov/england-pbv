@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Iron Trunk Hide — view potential 16.2</title>
+<title>Iron Trunk Hide — view potential 10.5</title>
 <meta name="description" content="Objective view metrics for Iron Trunk Hide: 8 km² visible, farthest sightline 13 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Iron Trunk Hide</h1>
-  <span class="rankline">#46008 in England &middot; top 98% of its area beats it &middot; near Cosgrove</span>
+  <span class="rankline">#46047 in England &middot; top 98% of its area beats it &middot; near Cosgrove</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">16.2<small>view potential (percentile composite)</small></div>
+    <div class="big-score">10.5<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SP 80402 42032). Click the marker for map links.
+    The exact computed spot (SP 80402 42032). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/iron-trunk-hide_view1.jpg" alt="Rendered view Looking east from Iron Trunk Hide" loading="lazy">
+      <figcaption>Looking east (73&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -177,49 +191,49 @@
       <td><a href="../viewpoints/viaduct-hide.html">Viaduct Hide</a></td>
       <td>E &middot; 1 km</td>
       <td class="num">~2 min</td>
-      <td class="num"><span class="score-pill">20.1</span></td>
+      <td class="num"><span class="score-pill">13.2</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/the-belvedere.html">The Belvedere</a></td>
       <td>ESE &middot; 6 km</td>
       <td class="num">~13 min</td>
-      <td class="num"><span class="score-pill">23.5</span></td>
+      <td class="num"><span class="score-pill">15.3</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/hartwell-heights.html">Hartwell Heights</a></td>
       <td>N &middot; 9 km</td>
       <td class="num">~18 min</td>
-      <td class="num"><span class="score-pill">29.3</span></td>
+      <td class="num"><span class="score-pill">19.0</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-sherington.html">Viewpoint near Sherington</a></td>
       <td>ENE &middot; 10 km</td>
       <td class="num">~19 min</td>
-      <td class="num"><span class="score-pill">36.6</span></td>
+      <td class="num"><span class="score-pill">29.0</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-newton-longville.html">Viewpoint near Newton Longville</a></td>
       <td>SSE &middot; 11 km</td>
       <td class="num">~21 min</td>
-      <td class="num"><span class="score-pill">36.9</span></td>
+      <td class="num"><span class="score-pill">30.4</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-bow-brickhill-19022.html">Viewpoint near Bow Brickhill</a></td>
+      <td><a href="../viewpoints/viewpoint-near-bow-brickhill-29848.html">Viewpoint near Bow Brickhill</a></td>
       <td>SE &middot; 13 km</td>
       <td class="num">~24 min</td>
-      <td class="num"><span class="score-pill">54.0</span></td>
+      <td class="num"><span class="score-pill">40.1</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-bow-brickhill.html">Viewpoint near Bow Brickhill</a></td>
       <td>SE &middot; 13 km</td>
       <td class="num">~24 min</td>
-      <td class="num"><span class="score-pill">57.0</span></td>
+      <td class="num"><span class="score-pill">48.9</span></td>
     </tr>
     
     <tr>
@@ -264,6 +278,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(73 - 34, 2500), ray(73, 2900),
+             ray(73 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

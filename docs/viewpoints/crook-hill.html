@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Crook Hill</h1>
-  <span class="rankline">#9811 in England &middot; top 30% of its area beats it &middot; near Fleet</span>
+  <span class="rankline">#9631 in England &middot; top 30% of its area beats it &middot; near Fleet</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SY 64325 79725). Click the marker for map links.
+    The exact computed spot (SY 64325 79725). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/crook-hill_view1.jpg" alt="Rendered view Looking south from Crook Hill" loading="lazy">
+      <figcaption>Looking south (194&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -176,7 +190,7 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-fleet-4796.html">Viewpoint near Fleet</a></td>
+      <td><a href="../viewpoints/viewpoint-near-fleet-4770.html">Viewpoint near Fleet</a></td>
       <td>WNW &middot; 2 km</td>
       <td class="num">~5 min</td>
       <td class="num"><span class="score-pill">71.0</span></td>
@@ -190,7 +204,7 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-upwey-1918.html">Viewpoint near Upwey</a></td>
+      <td><a href="../viewpoints/viewpoint-near-upwey-1913.html">Viewpoint near Upwey</a></td>
       <td>NNE &middot; 7 km</td>
       <td class="num">~14 min</td>
       <td class="num"><span class="score-pill">76.8</span></td>
@@ -266,6 +280,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(194 - 34, 2500), ray(194, 2900),
+             ray(194 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

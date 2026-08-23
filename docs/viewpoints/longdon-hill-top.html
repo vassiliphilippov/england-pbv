@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Longdon Hill Top — view potential 47.9</title>
+<title>Longdon Hill Top — view potential 45.9</title>
 <meta name="description" content="Objective view metrics for Longdon Hill Top: 319 km² visible, farthest sightline 60 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Longdon Hill Top</h1>
-  <span class="rankline">#25519 in England &middot; top 33% of its area beats it &middot; near Longdon</span>
+  <span class="rankline">#25213 in England &middot; top 24% of its area beats it &middot; near Longdon</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">47.9<small>view potential (percentile composite)</small></div>
+    <div class="big-score">45.9<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SK 08614 14297). Click the marker for map links.
+    The exact computed spot (SK 08614 14297). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/longdon-hill-top_view1.jpg" alt="Rendered view Looking north from Longdon Hill Top" loading="lazy">
+      <figcaption>Looking north (351&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -172,13 +186,6 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-cannock-wood.html">Viewpoint near Cannock Wood</a></td>
-      <td>WSW &middot; 4 km</td>
-      <td class="num">~9 min</td>
-      <td class="num"><span class="score-pill">50.7</span></td>
-    </tr>
-    
-    <tr>
       <td><a href="../viewpoints/viewpoint-near-upper-longdon.html">Viewpoint near Upper Longdon</a></td>
       <td>W &middot; 4 km</td>
       <td class="num">~10 min</td>
@@ -186,17 +193,10 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-prospect-village.html">Viewpoint near Prospect Village</a></td>
-      <td>WSW &middot; 6 km</td>
-      <td class="num">~13 min</td>
-      <td class="num"><span class="score-pill">58.1</span></td>
-    </tr>
-    
-    <tr>
       <td><a href="../viewpoints/wimblebury-hill.html">Wimblebury Hill</a></td>
       <td>WSW &middot; 7 km</td>
       <td class="num">~14 min</td>
-      <td class="num"><span class="score-pill">62.0</span></td>
+      <td class="num"><span class="score-pill">60.9</span></td>
     </tr>
     
     <tr>
@@ -207,7 +207,7 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-wootton-2930.html">Viewpoint near Wootton</a></td>
+      <td><a href="../viewpoints/viewpoint-near-wootton-2919.html">Viewpoint near Wootton</a></td>
       <td>N &middot; 32 km</td>
       <td class="num">~49 min</td>
       <td class="num"><span class="score-pill">74.4</span></td>
@@ -225,6 +225,20 @@
       <td>E &middot; 37 km</td>
       <td class="num">~56 min</td>
       <td class="num"><span class="score-pill">76.0</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-woodhouse-eaves.html">Viewpoint near Woodhouse Eaves</a></td>
+      <td>E &middot; 42 km</td>
+      <td class="num">~62 min</td>
+      <td class="num"><span class="score-pill">77.7</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/the-ercall.html">The Ercall</a></td>
+      <td>W &middot; 44 km</td>
+      <td class="num">~64 min</td>
+      <td class="num"><span class="score-pill">79.4</span></td>
     </tr>
     
   </table>
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(351 - 34, 2500), ray(351, 2900),
+             ray(351 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

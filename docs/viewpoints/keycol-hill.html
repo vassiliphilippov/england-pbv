@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Keycol Hill — view potential 42.4</title>
+<title>Keycol Hill — view potential 32.5</title>
 <meta name="description" content="Objective view metrics for Keycol Hill: 466 km² visible, farthest sightline 40 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Keycol Hill</h1>
-  <span class="rankline">#30995 in England &middot; top 50% of its area beats it &middot; near Newington</span>
+  <span class="rankline">#35503 in England &middot; top 40% of its area beats it &middot; near Newington</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">42.4<small>view potential (percentile composite)</small></div>
+    <div class="big-score">32.5<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (TQ 86878 64867). Click the marker for map links.
+    The exact computed spot (TQ 86878 64867). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/keycol-hill_view1.jpg" alt="Rendered view Looking north-west from Keycol Hill" loading="lazy">
+      <figcaption>Looking north-west (316&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -174,10 +188,10 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-newington-25710.html">Viewpoint near Newington</a></td>
+      <td><a href="../viewpoints/viewpoint-near-newington-29031.html">Viewpoint near Newington</a></td>
       <td>SSW &middot; 1 km</td>
       <td class="num">~3 min</td>
-      <td class="num"><span class="score-pill">47.7</span></td>
+      <td class="num"><span class="score-pill">41.2</span></td>
     </tr>
     
     <tr>
@@ -198,20 +212,13 @@
       <td><a href="../viewpoints/viewpoint-near-thurnham.html">Viewpoint near Thurnham</a></td>
       <td>SW &middot; 9 km</td>
       <td class="num">~17 min</td>
-      <td class="num"><span class="score-pill">63.6</span></td>
+      <td class="num"><span class="score-pill">63.4</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-boxley-8582.html">Viewpoint near Boxley</a></td>
-      <td>WSW &middot; 11 km</td>
-      <td class="num">~20 min</td>
-      <td class="num"><span class="score-pill">65.4</span></td>
-    </tr>
-    
-    <tr>
-      <td><a href="../viewpoints/viewpoint-near-boxley.html">Viewpoint near Boxley</a></td>
-      <td>WSW &middot; 11 km</td>
-      <td class="num">~21 min</td>
+      <td><a href="../viewpoints/viewpoint-near-charing.html">Viewpoint near Charing</a></td>
+      <td>SSE &middot; 16 km</td>
+      <td class="num">~29 min</td>
       <td class="num"><span class="score-pill">68.6</span></td>
     </tr>
     
@@ -227,6 +234,13 @@
       <td>SE &middot; 38 km</td>
       <td class="num">~56 min</td>
       <td class="num"><span class="score-pill">72.6</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/tolsford-hill.html">Tolsford Hill</a></td>
+      <td>SE &middot; 39 km</td>
+      <td class="num">~58 min</td>
+      <td class="num"><span class="score-pill">77.9</span></td>
     </tr>
     
   </table>
@@ -264,6 +278,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(316 - 34, 2500), ray(316, 2900),
+             ray(316 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

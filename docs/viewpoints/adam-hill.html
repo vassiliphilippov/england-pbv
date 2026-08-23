@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Adam Hill — view potential 50.9</title>
+<title>Adam Hill — view potential 41.0</title>
 <meta name="description" content="Objective view metrics for Adam Hill: 621 km² visible, farthest sightline 58 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Adam Hill</h1>
-  <span class="rankline">#22330 in England &middot; top 59% of its area beats it &middot; near Barningham</span>
+  <span class="rankline">#29239 in England &middot; top 83% of its area beats it &middot; near Barningham</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">50.9<small>view potential (percentile composite)</small></div>
+    <div class="big-score">41.0<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (NZ 08902 10062). Click the marker for map links.
+    The exact computed spot (NZ 08902 10062). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/adam-hill_view1.jpg" alt="Rendered view Looking north-east from Adam Hill" loading="lazy">
+      <figcaption>Looking north-east (30&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -172,28 +186,28 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-barningham-14147.html">Viewpoint near Barningham</a></td>
+      <td><a href="../viewpoints/viewpoint-near-barningham-13613.html">Viewpoint near Barningham</a></td>
       <td>NW &middot; 2 km</td>
       <td class="num">~5 min</td>
       <td class="num"><span class="score-pill">58.6</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-barningham-13369.html">Viewpoint near Barningham</a></td>
+      <td><a href="../viewpoints/viewpoint-near-barningham-12896.html">Viewpoint near Barningham</a></td>
       <td>NNW &middot; 2 km</td>
       <td class="num">~5 min</td>
       <td class="num"><span class="score-pill">59.4</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-barningham-6191.html">Viewpoint near Barningham</a></td>
+      <td><a href="../viewpoints/viewpoint-near-barningham-6144.html">Viewpoint near Barningham</a></td>
       <td>S &middot; 3 km</td>
       <td class="num">~7 min</td>
       <td class="num"><span class="score-pill">68.9</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-gayles-5962.html">Viewpoint near Gayles</a></td>
+      <td><a href="../viewpoints/viewpoint-near-gayles-5921.html">Viewpoint near Gayles</a></td>
       <td>SE &middot; 5 km</td>
       <td class="num">~11 min</td>
       <td class="num"><span class="score-pill">69.2</span></td>
@@ -207,7 +221,7 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-barningham-3816.html">Viewpoint near Barningham</a></td>
+      <td><a href="../viewpoints/viewpoint-near-barningham-3799.html">Viewpoint near Barningham</a></td>
       <td>WSW &middot; 6 km</td>
       <td class="num">~12 min</td>
       <td class="num"><span class="score-pill">72.7</span></td>
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(30 - 34, 2500), ray(30, 2900),
+             ray(30 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

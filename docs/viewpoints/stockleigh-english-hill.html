@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Stockleigh English Hill</h1>
-  <span class="rankline">#18896 in England &middot; top 28% of its area beats it &middot; near Poughill</span>
+  <span class="rankline">#17869 in England &middot; top 27% of its area beats it &middot; near Poughill</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SS 84843 06676). Click the marker for map links.
+    The exact computed spot (SS 84843 06676). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/stockleigh-english-hill_view1.jpg" alt="Rendered view Looking south-west from Stockleigh English Hill" loading="lazy">
+      <figcaption>Looking south-west (219&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -170,6 +184,13 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
+      <td><a href="../viewpoints/viewpoint-near-sandford-12242.html">Viewpoint near Sandford</a></td>
+      <td>SW &middot; 4 km</td>
+      <td class="num">~9 min</td>
+      <td class="num"><span class="score-pill">60.1</span></td>
+    </tr>
+    
+    <tr>
       <td><a href="../viewpoints/viewpoint-near-sandford.html">Viewpoint near Sandford</a></td>
       <td>SW &middot; 4 km</td>
       <td class="num">~9 min</td>
@@ -184,14 +205,14 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-stockleigh-pomeroy-5623.html">Viewpoint near Stockleigh Pomeroy</a></td>
+      <td><a href="../viewpoints/viewpoint-near-stockleigh-pomeroy-5584.html">Viewpoint near Stockleigh Pomeroy</a></td>
       <td>ESE &middot; 5 km</td>
       <td class="num">~11 min</td>
       <td class="num"><span class="score-pill">69.7</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-stockleigh-pomeroy-2769.html">Viewpoint near Stockleigh Pomeroy</a></td>
+      <td><a href="../viewpoints/viewpoint-near-stockleigh-pomeroy-2757.html">Viewpoint near Stockleigh Pomeroy</a></td>
       <td>SE &middot; 5 km</td>
       <td class="num">~11 min</td>
       <td class="num"><span class="score-pill">74.7</span></td>
@@ -216,13 +237,6 @@
       <td>SSE &middot; 24 km</td>
       <td class="num">~39 min</td>
       <td class="num"><span class="score-pill">80.0</span></td>
-    </tr>
-    
-    <tr>
-      <td><a href="../viewpoints/viewpoint-near-kenton-796.html">Viewpoint near Kenton</a></td>
-      <td>SSE &middot; 27 km</td>
-      <td class="num">~43 min</td>
-      <td class="num"><span class="score-pill">80.7</span></td>
     </tr>
     
   </table>
@@ -260,6 +274,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(219 - 34, 2500), ray(219, 2900),
+             ray(219 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

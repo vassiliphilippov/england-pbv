@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Viewpoint near Chaddleworth</h1>
-  <span class="rankline">#40434 in England &middot; top 84% of its area beats it &middot; near Chaddleworth</span>
+  <span class="rankline">#36114 in England &middot; top 58% of its area beats it &middot; near Chaddleworth</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SU 40225 78875). Click the marker for map links.
+    The exact computed spot (SU 40225 78875). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/viewpoint-near-chaddleworth_view1.jpg" alt="Rendered view Looking south-west from Viewpoint near Chaddleworth" loading="lazy">
+      <figcaption>Looking south-west (203&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -172,10 +186,10 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-east-garston-29929.html">Viewpoint near East Garston</a></td>
+      <td><a href="../viewpoints/viewpoint-near-east-garston-27290.html">Viewpoint near East Garston</a></td>
       <td>WSW &middot; 3 km</td>
       <td class="num">~8 min</td>
-      <td class="num"><span class="score-pill">43.5</span></td>
+      <td class="num"><span class="score-pill">43.4</span></td>
     </tr>
     
     <tr>
@@ -186,14 +200,14 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-farnborough.html">Viewpoint near Farnborough</a></td>
-      <td>NNE &middot; 5 km</td>
-      <td class="num">~11 min</td>
-      <td class="num"><span class="score-pill">57.5</span></td>
+      <td><a href="../viewpoints/viewpoint-near-eastbury.html">Viewpoint near Eastbury</a></td>
+      <td>W &middot; 5 km</td>
+      <td class="num">~12 min</td>
+      <td class="num"><span class="score-pill">48.4</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-letcombe-bassett-12855.html">Viewpoint near Letcombe Bassett</a></td>
+      <td><a href="../viewpoints/viewpoint-near-letcombe-bassett-12419.html">Viewpoint near Letcombe Bassett</a></td>
       <td>N &middot; 6 km</td>
       <td class="num">~12 min</td>
       <td class="num"><span class="score-pill">59.9</span></td>
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(203 - 34, 2500), ray(203, 2900),
+             ray(203 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

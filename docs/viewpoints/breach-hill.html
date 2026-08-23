@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Breach Hill — view potential 25.5</title>
+<title>Breach Hill — view potential 16.7</title>
 <meta name="description" content="Objective view metrics for Breach Hill: 132 km² visible, farthest sightline 40 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Breach Hill</h1>
-  <span class="rankline">#43901 in England &middot; top 88% of its area beats it &middot; near Curdridge</span>
+  <span class="rankline">#44663 in England &middot; top 89% of its area beats it &middot; near Curdridge</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">25.5<small>view potential (percentile composite)</small></div>
+    <div class="big-score">16.7<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SU 52908 14838). Click the marker for map links.
+    The exact computed spot (SU 52908 14838). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/breach-hill_view1.jpg" alt="Rendered view Looking north-west from Breach Hill" loading="lazy">
+      <figcaption>Looking north-west (323&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -175,39 +189,39 @@
       <td><a href="../viewpoints/winters-hill.html">Winters Hill</a></td>
       <td>N &middot; 2 km</td>
       <td class="num">~6 min</td>
-      <td class="num"><span class="score-pill">41.3</span></td>
+      <td class="num"><span class="score-pill">33.7</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-lower-swanwick.html">Viewpoint near Lower Swanwick</a></td>
-      <td>SW &middot; 6 km</td>
+      <td><a href="../viewpoints/viewpoint-near-bishop-s-waltham.html">Viewpoint near Bishop&#39;s Waltham</a></td>
+      <td>NE &middot; 6 km</td>
       <td class="num">~12 min</td>
-      <td class="num"><span class="score-pill">42.4</span></td>
-    </tr>
-    
-    <tr>
-      <td><a href="../viewpoints/viewpoint-near-knowle-28508.html">Viewpoint near Knowle</a></td>
-      <td>SSE &middot; 6 km</td>
-      <td class="num">~13 min</td>
-      <td class="num"><span class="score-pill">44.9</span></td>
+      <td class="num"><span class="score-pill">38.9</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/stephen-s-castle-down.html">Stephen&#39;s Castle Down</a></td>
       <td>NNE &middot; 6 km</td>
       <td class="num">~13 min</td>
-      <td class="num"><span class="score-pill">52.0</span></td>
+      <td class="num"><span class="score-pill">43.6</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-upham.html">Viewpoint near Upham</a></td>
+      <td>NNE &middot; 6 km</td>
+      <td class="num">~13 min</td>
+      <td class="num"><span class="score-pill">44.2</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-droxford.html">Viewpoint near Droxford</a></td>
       <td>ENE &middot; 7 km</td>
       <td class="num">~15 min</td>
-      <td class="num"><span class="score-pill">61.7</span></td>
+      <td class="num"><span class="score-pill">58.5</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/beacon-hill-4369.html">Beacon Hill</a></td>
+      <td><a href="../viewpoints/beacon-hill-4352.html">Beacon Hill</a></td>
       <td>NE &middot; 11 km</td>
       <td class="num">~20 min</td>
       <td class="num"><span class="score-pill">71.7</span></td>
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(323 - 34, 2500), ray(323, 2900),
+             ray(323 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

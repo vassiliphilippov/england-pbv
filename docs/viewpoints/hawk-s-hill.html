@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hawk&#39;s Hill — view potential 14.7</title>
+<title>Hawk&#39;s Hill — view potential 9.5</title>
 <meta name="description" content="Objective view metrics for Hawk&#39;s Hill: 7 km² visible, farthest sightline 6 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Hawk&#39;s Hill</h1>
-  <span class="rankline">#46155 in England &middot; top 95% of its area beats it &middot; near Hawk&#39;s Hill</span>
+  <span class="rankline">#46174 in England &middot; top 95% of its area beats it &middot; near Hawk&#39;s Hill</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">14.7<small>view potential (percentile composite)</small></div>
+    <div class="big-score">9.5<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (TQ 15796 55332). Click the marker for map links.
+    The exact computed spot (TQ 15796 55332). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/hawk-s-hill_view1.jpg" alt="Rendered view Looking south-east from Hawk&#39;s Hill" loading="lazy">
+      <figcaption>Looking south-east (146&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -173,35 +187,28 @@
       <td><a href="../viewpoints/box-hill-viewpoint.html">Box Hill Viewpoint</a></td>
       <td>SSE &middot; 5 km</td>
       <td class="num">~10 min</td>
-      <td class="num"><span class="score-pill">55.7</span></td>
-    </tr>
-    
-    <tr>
-      <td><a href="../viewpoints/viewpoint-near-dorking.html">Viewpoint near Dorking</a></td>
-      <td>S &middot; 5 km</td>
-      <td class="num">~11 min</td>
-      <td class="num"><span class="score-pill">55.9</span></td>
-    </tr>
-    
-    <tr>
-      <td><a href="../viewpoints/viewpoint-near-box-hill-village-6715.html">Viewpoint near Box Hill Village</a></td>
-      <td>SE &middot; 6 km</td>
-      <td class="num">~12 min</td>
-      <td class="num"><span class="score-pill">68.1</span></td>
+      <td class="num"><span class="score-pill">49.8</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-box-hill-village.html">Viewpoint near Box Hill Village</a></td>
       <td>SE &middot; 6 km</td>
       <td class="num">~12 min</td>
-      <td class="num"><span class="score-pill">71.0</span></td>
+      <td class="num"><span class="score-pill">66.7</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-lower-kingswood.html">Viewpoint near Lower Kingswood</a></td>
+      <td>ESE &middot; 9 km</td>
+      <td class="num">~17 min</td>
+      <td class="num"><span class="score-pill">67.7</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-coldharbour.html">Viewpoint near Coldharbour</a></td>
       <td>S &middot; 12 km</td>
       <td class="num">~22 min</td>
-      <td class="num"><span class="score-pill">71.3</span></td>
+      <td class="num"><span class="score-pill">70.0</span></td>
     </tr>
     
     <tr>
@@ -223,6 +230,13 @@
       <td>SSE &middot; 59 km</td>
       <td class="num">~82 min</td>
       <td class="num"><span class="score-pill">88.9</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-niton.html">Viewpoint near Niton</a></td>
+      <td>SW &middot; 103 km</td>
+      <td class="num">~128 min</td>
+      <td class="num"><span class="score-pill">89.2</span></td>
     </tr>
     
   </table>
@@ -260,6 +274,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(146 - 34, 2500), ray(146, 2900),
+             ray(146 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

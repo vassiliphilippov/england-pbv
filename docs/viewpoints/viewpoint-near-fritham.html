@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Viewpoint near Fritham — view potential 39.9</title>
+<title>Viewpoint near Fritham — view potential 38.7</title>
 <meta name="description" content="Objective view metrics for Viewpoint near Fritham: 186 km² visible, farthest sightline 54 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Viewpoint near Fritham</h1>
-  <span class="rankline">#33400 in England &middot; top 45% of its area beats it &middot; near Fritham</span>
+  <span class="rankline">#30913 in England &middot; top 31% of its area beats it &middot; near Fritham</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">39.9<small>view potential (percentile composite)</small></div>
+    <div class="big-score">38.7<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SU 20775 12475). Click the marker for map links.
+    The exact computed spot (SU 20775 12475). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/viewpoint-near-fritham_view1.jpg" alt="Rendered view Looking south-west from Viewpoint near Fritham" loading="lazy">
+      <figcaption>Looking south-west (247&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -171,21 +185,28 @@
       <td><a href="../viewpoints/viewpoint-near-frogham.html">Viewpoint near Frogham</a></td>
       <td>WNW &middot; 3 km</td>
       <td class="num">~7 min</td>
-      <td class="num"><span class="score-pill">42.7</span></td>
+      <td class="num"><span class="score-pill">40.2</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-bramshaw.html">Viewpoint near Bramshaw</a></td>
-      <td>ENE &middot; 6 km</td>
-      <td class="num">~13 min</td>
-      <td class="num"><span class="score-pill">46.6</span></td>
+      <td><a href="../viewpoints/viewpoint-near-redlynch.html">Viewpoint near Redlynch</a></td>
+      <td>N &middot; 10 km</td>
+      <td class="num">~19 min</td>
+      <td class="num"><span class="score-pill">40.8</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-west-grimstead-21123.html">Viewpoint near West Grimstead</a></td>
+      <td>N &middot; 12 km</td>
+      <td class="num">~22 min</td>
+      <td class="num"><span class="score-pill">50.6</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-west-grimstead.html">Viewpoint near West Grimstead</a></td>
       <td>N &middot; 12 km</td>
-      <td class="num">~22 min</td>
-      <td class="num"><span class="score-pill">62.7</span></td>
+      <td class="num">~23 min</td>
+      <td class="num"><span class="score-pill">54.6</span></td>
     </tr>
     
     <tr>
@@ -214,13 +235,6 @@
       <td>WNW &middot; 29 km</td>
       <td class="num">~45 min</td>
       <td class="num"><span class="score-pill">74.4</span></td>
-    </tr>
-    
-    <tr>
-      <td><a href="../viewpoints/west-high-down.html">West High Down</a></td>
-      <td>SSE &middot; 29 km</td>
-      <td class="num">~46 min</td>
-      <td class="num"><span class="score-pill">79.8</span></td>
     </tr>
     
   </table>
@@ -258,6 +272,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(247 - 34, 2500), ray(247, 2900),
+             ray(247 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

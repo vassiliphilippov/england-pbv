@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Clay Hill — view potential 40.0</title>
+<title>Clay Hill — view potential 29.2</title>
 <meta name="description" content="Objective view metrics for Clay Hill: 226 km² visible, farthest sightline 41 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Clay Hill</h1>
-  <span class="rankline">#33246 in England &middot; top 70% of its area beats it &middot; near Minsterworth</span>
+  <span class="rankline">#37771 in England &middot; top 76% of its area beats it &middot; near Minsterworth</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">40.0<small>view potential (percentile composite)</small></div>
+    <div class="big-score">29.2<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SO 76372 17177). Click the marker for map links.
+    The exact computed spot (SO 76372 17177). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/clay-hill_view1.jpg" alt="Rendered view Looking north-west from Clay Hill" loading="lazy">
+      <figcaption>Looking north-west (324&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -172,24 +186,17 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/rodway-hill.html">Rodway Hill</a></td>
-      <td>NNE &middot; 3 km</td>
-      <td class="num">~7 min</td>
-      <td class="num"><span class="score-pill">41.2</span></td>
-    </tr>
-    
-    <tr>
-      <td><a href="../viewpoints/windmill-hill-20467.html">Windmill Hill</a></td>
+      <td><a href="../viewpoints/windmill-hill-19259.html">Windmill Hill</a></td>
       <td>ESE &middot; 3 km</td>
       <td class="num">~7 min</td>
       <td class="num"><span class="score-pill">52.7</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/hockley-hill.html">Hockley Hill</a></td>
-      <td>SSE &middot; 4 km</td>
+      <td><a href="../viewpoints/viewpoint-near-bollow.html">Viewpoint near Bollow</a></td>
+      <td>SSW &middot; 4 km</td>
       <td class="num">~9 min</td>
-      <td class="num"><span class="score-pill">58.1</span></td>
+      <td class="num"><span class="score-pill">53.3</span></td>
     </tr>
     
     <tr>
@@ -227,6 +234,13 @@
       <td class="num"><span class="score-pill">80.5</span></td>
     </tr>
     
+    <tr>
+      <td><a href="../viewpoints/chase-end-hill.html">Chase End Hill</a></td>
+      <td>N &middot; 18 km</td>
+      <td class="num">~32 min</td>
+      <td class="num"><span class="score-pill">81.5</span></td>
+    </tr>
+    
   </table>
 </div>
 
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(324 - 34, 2500), ray(324, 2900),
+             ray(324 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

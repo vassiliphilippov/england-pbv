@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Burn Hill — view potential 40.4</title>
+<title>Burn Hill — view potential 26.3</title>
 <meta name="description" content="Objective view metrics for Burn Hill: 293 km² visible, farthest sightline 56 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Burn Hill</h1>
-  <span class="rankline">#32868 in England &middot; top 47% of its area beats it &middot; near Stone</span>
+  <span class="rankline">#39698 in England &middot; top 50% of its area beats it &middot; near Stone</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">40.4<small>view potential (percentile composite)</small></div>
+    <div class="big-score">26.3<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SP 77876 12426). Click the marker for map links.
+    The exact computed spot (SP 77876 12426). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/burn-hill_view1.jpg" alt="Rendered view Looking west from Burn Hill" loading="lazy">
+      <figcaption>Looking west (268&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -172,17 +186,17 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-upper-winchendon-31317.html">Viewpoint near Upper Winchendon</a></td>
+      <td><a href="../viewpoints/viewpoint-near-upper-winchendon-37442.html">Viewpoint near Upper Winchendon</a></td>
       <td>NNW &middot; 3 km</td>
       <td class="num">~7 min</td>
-      <td class="num"><span class="score-pill">42.0</span></td>
+      <td class="num"><span class="score-pill">29.7</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-upper-winchendon-14783.html">Viewpoint near Upper Winchendon</a></td>
+      <td><a href="../viewpoints/viewpoint-near-upper-winchendon-17524.html">Viewpoint near Upper Winchendon</a></td>
       <td>NNW &middot; 4 km</td>
       <td class="num">~8 min</td>
-      <td class="num"><span class="score-pill">58.0</span></td>
+      <td class="num"><span class="score-pill">54.5</span></td>
     </tr>
     
     <tr>
@@ -200,7 +214,7 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/beacon-hill-3791.html">Beacon Hill</a></td>
+      <td><a href="../viewpoints/beacon-hill-3774.html">Beacon Hill</a></td>
       <td>SE &middot; 9 km</td>
       <td class="num">~17 min</td>
       <td class="num"><span class="score-pill">72.7</span></td>
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(268 - 34, 2500), ray(268, 2900),
+             ray(268 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

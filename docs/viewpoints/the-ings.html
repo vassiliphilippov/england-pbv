@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>The Ings</h1>
-  <span class="rankline">#25121 in England &middot; top 40% of its area beats it &middot; near Denaby Main</span>
+  <span class="rankline">#23254 in England &middot; top 29% of its area beats it &middot; near Denaby Main</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SE 49925 00475). Click the marker for map links.
+    The exact computed spot (SE 49925 00475). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/the-ings_view1.jpg" alt="Rendered view Looking west from The Ings" loading="lazy">
+      <figcaption>Looking west (263&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -177,14 +191,21 @@
       <td><a href="../viewpoints/viewpoint-near-cadeby.html">Viewpoint near Cadeby</a></td>
       <td>ENE &middot; 1 km</td>
       <td class="num">~3 min</td>
-      <td class="num"><span class="score-pill">60.5</span></td>
+      <td class="num"><span class="score-pill">55.8</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-high-melton.html">Viewpoint near High Melton</a></td>
+      <td>N &middot; 2 km</td>
+      <td class="num">~5 min</td>
+      <td class="num"><span class="score-pill">58.5</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-maltby.html">Viewpoint near Maltby</a></td>
       <td>SSE &middot; 9 km</td>
       <td class="num">~18 min</td>
-      <td class="num"><span class="score-pill">70.8</span></td>
+      <td class="num"><span class="score-pill">70.7</span></td>
     </tr>
     
     <tr>
@@ -192,13 +213,6 @@
       <td>WSW &middot; 18 km</td>
       <td class="num">~31 min</td>
       <td class="num"><span class="score-pill">72.1</span></td>
-    </tr>
-    
-    <tr>
-      <td><a href="../viewpoints/viewpoint-near-oughtibridge.html">Viewpoint near Oughtibridge</a></td>
-      <td>WSW &middot; 19 km</td>
-      <td class="num">~32 min</td>
-      <td class="num"><span class="score-pill">72.5</span></td>
     </tr>
     
     <tr>
@@ -264,6 +278,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(263 - 34, 2500), ray(263, 2900),
+             ray(263 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

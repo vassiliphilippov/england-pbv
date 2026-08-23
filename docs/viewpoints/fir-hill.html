@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fir Hill — view potential 50.4</title>
+<title>Fir Hill — view potential 39.8</title>
 <meta name="description" content="Objective view metrics for Fir Hill: 579 km² visible, farthest sightline 60 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Fir Hill</h1>
-  <span class="rankline">#22932 in England &middot; top 29% of its area beats it &middot; near Harthill</span>
+  <span class="rankline">#30095 in England &middot; top 46% of its area beats it &middot; near Harthill</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">50.4<small>view potential (percentile composite)</small></div>
+    <div class="big-score">39.8<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SK 49440 79701). Click the marker for map links.
+    The exact computed spot (SK 49440 79701). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/fir-hill_view1.jpg" alt="Rendered view Looking west from Fir Hill" loading="lazy">
+      <figcaption>Looking west (260&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -174,6 +188,20 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
+      <td><a href="../viewpoints/bull-hill.html">Bull Hill</a></td>
+      <td>NE &middot; 2 km</td>
+      <td class="num">~6 min</td>
+      <td class="num"><span class="score-pill">43.6</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-killamarsh.html">Viewpoint near Killamarsh</a></td>
+      <td>WNW &middot; 3 km</td>
+      <td class="num">~7 min</td>
+      <td class="num"><span class="score-pill">45.9</span></td>
+    </tr>
+    
+    <tr>
       <td><a href="../viewpoints/viewpoint-near-shuttlewood.html">Viewpoint near Shuttlewood</a></td>
       <td>SSW &middot; 8 km</td>
       <td class="num">~16 min</td>
@@ -188,13 +216,6 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-marsh-lane.html">Viewpoint near Marsh Lane</a></td>
-      <td>W &middot; 10 km</td>
-      <td class="num">~19 min</td>
-      <td class="num"><span class="score-pill">61.1</span></td>
-    </tr>
-    
-    <tr>
       <td><a href="../viewpoints/viewpoint-near-ridgeway.html">Viewpoint near Ridgeway</a></td>
       <td>WNW &middot; 10 km</td>
       <td class="num">~19 min</td>
@@ -205,14 +226,14 @@
       <td><a href="../viewpoints/viewpoint-near-maltby.html">Viewpoint near Maltby</a></td>
       <td>NNE &middot; 14 km</td>
       <td class="num">~25 min</td>
-      <td class="num"><span class="score-pill">70.8</span></td>
+      <td class="num"><span class="score-pill">70.7</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-oughtibridge.html">Viewpoint near Oughtibridge</a></td>
-      <td>NW &middot; 22 km</td>
-      <td class="num">~37 min</td>
-      <td class="num"><span class="score-pill">72.5</span></td>
+      <td><a href="../viewpoints/viewpoint-near-whitley.html">Viewpoint near Whitley</a></td>
+      <td>NW &middot; 24 km</td>
+      <td class="num">~39 min</td>
+      <td class="num"><span class="score-pill">72.1</span></td>
     </tr>
     
     <tr>
@@ -220,13 +241,6 @@
       <td>NW &middot; 24 km</td>
       <td class="num">~40 min</td>
       <td class="num"><span class="score-pill">75.2</span></td>
-    </tr>
-    
-    <tr>
-      <td><a href="../viewpoints/tissington-hill.html">Tissington Hill</a></td>
-      <td>SW &middot; 44 km</td>
-      <td class="num">~64 min</td>
-      <td class="num"><span class="score-pill">75.5</span></td>
     </tr>
     
   </table>
@@ -264,6 +278,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(260 - 34, 2500), ray(260, 2900),
+             ray(260 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

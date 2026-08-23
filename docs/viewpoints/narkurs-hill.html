@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Narkurs Hill</h1>
-  <span class="rankline">#4083 in England &middot; top 7% of its area beats it &middot; near Downderry</span>
+  <span class="rankline">#4064 in England &middot; top 7% of its area beats it &middot; near Downderry</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SX 32738 55412). Click the marker for map links.
+    The exact computed spot (SX 32738 55412). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/narkurs-hill_view1.jpg" alt="Rendered view Looking south-west from Narkurs Hill" loading="lazy">
+      <figcaption>Looking south-west (209&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -174,14 +188,14 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-downderry-3847.html">Viewpoint near Downderry</a></td>
+      <td><a href="../viewpoints/viewpoint-near-downderry-3830.html">Viewpoint near Downderry</a></td>
       <td>W &middot; 1 km</td>
       <td class="num">~2 min</td>
       <td class="num"><span class="score-pill">72.6</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-seaton-3109.html">Viewpoint near Seaton</a></td>
+      <td><a href="../viewpoints/viewpoint-near-seaton-3096.html">Viewpoint near Seaton</a></td>
       <td>W &middot; 2 km</td>
       <td class="num">~5 min</td>
       <td class="num"><span class="score-pill">74.0</span></td>
@@ -264,6 +278,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(209 - 34, 2500), ray(209, 2900),
+             ray(209 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

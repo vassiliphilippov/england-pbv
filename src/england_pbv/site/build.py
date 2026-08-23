@@ -37,6 +37,7 @@ from england_pbv.terrain.grid import load_dem_grid, load_uint8_grid
 from england_pbv.verification.evaluate import load_scored
 from england_pbv.viewshed.horizon import build_sampling_plan, sweep_batch
 from england_pbv.viewshed.render import (
+    PANORAMA_WIDTH,
     best_view_directions,
     compass_label,
     render_panorama,
@@ -187,11 +188,23 @@ def _select_pages(
         if item.candidate.candidate_id not in page_ids:
             micro_ids.add(item.candidate.candidate_id)
             page_ids.add(item.candidate.candidate_id)
+    # Named places (OSM viewpoints, DoBIH hills) are what people search for: promote
+    # them from micro to lite so every named page carries a full-size panorama and a
+    # best-direction camera view. Anonymous screening discoveries stay micro — the
+    # size headroom (GitHub Pages 1 GB) only covers the ~1.7k named promotions.
+    promoted = 0
+    for item in deduped:
+        cid = item.candidate.candidate_id
+        if cid in micro_ids and item.candidate.name is not None:
+            micro_ids.discard(cid)
+            lite_ids.add(cid)
+            promoted += 1
     pages = [v for v in deduped if v.candidate.candidate_id in page_ids]
     print(
         f"pages: {len(pages)} ({N_PAGES_NATIONAL} national "
         f"+ local top-{REGIONAL_PAGES_PER_CELL} per 25 km cell "
-        f"+ {len(lite_ids)} lite (top-{FILL_PAGES_PER_CELL} per 10 km cell) "
+        f"+ {len(lite_ids)} lite (top-{FILL_PAGES_PER_CELL} per 10 km cell "
+        f"incl. {promoted} promoted named places) "
         f"+ {len(micro_ids)} micro (top-{MICRO_PAGES_PER_CELL} per 5 km cell)"
     )
     return pages, lite_ids, micro_ids
@@ -293,6 +306,37 @@ def build_site(
         if renders_dir.exists() and not skip_renders and max_pages is None:
             shutil.rmtree(renders_dir)
         renders_dir.mkdir(parents=True, exist_ok=True)
+        if skip_renders and max_pages is None:
+            # Self-heal reused renders: a re-scored dataset shuffles tiers and slug
+            # suffixes, so every kept file must match THIS build's expectation
+            # (panorama width per tier, view count per tier) — existence-only reuse
+            # would pair pages with wrong-size or orphaned images.
+            expected: dict[str, tuple[int, int]] = {}
+            for item in pages:
+                cid = item.candidate.candidate_id
+                if cid in micro_ids:
+                    expected[slugs[cid]] = (MICRO_PANORAMA_WIDTH, 0)
+                elif cid in lite_ids:
+                    expected[slugs[cid]] = (PANORAMA_WIDTH, 1)
+                else:
+                    expected[slugs[cid]] = (PANORAMA_WIDTH, 2)
+            stale = 0
+            for file in renders_dir.iterdir():
+                if file.suffix != ".jpg":
+                    continue
+                stem = file.stem
+                if "_view" in stem:
+                    slug, _, view_num = stem.rpartition("_view")
+                    tier = expected.get(slug)
+                    if tier is None or not view_num.isdigit() or int(view_num) > tier[1]:
+                        file.unlink()
+                        stale += 1
+                else:
+                    tier = expected.get(stem)
+                    if tier is None or Image.open(file).size[0] != tier[0]:
+                        file.unlink()
+                        stale += 1
+            print(f"render reuse: {stale} stale/orphaned files removed")
     (site_dir / "assets").mkdir(parents=True, exist_ok=True)
     (site_dir / "data").mkdir(parents=True, exist_ok=True)
     shutil.copy(paths.TEMPLATES_DIR / "style.css", site_dir / "assets" / "style.css")

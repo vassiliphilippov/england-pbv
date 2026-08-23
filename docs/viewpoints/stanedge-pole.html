@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Stanedge Pole</h1>
-  <span class="rankline">#12694 in England &middot; top 15% of its area beats it &middot; near Hathersage</span>
+  <span class="rankline">#12270 in England &middot; top 14% of its area beats it &middot; near Hathersage</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SK 24675 84425). Click the marker for map links.
+    The exact computed spot (SK 24675 84425). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/stanedge-pole_view1.jpg" alt="Rendered view Looking north-east from Stanedge Pole" loading="lazy">
+      <figcaption>Looking north-east (54&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -172,7 +186,7 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-hathersage-10159.html">Viewpoint near Hathersage</a></td>
+      <td><a href="../viewpoints/viewpoint-near-hathersage-9962.html">Viewpoint near Hathersage</a></td>
       <td>WSW &middot; 1 km</td>
       <td class="num">~2 min</td>
       <td class="num"><span class="score-pill">62.8</span></td>
@@ -186,7 +200,7 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-thornhill-3072.html">Viewpoint near Thornhill</a></td>
+      <td><a href="../viewpoints/viewpoint-near-thornhill-3061.html">Viewpoint near Thornhill</a></td>
       <td>NW &middot; 7 km</td>
       <td class="num">~14 min</td>
       <td class="num"><span class="score-pill">74.1</span></td>
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(54 - 34, 2500), ray(54, 2900),
+             ray(54 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Quarry Cross</h1>
-  <span class="rankline">#14897 in England &middot; top 27% of its area beats it &middot; near Bere Alston</span>
+  <span class="rankline">#14270 in England &middot; top 27% of its area beats it &middot; near Bere Alston</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SX 45675 67025). Click the marker for map links.
+    The exact computed spot (SX 45675 67025). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/quarry-cross_view1.jpg" alt="Rendered view Looking south from Quarry Cross" loading="lazy">
+      <figcaption>Looking south (166&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -186,7 +200,7 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-st-dominic-12534.html">Viewpoint near St Dominic</a></td>
+      <td><a href="../viewpoints/viewpoint-near-st-dominic-12122.html">Viewpoint near St Dominic</a></td>
       <td>W &middot; 5 km</td>
       <td class="num">~12 min</td>
       <td class="num"><span class="score-pill">60.2</span></td>
@@ -200,7 +214,7 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-st-mellion-10662.html">Viewpoint near St Mellion</a></td>
+      <td><a href="../viewpoints/viewpoint-near-st-mellion-10421.html">Viewpoint near St Mellion</a></td>
       <td>WSW &middot; 5 km</td>
       <td class="num">~12 min</td>
       <td class="num"><span class="score-pill">62.2</span></td>
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(166 - 34, 2500), ray(166, 2900),
+             ray(166 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

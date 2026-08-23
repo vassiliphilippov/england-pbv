@@ -59,8 +59,18 @@ against the respective max. `α₀(θ)` = angle to the nearest sampled ground (7
 
 Each raw input becomes its **percentile among all ~46k England candidates** (frozen
 transforms in `score_inputs.py`); components are means of input percentiles; the composite
-is the unweighted mean of the six components. Equal weighting is itself a documented human
-convention, not a discovered law.
+is the unweighted mean of the six components, **scaled by a retention factor**. Equal
+weighting is itself a documented human convention, not a discovered law.
+
+The retention factor (added 2026-08-24) grounds terrain potential in what a standing
+person actually sees: `factor = 0.65 + 0.35 * smoothstep(veg_retention, 0.03, 0.30)`,
+applied to the RAW leaf-on retention rather than its percentile (the national
+distribution compresses 9% and 20% retention onto neighbouring percentiles, which let
+wooded summits outrank open scarp viewpoints — the Box Hill case). Full credit from 30%
+retention keeps wooded-gap viewpoints (Surprise View, Newlands Corner) intact; the 0.65
+floor keeps a fully-wooded summit's score meaningful rather than zeroed. Calibrated
+against the verification set: positives 51/60 (unchanged; Box Hill's Salomons Memorial
+viewpoint starts passing, Gibbet Hill starts failing), negatives 17/20 → 18/20.
 
 | Component | Inputs |
 |---|---|

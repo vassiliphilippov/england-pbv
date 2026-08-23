@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Ulgraves</h1>
-  <span class="rankline">#5642 in England &middot; top 25% of its area beats it &middot; near Garnett Bridge</span>
+  <span class="rankline">#5603 in England &middot; top 25% of its area beats it &middot; near Garnett Bridge</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SD 51065 99610). Click the marker for map links.
+    The exact computed spot (SD 51065 99610). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/ulgraves_view1.jpg" alt="Rendered view Looking south from Ulgraves" loading="lazy">
+      <figcaption>Looking south (172&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -182,7 +196,7 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-sadgill-1770.html">Viewpoint near Sadgill</a></td>
+      <td><a href="../viewpoints/viewpoint-near-sadgill-1766.html">Viewpoint near Sadgill</a></td>
       <td>N &middot; 4 km</td>
       <td class="num">~9 min</td>
       <td class="num"><span class="score-pill">77.3</span></td>
@@ -258,6 +272,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(172 - 34, 2500), ray(172, 2900),
+             ray(172 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

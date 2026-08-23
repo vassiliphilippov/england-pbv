@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Little Solsbury Hill</h1>
-  <span class="rankline">#18737 in England &middot; top 30% of its area beats it &middot; near Swainswick</span>
+  <span class="rankline">#17722 in England &middot; top 27% of its area beats it &middot; near Swainswick</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (ST 76790 67948). Click the marker for map links.
+    The exact computed spot (ST 76790 67948). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/little-solsbury-hill_view1.jpg" alt="Rendered view Looking south-west from Little Solsbury Hill" loading="lazy">
+      <figcaption>Looking south-west (207&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -172,17 +186,10 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-bathampton.html">Viewpoint near Bathampton</a></td>
-      <td>SSE &middot; 3 km</td>
-      <td class="num">~7 min</td>
-      <td class="num"><span class="score-pill">58.2</span></td>
-    </tr>
-    
-    <tr>
       <td><a href="../viewpoints/viewpoint-near-bathford.html">Viewpoint near Bathford</a></td>
       <td>ESE &middot; 3 km</td>
       <td class="num">~8 min</td>
-      <td class="num"><span class="score-pill">64.0</span></td>
+      <td class="num"><span class="score-pill">62.4</span></td>
     </tr>
     
     <tr>
@@ -227,6 +234,13 @@
       <td class="num"><span class="score-pill">80.9</span></td>
     </tr>
     
+    <tr>
+      <td><a href="../viewpoints/garway-hill.html">Garway Hill</a></td>
+      <td>NNW &middot; 66 km</td>
+      <td class="num">~89 min</td>
+      <td class="num"><span class="score-pill">84.6</span></td>
+    </tr>
+    
   </table>
 </div>
 
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(207 - 34, 2500), ray(207, 2900),
+             ray(207 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

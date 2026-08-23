@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Winder</h1>
-  <span class="rankline">#2504 in England &middot; top 5% of its area beats it &middot; near Sedbergh</span>
+  <span class="rankline">#2499 in England &middot; top 5% of its area beats it &middot; near Sedbergh</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SD 65362 93275). Click the marker for map links.
+    The exact computed spot (SD 65362 93275). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/winder_view1.jpg" alt="Rendered view Looking west from Winder" loading="lazy">
+      <figcaption>Looking west (249&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -168,7 +182,7 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-sedbergh-2112.html">Viewpoint near Sedbergh</a></td>
+      <td><a href="../viewpoints/viewpoint-near-sedbergh-2107.html">Viewpoint near Sedbergh</a></td>
       <td>NNE &middot; 1 km</td>
       <td class="num">~4 min</td>
       <td class="num"><span class="score-pill">76.3</span></td>
@@ -258,6 +272,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(249 - 34, 2500), ray(249, 2900),
+             ray(249 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

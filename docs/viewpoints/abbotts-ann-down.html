@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Abbotts Ann Down — view potential 22.5</title>
+<title>Abbotts Ann Down — view potential 14.6</title>
 <meta name="description" content="Objective view metrics for Abbotts Ann Down: 107 km² visible, farthest sightline 44 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Abbotts Ann Down</h1>
-  <span class="rankline">#44940 in England &middot; top 95% of its area beats it &middot; near Abbotts Ann</span>
+  <span class="rankline">#45294 in England &middot; top 96% of its area beats it &middot; near Abbotts Ann</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">22.5<small>view potential (percentile composite)</small></div>
+    <div class="big-score">14.6<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SU 32422 41139). Click the marker for map links.
+    The exact computed spot (SU 32422 41139). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/abbotts-ann-down_view1.jpg" alt="Rendered view Looking south from Abbotts Ann Down" loading="lazy">
+      <figcaption>Looking south (169&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -170,24 +184,31 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-goodworth-clatford.html">Viewpoint near Goodworth Clatford</a></td>
-      <td>ESE &middot; 3 km</td>
-      <td class="num">~7 min</td>
-      <td class="num"><span class="score-pill">35.4</span></td>
-    </tr>
-    
-    <tr>
       <td><a href="../viewpoints/bury-hill.html">Bury Hill</a></td>
       <td>NE &middot; 3 km</td>
       <td class="num">~8 min</td>
-      <td class="num"><span class="score-pill">40.9</span></td>
+      <td class="num"><span class="score-pill">27.6</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/barrow-hill-38088.html">Barrow Hill</a></td>
+      <td>E &middot; 3 km</td>
+      <td class="num">~8 min</td>
+      <td class="num"><span class="score-pill">28.7</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-nether-wallop.html">Viewpoint near Nether Wallop</a></td>
       <td>S &middot; 3 km</td>
       <td class="num">~8 min</td>
-      <td class="num"><span class="score-pill">54.3</span></td>
+      <td class="num"><span class="score-pill">45.8</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-longstock.html">Viewpoint near Longstock</a></td>
+      <td>SSE &middot; 4 km</td>
+      <td class="num">~9 min</td>
+      <td class="num"><span class="score-pill">52.8</span></td>
     </tr>
     
     <tr>
@@ -198,17 +219,10 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-stockbridge-9896.html">Viewpoint near Stockbridge</a></td>
-      <td>SE &middot; 8 km</td>
-      <td class="num">~16 min</td>
-      <td class="num"><span class="score-pill">63.3</span></td>
-    </tr>
-    
-    <tr>
       <td><a href="../viewpoints/viewpoint-near-stockbridge.html">Viewpoint near Stockbridge</a></td>
       <td>SE &middot; 8 km</td>
       <td class="num">~16 min</td>
-      <td class="num"><span class="score-pill">64.3</span></td>
+      <td class="num"><span class="score-pill">63.3</span></td>
     </tr>
     
     <tr>
@@ -219,7 +233,7 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/beacon-hill-1981.html">Beacon Hill</a></td>
+      <td><a href="../viewpoints/beacon-hill-1976.html">Beacon Hill</a></td>
       <td>NE &middot; 21 km</td>
       <td class="num">~35 min</td>
       <td class="num"><span class="score-pill">76.7</span></td>
@@ -260,6 +274,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(169 - 34, 2500), ray(169, 2900),
+             ray(169 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

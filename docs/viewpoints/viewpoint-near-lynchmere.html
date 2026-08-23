@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Viewpoint near Lynchmere</h1>
-  <span class="rankline">#10647 in England &middot; top 14% of its area beats it &middot; near Lynchmere</span>
+  <span class="rankline">#10404 in England &middot; top 12% of its area beats it &middot; near Lynchmere</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -117,8 +117,13 @@
       <figcaption>Looking east (107&deg;) &mdash; 68&deg; lens</figcaption>
     </figure>
     
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/viewpoint-near-lynchmere_view2.jpg" alt="Rendered view Looking west from Viewpoint near Lynchmere" loading="lazy">
+      <figcaption>Looking west (261&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
   </div>
-  <p class="note">Rendered views along the best direction of this panorama.</p>
+  <p class="note">Rendered views along the best directions of this panorama.</p>
 </div>
 
 
@@ -279,6 +284,10 @@
   
   L.polygon([[lat, lon], ray(107 - 34, 2500), ray(107, 2900),
              ray(107 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
+  
+  L.polygon([[lat, lon], ray(261 - 34, 2500), ray(261, 2900),
+             ray(261 + 34, 2500)],
             { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();

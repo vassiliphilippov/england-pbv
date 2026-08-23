@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Ransable Hill</h1>
-  <span class="rankline">#9534 in England &middot; top 11% of its area beats it &middot; near Lothersdale</span>
+  <span class="rankline">#9367 in England &middot; top 10% of its area beats it &middot; near Lothersdale</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SD 95178 47746). Click the marker for map links.
+    The exact computed spot (SD 95178 47746). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/ransable-hill_view1.jpg" alt="Rendered view Looking north-west from Ransable Hill" loading="lazy">
+      <figcaption>Looking north-west (293&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -172,7 +186,7 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-lothersdale-9080.html">Viewpoint near Lothersdale</a></td>
+      <td><a href="../viewpoints/viewpoint-near-lothersdale-8930.html">Viewpoint near Lothersdale</a></td>
       <td>SSW &middot; 0 km</td>
       <td class="num">~1 min</td>
       <td class="num"><span class="score-pill">64.7</span></td>
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(293 - 34, 2500), ray(293, 2900),
+             ray(293 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Bull Hill</h1>
-  <span class="rankline">#29755 in England &middot; top 50% of its area beats it &middot; near Thorpe Salvin</span>
+  <span class="rankline">#27075 in England &middot; top 37% of its area beats it &middot; near Thorpe Salvin</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SK 50934 81653). Click the marker for map links.
+    The exact computed spot (SK 50934 81653). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/bull-hill_view1.jpg" alt="Rendered view Looking west from Bull Hill" loading="lazy">
+      <figcaption>Looking west (279&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -172,17 +186,10 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/fir-hill.html">Fir Hill</a></td>
-      <td>SW &middot; 2 km</td>
-      <td class="num">~6 min</td>
-      <td class="num"><span class="score-pill">50.4</span></td>
-    </tr>
-    
-    <tr>
-      <td><a href="../viewpoints/honey-hills.html">Honey Hills</a></td>
-      <td>ENE &middot; 8 km</td>
-      <td class="num">~16 min</td>
-      <td class="num"><span class="score-pill">51.8</span></td>
+      <td><a href="../viewpoints/viewpoint-near-killamarsh.html">Viewpoint near Killamarsh</a></td>
+      <td>W &middot; 4 km</td>
+      <td class="num">~10 min</td>
+      <td class="num"><span class="score-pill">45.9</span></td>
     </tr>
     
     <tr>
@@ -210,14 +217,14 @@
       <td><a href="../viewpoints/viewpoint-near-maltby.html">Viewpoint near Maltby</a></td>
       <td>NNE &middot; 11 km</td>
       <td class="num">~21 min</td>
-      <td class="num"><span class="score-pill">70.8</span></td>
+      <td class="num"><span class="score-pill">70.7</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-oughtibridge.html">Viewpoint near Oughtibridge</a></td>
-      <td>NW &middot; 22 km</td>
-      <td class="num">~37 min</td>
-      <td class="num"><span class="score-pill">72.5</span></td>
+      <td><a href="../viewpoints/viewpoint-near-whitley.html">Viewpoint near Whitley</a></td>
+      <td>NW &middot; 23 km</td>
+      <td class="num">~38 min</td>
+      <td class="num"><span class="score-pill">72.1</span></td>
     </tr>
     
     <tr>
@@ -225,6 +232,13 @@
       <td>NW &middot; 24 km</td>
       <td class="num">~40 min</td>
       <td class="num"><span class="score-pill">75.2</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/tissington-hill.html">Tissington Hill</a></td>
+      <td>SW &middot; 46 km</td>
+      <td class="num">~66 min</td>
+      <td class="num"><span class="score-pill">75.5</span></td>
     </tr>
     
   </table>
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(279 - 34, 2500), ray(279, 2900),
+             ray(279 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

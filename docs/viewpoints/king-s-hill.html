@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>King&#39;s Hill — view potential 20.4</title>
+<title>King&#39;s Hill — view potential 19.3</title>
 <meta name="description" content="Objective view metrics for King&#39;s Hill: 9 km² visible, farthest sightline 20 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>King&#39;s Hill</h1>
-  <span class="rankline">#45471 in England &middot; top 76% of its area beats it &middot; near Dane End</span>
+  <span class="rankline">#43597 in England &middot; top 55% of its area beats it &middot; near Dane End</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">20.4<small>view potential (percentile composite)</small></div>
+    <div class="big-score">19.3<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (TL 34823 22535). Click the marker for map links.
+    The exact computed spot (TL 34823 22535). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/king-s-hill_view1.jpg" alt="Rendered view Looking south-west from King&#39;s Hill" loading="lazy">
+      <figcaption>Looking south-west (226&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -170,38 +184,24 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/knights-hill-45174.html">Knights Hill</a></td>
-      <td>NE &middot; 4 km</td>
-      <td class="num">~8 min</td>
-      <td class="num"><span class="score-pill">21.7</span></td>
-    </tr>
-    
-    <tr>
-      <td><a href="../viewpoints/wickham-hill.html">Wickham Hill</a></td>
-      <td>ENE &middot; 4 km</td>
-      <td class="num">~10 min</td>
-      <td class="num"><span class="score-pill">21.8</span></td>
-    </tr>
-    
-    <tr>
-      <td><a href="../viewpoints/viewpoint-near-aston-42527.html">Viewpoint near Aston</a></td>
+      <td><a href="../viewpoints/viewpoint-near-aston-43169.html">Viewpoint near Aston</a></td>
       <td>W &middot; 6 km</td>
       <td class="num">~13 min</td>
-      <td class="num"><span class="score-pill">28.3</span></td>
+      <td class="num"><span class="score-pill">20.3</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-thundridge.html">Viewpoint near Thundridge</a></td>
       <td>S &middot; 7 km</td>
       <td class="num">~14 min</td>
-      <td class="num"><span class="score-pill">40.8</span></td>
+      <td class="num"><span class="score-pill">27.7</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-baldock.html">Viewpoint near Baldock</a></td>
       <td>NW &middot; 14 km</td>
       <td class="num">~25 min</td>
-      <td class="num"><span class="score-pill">53.9</span></td>
+      <td class="num"><span class="score-pill">53.7</span></td>
     </tr>
     
     <tr>
@@ -219,10 +219,24 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-church-end.html">Viewpoint near Church End</a></td>
-      <td>W &middot; 34 km</td>
-      <td class="num">~52 min</td>
-      <td class="num"><span class="score-pill">65.8</span></td>
+      <td><a href="../viewpoints/beacon-hill-3077.html">Beacon Hill</a></td>
+      <td>W &middot; 39 km</td>
+      <td class="num">~58 min</td>
+      <td class="num"><span class="score-pill">74.1</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-halton.html">Viewpoint near Halton</a></td>
+      <td>WSW &middot; 48 km</td>
+      <td class="num">~68 min</td>
+      <td class="num"><span class="score-pill">74.3</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/coombe-hill-monument.html">Coombe Hill Monument</a></td>
+      <td>WSW &middot; 52 km</td>
+      <td class="num">~74 min</td>
+      <td class="num"><span class="score-pill">75.5</span></td>
     </tr>
     
   </table>
@@ -260,6 +274,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(226 - 34, 2500), ray(226, 2900),
+             ray(226 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

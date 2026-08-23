@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Upper Park — view potential 45.4</title>
+<title>Upper Park — view potential 36.1</title>
 <meta name="description" content="Objective view metrics for Upper Park: 357 km² visible, farthest sightline 60 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Upper Park</h1>
-  <span class="rankline">#28040 in England &middot; top 40% of its area beats it &middot; near Salt</span>
+  <span class="rankline">#32872 in England &middot; top 49% of its area beats it &middot; near Salt</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">45.4<small>view potential (percentile composite)</small></div>
+    <div class="big-score">36.1<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SJ 96225 29625). Click the marker for map links.
+    The exact computed spot (SJ 96225 29625). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/upper-park_view1.jpg" alt="Rendered view Looking south-west from Upper Park" loading="lazy">
+      <figcaption>Looking south-west (244&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -172,28 +186,28 @@
     <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-aston-by-stone-27874.html">Viewpoint near Aston-by-Stone</a></td>
-      <td>NW &middot; 4 km</td>
-      <td class="num">~9 min</td>
-      <td class="num"><span class="score-pill">45.6</span></td>
+      <td><a href="../viewpoints/viewpoint-near-milwich.html">Viewpoint near Milwich</a></td>
+      <td>N &middot; 2 km</td>
+      <td class="num">~5 min</td>
+      <td class="num"><span class="score-pill">41.6</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-hopton.html">Viewpoint near Hopton</a></td>
       <td>SSW &middot; 5 km</td>
       <td class="num">~11 min</td>
-      <td class="num"><span class="score-pill">49.7</span></td>
+      <td class="num"><span class="score-pill">44.6</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-aston-by-stone.html">Viewpoint near Aston-by-Stone</a></td>
       <td>NW &middot; 5 km</td>
       <td class="num">~11 min</td>
-      <td class="num"><span class="score-pill">50.7</span></td>
+      <td class="num"><span class="score-pill">50.3</span></td>
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-oulton-22037.html">Viewpoint near Oulton</a></td>
+      <td><a href="../viewpoints/viewpoint-near-oulton-20604.html">Viewpoint near Oulton</a></td>
       <td>NW &middot; 6 km</td>
       <td class="num">~13 min</td>
       <td class="num"><span class="score-pill">51.2</span></td>
@@ -214,17 +228,17 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-beech-10738.html">Viewpoint near Beech</a></td>
-      <td>NW &middot; 14 km</td>
+      <td><a href="../viewpoints/viewpoint-near-cheadle.html">Viewpoint near Cheadle</a></td>
+      <td>NNE &middot; 15 km</td>
       <td class="num">~26 min</td>
-      <td class="num"><span class="score-pill">62.1</span></td>
+      <td class="num"><span class="score-pill">61.0</span></td>
     </tr>
     
     <tr>
       <td><a href="../viewpoints/viewpoint-near-beech.html">Viewpoint near Beech</a></td>
       <td>NW &middot; 15 km</td>
       <td class="num">~26 min</td>
-      <td class="num"><span class="score-pill">63.7</span></td>
+      <td class="num"><span class="score-pill">62.9</span></td>
     </tr>
     
   </table>
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(244 - 34, 2500), ray(244, 2900),
+             ray(244 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>

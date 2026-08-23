@@ -38,6 +38,31 @@ COMPONENT_INPUTS: dict[str, list[int]] = {
 }
 COMPONENT_ORDER: list[str] = ["prospect", "openness", "drop", "depth", "diversity", "clearness"]
 
+# The percentile composite measures terrain POTENTIAL; the retention factor grounds it
+# in what a standing person actually sees. Raw leaf-on retention (not its percentile —
+# the national distribution compresses 9% and 20% retention onto neighbouring
+# percentiles) scales the composite through a smoothstep: full credit at >=30%
+# retention, floor at <=3%. Calibrated 2026-08-24 against the 60-viewpoint
+# verification set: positives hold at 51/60, negatives improve 17->20 to 18/20, and
+# Box Hill's open Salomons Memorial viewpoint (a failing expected-high positive)
+# overtakes the wooded Box Hill summit. Steeper hi values break wooded-gap
+# viewpoints (Surprise View, Newlands Corner, ~30-35% retention) — keep hi at 0.30.
+RETENTION_FACTOR_FLOOR: float = 0.65
+RETENTION_SMOOTHSTEP_LO: float = 0.03
+RETENTION_SMOOTHSTEP_HI: float = 0.30
+_RETENTION_INPUT_INDEX: int = INPUT_NAMES.index("retention")
+
+
+def retention_factor(retention: NDArray[np.float64]) -> NDArray[np.float64]:
+    """Smoothstep multiplier 0.65..1.0 from raw leaf-on retention."""
+    t = np.clip(
+        (retention - RETENTION_SMOOTHSTEP_LO) / (RETENTION_SMOOTHSTEP_HI - RETENTION_SMOOTHSTEP_LO),
+        0.0,
+        1.0,
+    )
+    smooth = 3.0 * t * t - 2.0 * t * t * t
+    return RETENTION_FACTOR_FLOOR + (1.0 - RETENTION_FACTOR_FLOOR) * smooth
+
 
 def band_depth_entropy(angular_by_band: list[float]) -> float:
     total = sum(angular_by_band)
@@ -97,7 +122,7 @@ class FrozenPercentiles:
         for component in COMPONENT_ORDER:
             indices = COMPONENT_INPUTS[component]
             totals += np.mean(pct[:, indices], axis=1)
-        return totals / len(COMPONENT_ORDER)
+        return totals / len(COMPONENT_ORDER) * retention_factor(vectors[:, _RETENTION_INPUT_INDEX])
 
     def score_one(self, vector: list[float]) -> ScoredComponents:
         pct = self.percentiles(np.array([vector], dtype=np.float64))[0]
@@ -105,5 +130,8 @@ class FrozenPercentiles:
         for component in COMPONENT_ORDER:
             indices = COMPONENT_INPUTS[component]
             components[component] = float(np.mean(pct[indices]))
-        composite = float(np.mean([components[c] for c in COMPONENT_ORDER]))
+        factor = float(
+            retention_factor(np.array([vector[_RETENTION_INPUT_INDEX]], dtype=np.float64))[0]
+        )
+        composite = float(np.mean([components[c] for c in COMPONENT_ORDER])) * factor
         return ScoredComponents(components=components, composite=composite)

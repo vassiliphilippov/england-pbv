@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>East View — view potential 46.2</title>
+<meta name="description" content="Objective view metrics for East View: 293 km² visible, farthest sightline 48 km">
+<link rel="stylesheet" href="../assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="../index.html">Potentially Beautiful <span>Views of England</span></a>
+    <nav>
+      <a href="../index.html">Map &amp; rankings</a>
+      <a href="../postcode.html">Near me</a>
+      <a href="../vote.html">Vote</a>
+      <a href="../verification.html">Verification</a>
+      <a href="../methodology.html">Methodology</a>
+      <a href="https://github.com/vassiliphilippov/england-pbv">GitHub</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+
+<p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
+<div class="viewpoint-head">
+  <h1>East View</h1>
+  <span class="rankline">#24943 in England &middot; top 28% of its area beats it &middot; near Colwick</span>
+</div>
+
+<div class="links-row" style="margin: 12px 0 18px;">
+  <a href="https://maps.google.com/?q=52.95283,-1.11670">Google Maps</a>
+  <a href="https://explore.osmaps.com/pin?lat=52.95283&amp;lon=-1.11670&amp;zoom=15">OS Maps</a>
+  <a href="https://www.openstreetmap.org/?mlat=52.95283&amp;mlon=-1.11670#map=15/52.95283/-1.11670">OpenStreetMap</a>
+  <a href="https://www.peakfinder.com/?lat=52.95283&amp;lng=-1.11670">PeakFinder panorama</a>
+  <a href="https://www.geograph.org.uk/gridref/SK5939">Photos of this square (Geograph)</a>
+</div>
+
+<div class="card">
+  <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
+    <div class="big-score">46.2<small>view potential (percentile composite)</small></div>
+    <div class="components" style="flex:1; min-width:min(340px,100%);">
+      
+      <div class="component">
+        <div class="value">48</div>
+        <div class="bar"><i style="width:48%"></i></div>
+        <div class="name">Prospect</div>
+      </div>
+      
+      <div class="component">
+        <div class="value">52</div>
+        <div class="bar"><i style="width:52%"></i></div>
+        <div class="name">Openness</div>
+      </div>
+      
+      <div class="component">
+        <div class="value">52</div>
+        <div class="bar"><i style="width:52%"></i></div>
+        <div class="name">Drop</div>
+      </div>
+      
+      <div class="component">
+        <div class="value">48</div>
+        <div class="bar"><i style="width:48%"></i></div>
+        <div class="name">Depth</div>
+      </div>
+      
+      <div class="component">
+        <div class="value">86</div>
+        <div class="bar"><i style="width:86%"></i></div>
+        <div class="name">Variety</div>
+      </div>
+      
+      <div class="component">
+        <div class="value">13</div>
+        <div class="bar"><i style="width:13%"></i></div>
+        <div class="name">Clearness</div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Where it is</h3>
+  <div id="vp-map"></div>
+  <p class="note">
+    The exact computed spot (SK 59441 39860). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
+  </p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">The view, rendered</h3>
+  <img class="render-img" src="../renders/east-view.jpg" alt="Synthetic 360-degree render of the view from East View" loading="lazy">
+  <div class="compass-ruler"><span>N</span><span>E</span><span>S</span><span>W</span><span>N</span></div>
+  <p class="note">
+    A 360&deg; render of this exact spot computed from the terrain model, tree cover and land
+    cover &mdash; summer colours, afternoon light, calibrated against photographs of famous
+    viewpoints. Real trees, hedges and buildings will differ in detail.
+  </p>
+</div>
+
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/east-view_view1.jpg" alt="Rendered view Looking south-west from East View" loading="lazy">
+      <figcaption>Looking south-west (208&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
+
+
+<div class="card">
+  <h3 style="margin-top:0">The panorama</h3>
+  <svg viewBox="0 0 920 240" xmlns="http://www.w3.org/2000/svg" class="horizon-chart" role="img" aria-label="Horizon panorama"><line x1="44" y1="178.8" x2="908" y2="178.8" class="zero-line"/><path d="M44,206.0 L44.0,171.3 50.0,171.7 56.0,172.1 62.0,172.7 68.0,173.2 74.0,173.4 80.0,173.8 86.0,174.0 92.0,174.5 98.0,175.3 104.0,174.8 110.0,172.3 116.0,169.7 122.0,167.1 128.0,164.4 134.0,161.6 140.0,158.8 146.0,155.9 152.0,152.9 158.0,149.9 164.0,147.2 170.0,145.6 176.0,144.4 182.0,143.4 188.0,142.4 194.0,138.4 200.0,135.9 206.0,137.2 212.0,138.5 218.0,139.6 224.0,139.9 230.0,139.9 236.0,140.1 242.0,143.0 248.0,145.4 254.0,151.5 260.0,157.6 266.0,163.7 272.0,169.7 278.0,174.8 284.0,179.6 290.0,179.2 296.0,179.2 302.0,178.4 308.0,177.9 314.0,177.3 320.0,177.3 326.0,177.5 332.0,177.3 338.0,177.2 344.0,177.1 350.0,177.2 356.0,177.5 362.0,177.8 368.0,177.5 374.0,177.2 380.0,176.9 386.0,176.8 392.0,176.7 398.0,177.3 404.0,177.2 410.0,177.0 416.0,177.1 422.0,177.4 428.0,177.6 434.0,177.7 440.0,177.9 446.0,178.0 452.0,178.2 458.0,178.4 464.0,178.8 470.0,179.2 476.0,179.6 482.0,179.4 488.0,179.2 494.0,179.6 500.0,179.5 506.0,178.3 512.0,177.7 518.0,176.6 524.0,176.6 530.0,176.4 536.0,176.3 542.0,176.1 548.0,177.0 554.0,177.4 560.0,178.6 566.0,178.7 572.0,178.5 578.0,178.4 584.0,178.5 590.0,178.7 596.0,178.4 602.0,178.2 608.0,178.8 614.0,178.9 620.0,179.6 626.0,180.0 632.0,180.7 638.0,180.3 644.0,180.3 650.0,180.0 656.0,178.5 662.0,177.9 668.0,177.2 674.0,177.7 680.0,178.3 686.0,178.5 692.0,178.4 698.0,177.9 704.0,177.8 710.0,177.1 716.0,176.2 722.0,177.4 728.0,176.2 734.0,175.3 740.0,175.4 746.0,175.1 752.0,175.4 758.0,175.7 764.0,175.4 770.0,175.6 776.0,175.7 782.0,175.5 788.0,175.4 794.0,176.1 800.0,175.9 806.0,175.0 812.0,173.4 818.0,171.5 824.0,170.4 830.0,169.4 836.0,169.2 842.0,168.8 848.0,168.9 854.0,169.2 860.0,169.8 866.0,169.8 872.0,169.3 878.0,168.6 884.0,169.5 890.0,170.1 896.0,170.4 902.0,170.8 908.0,171.3 L908,206.0 Z" class="terrain-fill"/><polyline points="44.0,108.4 50.0,102.7 56.0,97.0 62.0,91.4 68.0,85.7 74.0,80.0 80.0,74.3 86.0,68.7 92.0,63.4 98.0,61.1 104.0,58.8 110.0,56.3 116.0,53.8 122.0,51.3 128.0,48.6 134.0,45.9 140.0,43.2 146.0,40.4 152.0,37.5 158.0,34.6 164.0,32.0 170.0,30.5 176.0,29.3 182.0,28.3 188.0,27.3 194.0,26.6 200.0,26.0 206.0,25.5 212.0,25.2 218.0,25.0 224.0,24.9 230.0,24.9 236.0,25.1 242.0,28.9 248.0,36.7 254.0,44.6 260.0,52.6 266.0,60.8 272.0,69.1 278.0,77.6 284.0,86.2 290.0,95.0 296.0,104.1 302.0,113.3 308.0,122.7 314.0,132.3 320.0,141.7 326.0,151.1 332.0,160.3 338.0,169.4 344.0,175.5 350.0,177.2 356.0,177.5 362.0,177.8 368.0,177.5 374.0,177.2 380.0,176.9 386.0,176.2 392.0,176.7 398.0,177.3 404.0,176.6 410.0,177.0 416.0,177.1 422.0,177.4 428.0,177.6 434.0,177.5 440.0,177.5 446.0,177.4 452.0,177.8 458.0,178.4 464.0,178.5 470.0,178.3 476.0,178.6 482.0,178.4 488.0,178.2 494.0,179.1 500.0,177.6 506.0,177.9 512.0,177.7 518.0,176.2 524.0,176.2 530.0,176.0 536.0,176.3 542.0,176.1 548.0,176.6 554.0,176.9 560.0,178.2 566.0,177.8 572.0,178.5 578.0,178.0 584.0,178.5 590.0,178.7 596.0,178.4 602.0,178.2 608.0,178.4 614.0,178.5 620.0,179.4 626.0,179.9 632.0,179.9 638.0,180.1 644.0,179.3 650.0,179.4 656.0,177.3 662.0,177.7 668.0,177.2 674.0,177.0 680.0,178.0 686.0,178.4 692.0,177.9 698.0,177.9 704.0,177.4 710.0,175.8 716.0,175.9 722.0,177.2 728.0,175.3 734.0,174.0 740.0,174.2 746.0,174.7 752.0,175.0 758.0,175.4 764.0,175.4 770.0,175.6 776.0,173.7 782.0,171.9 788.0,173.4 794.0,175.3 800.0,173.9 806.0,172.0 812.0,170.7 818.0,167.1 824.0,166.2 830.0,166.2 836.0,165.0 842.0,166.1 848.0,162.6 854.0,157.6 860.0,152.5 866.0,147.2 872.0,141.7 878.0,136.2 884.0,130.5 890.0,125.0 896.0,119.5 902.0,114.0 908.0,108.4" class="veg-line" fill="none"/><rect x="44" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="58" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="73" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="87" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="102" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="116" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="130" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="145" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="159" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="174" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="188" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="202" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="217" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="231" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="246" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="260" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="274" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="289" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="303" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="318" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="332" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="346" y="214" width="14.9" height="8" fill="#99b0d6"/><rect x="361" y="214" width="14.9" height="8" fill="#9cb2d7"/><rect x="375" y="214" width="14.9" height="8" fill="#9bb1d7"/><rect x="390" y="214" width="14.9" height="8" fill="#9eb4d8"/><rect x="404" y="214" width="14.9" height="8" fill="#9fb5d8"/><rect x="418" y="214" width="14.9" height="8" fill="#9eb4d8"/><rect x="433" y="214" width="14.9" height="8" fill="#9eb4d8"/><rect x="447" y="214" width="14.9" height="8" fill="#9cb2d7"/><rect x="462" y="214" width="14.9" height="8" fill="#a2b7d9"/><rect x="476" y="214" width="14.9" height="8" fill="#b1c2de"/><rect x="490" y="214" width="14.9" height="8" fill="#b9c9e1"/><rect x="505" y="214" width="14.9" height="8" fill="#7e9ccc"/><rect x="519" y="214" width="14.9" height="8" fill="#7e9ccc"/><rect x="534" y="214" width="14.9" height="8" fill="#7d9bcc"/><rect x="548" y="214" width="14.9" height="8" fill="#829fce"/><rect x="562" y="214" width="14.9" height="8" fill="#7695ca"/><rect x="577" y="214" width="14.9" height="8" fill="#7695ca"/><rect x="591" y="214" width="14.9" height="8" fill="#7594c9"/><rect x="606" y="214" width="14.9" height="8" fill="#7393c9"/><rect x="620" y="214" width="14.9" height="8" fill="#6b8dc6"/><rect x="634" y="214" width="14.9" height="8" fill="#4c75bb"/><rect x="649" y="214" width="14.9" height="8" fill="#acbfdd"/><rect x="663" y="214" width="14.9" height="8" fill="#b1c2de"/><rect x="678" y="214" width="14.9" height="8" fill="#a0b6d8"/><rect x="692" y="214" width="14.9" height="8" fill="#9eb4d8"/><rect x="706" y="214" width="14.9" height="8" fill="#9cb2d7"/><rect x="721" y="214" width="14.9" height="8" fill="#5e83c1"/><rect x="735" y="214" width="14.9" height="8" fill="#c0cee4"/><rect x="750" y="214" width="14.9" height="8" fill="#5b81c0"/><rect x="764" y="214" width="14.9" height="8" fill="#5c82c0"/><rect x="778" y="214" width="14.9" height="8" fill="#d9e1ed"/><rect x="793" y="214" width="14.9" height="8" fill="#d9e1ed"/><rect x="807" y="214" width="14.9" height="8" fill="#d8e0ec"/><rect x="822" y="214" width="14.9" height="8" fill="#d8e0ec"/><rect x="836" y="214" width="14.9" height="8" fill="#d8e0ec"/><rect x="850" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="865" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="879" y="214" width="14.9" height="8" fill="#e1e7ef"/><rect x="894" y="214" width="14.9" height="8" fill="#e1e7ef"/><text x="44.0" y="234" class="axis-label" text-anchor="middle">N</text><text x="260.0" y="234" class="axis-label" text-anchor="middle">E</text><text x="476.0" y="234" class="axis-label" text-anchor="middle">S</text><text x="692.0" y="234" class="axis-label" text-anchor="middle">W</text><text x="908.0" y="234" class="axis-label" text-anchor="middle">N</text><text x="38" y="182.8" class="axis-label" text-anchor="end">0&#176;</text><text x="38" y="114.7" class="axis-label" text-anchor="end">5&#176;</text><text x="38" y="46.7" class="axis-label" text-anchor="end">10&#176;</text></svg>
+  <p class="note">
+    Grey silhouette: terrain skyline in each direction (720 bearings, Earth curvature and
+    refraction included). Dashed green: skyline with trees (+15&nbsp;m) and buildings (+8&nbsp;m) as
+    obstacles. Blue strip: how far the ground is visible on each bearing.
+  </p>
+</div>
+
+<div class="two-col-cards">
+  <div class="card" style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
+    <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg" class="polar-chart" role="img" aria-label="View reach by direction"><circle cx="130.0" cy="130.0" r="44.9" class="polar-ring"/><text x="133.0" y="83.1" class="polar-ring-label">10km</text><circle cx="130.0" cy="130.0" r="71.0" class="polar-ring"/><text x="133.0" y="57.0" class="polar-ring-label">25km</text><circle cx="130.0" cy="130.0" r="100.4" class="polar-ring"/><text x="133.0" y="27.6" class="polar-ring-label">50km</text><path d="M130.0,130.0 L183,168 A65,65 0 0 1 178,174 Z" fill="#a5bada"/><path d="M130.0,130.0 L178,173 A64,64 0 0 1 173,178 Z" fill="#a8bbdb"/><path d="M130.0,130.0 L173,178 A65,65 0 0 1 168,183 Z" fill="#a7badb"/><path d="M130.0,130.0 L167,181 A63,63 0 0 1 161,185 Z" fill="#a9bddc"/><path d="M130.0,130.0 L161,184 A63,63 0 0 1 155,188 Z" fill="#aabddc"/><path d="M130.0,130.0 L156,188 A64,64 0 0 1 149,191 Z" fill="#a9bcdc"/><path d="M130.0,130.0 L150,190 A64,64 0 0 1 143,192 Z" fill="#a9bcdc"/><path d="M130.0,130.0 L143,193 A64,64 0 0 1 136,194 Z" fill="#a8bbdb"/><path d="M130.0,130.0 L136,191 A61,61 0 0 1 130,191 Z" fill="#adbfdd"/><path d="M130.0,130.0 L130,184 A54,54 0 0 1 124,184 Z" fill="#b9c8e1"/><path d="M130.0,130.0 L125,179 A49,49 0 0 1 120,178 Z" fill="#c0cee4"/><path d="M130.0,130.0 L114,205 A77,77 0 0 1 106,203 Z" fill="#8fa8d2"/><path d="M130.0,130.0 L106,203 A77,77 0 0 1 98,200 Z" fill="#8fa8d2"/><path d="M130.0,130.0 L99,201 A77,77 0 0 1 91,197 Z" fill="#8ea7d2"/><path d="M130.0,130.0 L92,195 A75,75 0 0 1 86,191 Z" fill="#92abd4"/><path d="M130.0,130.0 L83,195 A80,80 0 0 1 76,189 Z" fill="#88a3d0"/><path d="M130.0,130.0 L77,189 A80,80 0 0 1 70,183 Z" fill="#88a3d0"/><path d="M130.0,130.0 L70,184 A80,80 0 0 1 65,177 Z" fill="#87a2d0"/><path d="M130.0,130.0 L65,178 A81,81 0 0 1 60,170 Z" fill="#86a1cf"/><path d="M130.0,130.0 L57,172 A84,84 0 0 1 53,164 Z" fill="#7f9ccd"/><path d="M130.0,130.0 L44,168 A94,94 0 0 1 40,159 Z" fill="#6588c4"/><path d="M130.0,130.0 L77,147 A56,56 0 0 1 75,141 Z" fill="#b5c6e0"/><path d="M130.0,130.0 L77,141 A54,54 0 0 1 76,135 Z" fill="#b9c8e1"/><path d="M130.0,130.0 L68,137 A62,62 0 0 1 68,130 Z" fill="#abbedc"/><path d="M130.0,130.0 L66,130 A64,64 0 0 1 67,123 Z" fill="#a9bcdc"/><path d="M130.0,130.0 L66,123 A64,64 0 0 1 67,116 Z" fill="#a8bbdb"/><path d="M130.0,130.0 L43,112 A88,88 0 0 1 46,102 Z" fill="#7493c9"/><path d="M130.0,130.0 L88,116 A44,44 0 0 1 89,112 Z" fill="#c6d2e6"/><path d="M130.0,130.0 L48,94 A89,89 0 0 1 53,85 Z" fill="#7192c8"/><path d="M130.0,130.0 L53,86 A89,89 0 0 1 58,77 Z" fill="#7293c8"/><path d="M130.0,130.0 L112,117 A22,22 0 0 1 113,115 Z" fill="#dae2ed"/><path d="M130.0,130.0 L114,115 A22,22 0 0 1 115,114 Z" fill="#dbe2ed"/><path d="M130.0,130.0 L114,113 A23,23 0 0 1 116,111 Z" fill="#dae2ed"/><path d="M130.0,130.0 L116,111 A23,23 0 0 1 118,110 Z" fill="#dae2ed"/><path d="M130.0,130.0 L118,110 A23,23 0 0 1 121,109 Z" fill="#dae2ed"/><text x="130.0" y="13.0" class="axis-label" text-anchor="middle">N</text><text x="251.0" y="134.0" class="axis-label" text-anchor="middle">E</text><text x="130.0" y="255.0" class="axis-label" text-anchor="middle">S</text><text x="9.0" y="134.0" class="axis-label" text-anchor="middle">W</text></svg>
+    <div>
+      <h3 style="margin-top:0">Where the view opens</h3>
+      <p class="note">Wedge length = distance to the farthest visible ground on that bearing
+      (vegetation-aware). Rings at 10, 25 and 50&nbsp;km.</p>
+    </div>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0">What fills the view</h3>
+    <div class="lc-bar">
+      
+      <div style="width:49.80%; background:#a9756b" title="built-up 50%"></div>
+      
+      <div style="width:31.47%; background:#55803c" title="woodland 31%"></div>
+      
+      <div style="width:14.62%; background:#a8c686" title="grassland 15%"></div>
+      
+      <div style="width:2.38%; background:#d9c078" title="cropland 2%"></div>
+      
+      <div style="width:1.70%; background:#6da3c9" title="water 2%"></div>
+      
+    </div>
+    <p class="lc-legend">
+      <b>50%</b> built-up &middot; <b>31%</b> woodland &middot; <b>15%</b> grassland &middot; <b>2%</b> cropland &middot; <b>2%</b> water
+    </p>
+    <p class="note">Angular shares of the visible panorama (visual magnitude), not map area.
+    Landscape diversity 0.50 (0&ndash;1 Shannon).</p>
+  </div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Key numbers</h3>
+  <div class="facts">
+    <div class="fact"><div class="k">Elevation</div><div class="v">84 m</div></div>
+    <div class="fact"><div class="k">Visible land</div><div class="v">293 <small>km²</small></div></div>
+    <div class="fact"><div class="k">Farthest sightline</div><div class="v">48 <small>km</small></div></div>
+    <div class="fact"><div class="k">Open arc beyond 10 km</div><div class="v">26&deg;</div></div>
+    <div class="fact"><div class="k">Drop to the vale</div><div class="v">63 <small>m</small></div></div>
+    <div class="fact"><div class="k">Downward view angle</div><div class="v">6.6&deg;</div></div>
+    <div class="fact"><div class="k">Leaf-on retention</div><div class="v">22<small>%</small></div></div>
+    <div class="fact"><div class="k">Grid reference</div><div class="v" style="font-size:15px">SK 59441 39860</div></div>
+  </div>
+</div>
+
+
+<div class="card">
+  <h3 style="margin-top:0">More beautiful places nearby</h3>
+  <p class="note">The staircase of upgrades: each row has a higher view potential than everything
+  closer. Driving times are estimates from straight-line distance, calibrated against real road
+  routing &mdash; check an actual route before setting out.</p>
+  <table class="rank">
+    <tr><th>Place</th><th>Direction</th><th class="num">Drive</th><th class="num">Score</th></tr>
+    
+    <tr>
+      <td><a href="../viewpoints/south-viewing-platform.html">South Viewing Platform</a></td>
+      <td>NNE &middot; 5 km</td>
+      <td class="num">~10 min</td>
+      <td class="num"><span class="score-pill">50.3</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/north-viewing-platform.html">North Viewing Platform</a></td>
+      <td>NNE &middot; 5 km</td>
+      <td class="num">~11 min</td>
+      <td class="num"><span class="score-pill">50.6</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-arnold.html">Viewpoint near Arnold</a></td>
+      <td>N &middot; 7 km</td>
+      <td class="num">~15 min</td>
+      <td class="num"><span class="score-pill">64.1</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/no-man-s-lane.html">No Man&#39;s Lane</a></td>
+      <td>W &middot; 14 km</td>
+      <td class="num">~25 min</td>
+      <td class="num"><span class="score-pill">65.8</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-stathern-7846.html">Viewpoint near Stathern</a></td>
+      <td>ESE &middot; 21 km</td>
+      <td class="num">~35 min</td>
+      <td class="num"><span class="score-pill">66.3</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-stathern.html">Viewpoint near Stathern</a></td>
+      <td>ESE &middot; 21 km</td>
+      <td class="num">~35 min</td>
+      <td class="num"><span class="score-pill">67.2</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-belvoir-6109.html">Viewpoint near Belvoir</a></td>
+      <td>ESE &middot; 23 km</td>
+      <td class="num">~38 min</td>
+      <td class="num"><span class="score-pill">68.9</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-belvoir.html">Viewpoint near Belvoir</a></td>
+      <td>ESE &middot; 23 km</td>
+      <td class="num">~38 min</td>
+      <td class="num"><span class="score-pill">70.8</span></td>
+    </tr>
+    
+  </table>
+</div>
+
+
+<p class="note" style="margin-top:14px">
+  52.95283, -1.11670 &middot; source: osm viewpoint &middot; position refined by local search.
+  Computed location &mdash; check access rights before visiting.
+</p>
+
+<script>
+(function () {
+  const lat = 52.95283, lon = -1.11670;
+  const map = L.map('vp-map', { scrollWheelZoom: false }).setView([lat, lon], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 17,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  const name = "East View";
+  // bindPopup parses its string as HTML; names come from open data (OSM/DoBIH tags).
+  const nameHtml = name.replace(/[&<>"]/g,
+    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  L.marker([lat, lon]).addTo(map).bindPopup(
+    '<b>' + nameHtml + '</b><br>' +
+    '<a href="https://maps.google.com/?q=52.95283,-1.11670">Google Maps</a> &middot; ' +
+    '<a href="https://explore.osmaps.com/pin?lat=52.95283&amp;lon=-1.11670&amp;zoom=15">OS Maps</a> &middot; ' +
+    '<a href="https://www.openstreetmap.org/?mlat=52.95283&amp;mlon=-1.11670#map=15/52.95283/-1.11670">OpenStreetMap</a>'
+  );
+  // 68-degree wedges along the rendered camera directions, ~2.5 km deep.
+  const mPerDegLat = 111320;
+  const mPerDegLon = mPerDegLat * Math.cos(lat * Math.PI / 180);
+  function ray(azDeg, meters) {
+    const az = azDeg * Math.PI / 180;
+    return [lat + Math.cos(az) * meters / mPerDegLat,
+            lon + Math.sin(az) * meters / mPerDegLon];
+  }
+  
+  L.polygon([[lat, lon], ray(208 - 34, 2500), ray(208, 2900),
+             ray(208 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
+  
+})();
+</script>
+
+</main>
+<footer class="site">
+  <div class="wrap">
+    Computed from open data: OS Terrain 50 (contains OS data &copy; Crown copyright and database right 2026)
+    &middot; ESA WorldCover 2021 (CC-BY 4.0) &middot; OpenStreetMap (ODbL) &middot; Database of British and Irish Hills (CC-BY 4.0)
+    &middot; Environment Agency LiDAR Composite DTM (OGL) &middot; Natural England Priority Habitats Inventory (OGL)
+    &middot; renders contain modified Copernicus Sentinel data 2023&ndash;2026 (CC BY-SA 3.0 IGO).
+    Scores describe measurable view geometry ("view potential"), never beauty itself.
+    Locations are computed &mdash; always check access rights, paths and safety before visiting.
+  </div>
+</footer>
+</body>
+</html>

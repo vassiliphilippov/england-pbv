@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Seaview — view potential 43.7</title>
+<title>Seaview — view potential 41.8</title>
 <meta name="description" content="Objective view metrics for Seaview: 537 km² visible, farthest sightline 49 km">
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
@@ -31,7 +31,7 @@
 <p class="crumb"><a href="../index.html">&larr; all viewpoints</a></p>
 <div class="viewpoint-head">
   <h1>Seaview</h1>
-  <span class="rankline">#29663 in England &middot; top 53% of its area beats it &middot; near Poole</span>
+  <span class="rankline">#28560 in England &middot; top 47% of its area beats it &middot; near Poole</span>
 </div>
 
 <div class="links-row" style="margin: 12px 0 18px;">
@@ -44,7 +44,7 @@
 
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
-    <div class="big-score">43.7<small>view potential (percentile composite)</small></div>
+    <div class="big-score">41.8<small>view potential (percentile composite)</small></div>
     <div class="components" style="flex:1; min-width:min(340px,100%);">
       
       <div class="component">
@@ -91,7 +91,8 @@
   <h3 style="margin-top:0">Where it is</h3>
   <div id="vp-map"></div>
   <p class="note">
-    The exact computed spot (SZ 03339 92206). Click the marker for map links.
+    The exact computed spot (SZ 03339 92206). Green wedges show where the
+    rendered camera views below look. Click the marker for map links.
   </p>
 </div>
 
@@ -106,6 +107,19 @@
   </p>
 </div>
 
+
+<div class="card">
+  <h3 style="margin-top:0">Through the camera</h3>
+  <div class="views-grid">
+    
+    <figure class="view-figure">
+      <img class="render-img" src="../renders/seaview_view1.jpg" alt="Rendered view Looking south-west from Seaview" loading="lazy">
+      <figcaption>Looking south-west (240&deg;) &mdash; 68&deg; lens</figcaption>
+    </figure>
+    
+  </div>
+  <p class="note">Rendered views along the best direction of this panorama.</p>
+</div>
 
 
 <div class="card">
@@ -179,13 +193,6 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-merley.html">Viewpoint near Merley</a></td>
-      <td>N &middot; 4 km</td>
-      <td class="num">~10 min</td>
-      <td class="num"><span class="score-pill">59.5</span></td>
-    </tr>
-    
-    <tr>
       <td><a href="../viewpoints/viewpoint-near-corfe-mullen.html">Viewpoint near Corfe Mullen</a></td>
       <td>WNW &middot; 6 km</td>
       <td class="num">~13 min</td>
@@ -193,7 +200,7 @@
     </tr>
     
     <tr>
-      <td><a href="../viewpoints/viewpoint-near-studland-10270.html">Viewpoint near Studland</a></td>
+      <td><a href="../viewpoints/viewpoint-near-studland-10055.html">Viewpoint near Studland</a></td>
       <td>S &middot; 10 km</td>
       <td class="num">~20 min</td>
       <td class="num"><span class="score-pill">62.6</span></td>
@@ -225,6 +232,13 @@
       <td>SW &middot; 17 km</td>
       <td class="num">~29 min</td>
       <td class="num"><span class="score-pill">86.6</span></td>
+    </tr>
+    
+    <tr>
+      <td><a href="../viewpoints/viewpoint-near-kimmeridge.html">Viewpoint near Kimmeridge</a></td>
+      <td>SW &middot; 17 km</td>
+      <td class="num">~30 min</td>
+      <td class="num"><span class="score-pill">87.5</span></td>
     </tr>
     
   </table>
@@ -262,6 +276,10 @@
     return [lat + Math.cos(az) * meters / mPerDegLat,
             lon + Math.sin(az) * meters / mPerDegLon];
   }
+  
+  L.polygon([[lat, lon], ray(240 - 34, 2500), ray(240, 2900),
+             ray(240 + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
   
 })();
 </script>
