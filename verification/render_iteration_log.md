@@ -47,6 +47,24 @@ stand at the edge, grid refs quantize to 10 m; (b) land cover still 50 m — tre
 should sample native 10 m WorldCover (restores hedgerow oaks); (c) near-foreground still
 silk-smooth under the new sun; (d) villages remain mauve mist (OSM buildings).
 
+## Cycle 3 — native 10 m land cover + brow nudge — ACCEPTED
+
+Changes: England 10 m WorldCover grid (uint8, same frame as the 10 m DTM) sampled for
+geometry and colour with 50 m fallback (Wales keeps real 10 m cover; only terrain falls
+back there). "Step to the brow": render_view camera advances up to 2x12 m along the view
+bearing when the ground ahead drops >1 m.
+
+Verdict: strong accept. Latrigg is now near-1:1 with the photo (Keswick as textured town
+mass, plantation belt, fell relief). Coombe's vale gained hedgerow trees and farm
+buildings; Mam Tor's Edale side shows walled fields like the photo. The Mam Tor crown
+persists — the nudge threshold (1 m per 12 m step) never fires on the flat crest; the
+photo camera's advantage is microrelief (path cut) below 10 m resolution.
+
+Carry-over: (a) relax nudge to ~0.4 m/step x4 steps and re-test Mam Tor only; (b) fell
+colours — bracken russet/heather on steep acid upland (photo Latrigg foreground is orange
+bracken); (c) round tree canopy tops; (d) photo-like cumulus sky; (e) consider swapping in
+a fresh photo set soon — Latrigg/Coaley/Uffington/Devil's Dyke are close.
+
 ## Failures ledger (do not repeat)
 
 - (from pre-loop) Fixed march steps near the observer paint terrace bands — step must scale

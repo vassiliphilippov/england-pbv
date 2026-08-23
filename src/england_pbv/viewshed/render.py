@@ -130,6 +130,29 @@ def _sample_elev(
 
 
 @njit(cache=True, inline="always")
+def _landcover_at2(
+    lc50: NDArray[np.uint8],
+    lc10: NDArray[np.uint8],
+    has10: bool,
+    x: float,
+    y: float,
+) -> int:
+    """Land-cover bin from the England 10 m grid, falling back to the 50 m grid."""
+    if has10:
+        c = int((x - DEM10_X0) / DEM10_CELL)
+        r = int((y - DEM10_Y0) / DEM10_CELL)
+        h10, w10 = lc10.shape
+        if c >= 0 and c < w10 and r >= 0 and r < h10:
+            code = int(lc10[r, c])
+            if code != 0:
+                bin_index = code // 10
+                if bin_index >= 11:
+                    bin_index = 10
+                return bin_index
+    return _landcover_at(lc50, x, y)
+
+
+@njit(cache=True, inline="always")
 def _hash01(ix: int, iy: int) -> float:
     h = (ix * 73856093) ^ (iy * 19349663)
     h = (h ^ (h >> 13)) * 1274126177
@@ -171,6 +194,8 @@ def _render_kernel(
     dem10: NDArray[np.int16],
     has10: bool,
     landcover: NDArray[np.uint8],
+    landcover10: NDArray[np.uint8],
+    has10_lc: bool,
     obs_e: float,
     obs_n: float,
     eye_z: float,
@@ -218,7 +243,7 @@ def _render_kernel(
             x = obs_e + dx * r
             y = obs_n + dy * r
             z = _sample_elev(dem, dem10, has10, x, y)
-            lc_bin = _landcover_at(landcover, x, y)
+            lc_bin = _landcover_at2(landcover, landcover10, has10_lc, x, y)
             clearing = (r - CLEARING_RAMP_START_M) / (CLEARING_RAMP_FULL_M - CLEARING_RAMP_START_M)
             if clearing < 0.0:
                 clearing = 0.0
@@ -268,7 +293,7 @@ def _render_kernel(
                 if jitter > 1.5:
                     xc = x + (_smooth_noise(x * 0.11 + 7.7, y * 0.11) - 0.5) * 2.0 * jitter
                     yc = y + (_smooth_noise(x * 0.11, y * 0.11 + 3.3) - 0.5) * 2.0 * jitter
-                    lc_color = _landcover_at(landcover, xc, yc)
+                    lc_color = _landcover_at2(landcover, landcover10, has10_lc, xc, yc)
                 else:
                     xc = x
                     yc = y
@@ -481,6 +506,8 @@ def _run_kernel(
     dem10: NDArray[np.int16],
     has10: bool,
     landcover: NDArray[np.uint8],
+    landcover10: NDArray[np.uint8],
+    has10_lc: bool,
     easting: float,
     northing: float,
     col_azimuth: NDArray[np.float64],
@@ -491,8 +518,22 @@ def _run_kernel(
     f_v_px: float,
     cy_px: float,
     pitch_rad: float,
+    view_bearing_rad: float = -99.0,
 ) -> NDArray[np.uint8]:
     easting, northing, ground = _crest_snap(dem, dem10, has10, easting, northing)
+    if view_bearing_rad > -10.0:
+        # Photographers step to the edge: grid refs quantize to 10 m, and at a break
+        # of slope those metres decide whether the foreground hides the valley.
+        bx = math.sin(view_bearing_rad)
+        by = math.cos(view_bearing_rad)
+        for _ in range(2):
+            ahead = _sample_elev(dem, dem10, has10, easting + bx * 12.0, northing + by * 12.0)
+            if ahead < ground - 1.0:
+                easting += bx * 12.0
+                northing += by * 12.0
+                ground = ahead
+            else:
+                break
     eye_z = ground + EYE_HEIGHT_M + EYE_BOOST_M
     image = np.zeros((height, len(col_azimuth), 3), dtype=np.uint8)
     _render_kernel(
@@ -500,6 +541,8 @@ def _run_kernel(
         dem10,
         has10,
         landcover,
+        landcover10,
+        has10_lc,
         easting,
         northing,
         eye_z,
@@ -524,12 +567,19 @@ def _run_kernel(
 
 
 _DEM10_STUB: NDArray[np.int16] = np.full((1, 1), -32768, dtype=np.int16)
+_LC10_STUB: NDArray[np.uint8] = np.zeros((1, 1), dtype=np.uint8)
 
 
 def _dem10_or_stub(dem10: NDArray[np.int16] | None) -> tuple[NDArray[np.int16], bool]:
     if dem10 is None:
         return _DEM10_STUB, False
     return dem10, True
+
+
+def _lc10_or_stub(landcover10: NDArray[np.uint8] | None) -> tuple[NDArray[np.uint8], bool]:
+    if landcover10 is None:
+        return _LC10_STUB, False
+    return landcover10, True
 
 
 def _downsample(image: NDArray[np.uint8], width: int, height: int) -> Image.Image:
@@ -546,17 +596,21 @@ def render_panorama(
     easting: float,
     northing: float,
     dem10: NDArray[np.int16] | None = None,
+    landcover10: NDArray[np.uint8] | None = None,
 ) -> Image.Image:
     scale = SUPERSAMPLE
     width = PANORAMA_WIDTH * scale
     height = PANORAMA_HEIGHT * scale
     col_azimuth = 2.0 * math.pi * (np.arange(width, dtype=np.float64) + 0.5) / width
     dem10_arr, has10 = _dem10_or_stub(dem10)
+    lc10_arr, has10_lc = _lc10_or_stub(landcover10)
     image = _run_kernel(
         dem,
         dem10_arr,
         has10,
         landcover,
+        lc10_arr,
+        has10_lc,
         easting,
         northing,
         col_azimuth,
@@ -583,6 +637,7 @@ def render_view(
     pitch_deg: float = VIEW_PITCH_DEG,
     horizon_fraction: float = VIEW_HORIZON_FRACTION,
     dem10: NDArray[np.int16] | None = None,
+    landcover10: NDArray[np.uint8] | None = None,
 ) -> Image.Image:
     """Rectilinear 'camera' view toward one bearing.
 
@@ -603,11 +658,14 @@ def render_view(
     top_rad = math.atan(cy / f_v) + pitch
     bottom_rad = math.atan((cy - render_h) / f_v) + pitch
     dem10_arr, has10 = _dem10_or_stub(dem10)
+    lc10_arr, has10_lc = _lc10_or_stub(landcover10)
     image = _run_kernel(
         dem,
         dem10_arr,
         has10,
         landcover,
+        lc10_arr,
+        has10_lc,
         easting,
         northing,
         col_azimuth,
@@ -618,6 +676,7 @@ def render_view(
         f_v,
         cy,
         pitch,
+        view_bearing_rad=center,
     )
     return _downsample(image, width, height)
 
