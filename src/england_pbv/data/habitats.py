@@ -25,9 +25,10 @@ PHI_QUERY_URL: str = (
     "https://services.arcgis.com/JJzESW51TqeY9uat/arcgis/rest/services/"
     "Priority_Habitats_Inventory_England/FeatureServer/0/query"
 )
-PHOTO_SET_FILES: tuple[str, str] = (
+PHOTO_SET_FILES: tuple[str, str, str] = (
     "render_calibration_photos.json",
     "render_calibration_photos_set2.json",
+    "render_calibration_photos_set3.json",
 )
 SEARCH_RADIUS_M: float = 3000.0
 PAGE_SIZE: int = 2000

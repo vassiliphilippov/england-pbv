@@ -18,9 +18,10 @@ import requests
 from england_pbv import paths
 from england_pbv.terrain.grid import latlon_to_bng
 
-PHOTO_SET_FILES: tuple[str, str] = (
+PHOTO_SET_FILES: tuple[str, str, str] = (
     "render_calibration_photos.json",
     "render_calibration_photos_set2.json",
+    "render_calibration_photos_set3.json",
 )
 OVERPASS_MIRRORS: tuple[str, str] = (
     "https://overpass-api.de/api/interpreter",

@@ -279,6 +279,28 @@ Also this cycle: photo set 3 sourced by a find+validate workflow (ten new region
 Dartmoor, Cornwall coast, Beachy Head, High Cup Nick, Howgills, Bowland, Cotswold
 scarp, Dedham Vale, Isle of Wight, Cheddar) for the next generalization check.
 
+## Cycle 12b — photo set 3 generalization check — PASS with new findings
+
+Set 3 (verification/render_calibration_photos_set3.json): ten new documented photos
+found and independently validated by a two-stage workflow (every entry's camera-vs-
+subject grid reference re-derived — the Wye Downs lesson institutionalized; all ten
+validated with zero corrections). Regions never touched: Dartmoor, Cornwall coast,
+Seven Sisters, High Cup Nick, Howgills, Bowland, Cotswold scarp, Dedham Vale, Isle of
+Wight, Cheddar Gorge. Rendered with the engine UNCHANGED.
+
+Verdict: improvements generalize. High Cup Nick is the standout (the U-shaped gill,
+scree flanks and real Eden Valley fields); Dedham's flat arable works (real golden
+stubble via satellite); Broadway's 80 mm telephoto vale shows genuine Evesham
+patchwork; Cheddar's gorge cleft is recognizable.
+
+New systematic findings for coming cycles: (1) tree belts at 0.5–2 km render as flat
+cutout walls (Haytor's invented tree wall, Broadway's pale cardboard belt) — the
+procedural-to-satellite handoff zone starves mid-range canopy of texture; (2) rock has
+no lithology — Seven Sisters' chalk renders khaki instead of white (BGS open 625k
+bedrock geology could colour rock by formation: chalk white, limestone pale, dolerite
+dark); (3) steep dense woodland seen obliquely still contour-bands (Cheddar's gorge
+sides); (4) Haytor's car park renders as a pink blob.
+
 ## Failures ledger (do not repeat)
 
 - (from pre-loop) Fixed march steps near the observer paint terrace bands — step must scale

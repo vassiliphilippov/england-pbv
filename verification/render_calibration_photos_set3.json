@@ -1,0 +1,152 @@
+[
+ {
+  "key": "haytor",
+  "name": "Haytor top car park, Dartmoor (view SW to Rippon Tor and Saddle Tor)",
+  "lat": 50.5769126,
+  "lon": -3.7537593,
+  "bearing": 225,
+  "focal35": 36,
+  "aspect": [
+   2048,
+   1536
+  ],
+  "horizon": 0.41,
+  "url": "https://s0.geograph.org.uk/geophotos/04/03/15/4031572_c40bb974_original.jpg",
+  "credit": "Alan Hunt, geograph.org.uk/photo/4031572, CC BY-SA 2.0"
+ },
+ {
+  "key": "cornwall",
+  "name": "St Agnes Beacon, Cornwall",
+  "lat": 50.30741,
+  "lon": -5.2171,
+  "bearing": 225,
+  "focal35": 24,
+  "aspect": [
+   5184,
+   2920
+  ],
+  "horizon": 0.43,
+  "url": "https://s0.geograph.org.uk/geophotos/05/24/62/5246291_b0285b79_original.jpg",
+  "credit": "Colin Park, geograph.org.uk/photo/5246291, CC BY-SA 2.0"
+ },
+ {
+  "key": "beachyhead",
+  "name": "Seven Sisters chalk cliffs from Cuckmere Haven, East Sussex",
+  "lat": 50.757824,
+  "lon": 0.143544,
+  "bearing": 104,
+  "focal35": 77,
+  "aspect": [
+   1024,
+   683
+  ],
+  "horizon": 0.49,
+  "url": "https://s0.geograph.org.uk/geophotos/06/83/22/6832207_fe14cd7e_original.jpg",
+  "credit": "Ian Capper, geograph.org.uk/photo/6832207, CC BY-SA 2.0"
+ },
+ {
+  "key": "highcup",
+  "name": "High Cup Nick, North Pennines",
+  "lat": 54.628577,
+  "lon": -2.395725,
+  "bearing": 225,
+  "focal35": 27,
+  "aspect": [
+   640,
+   425
+  ],
+  "horizon": 0.22,
+  "url": "https://s0.geograph.org.uk/geophotos/01/80/41/1804106_0e5bb9b8.jpg",
+  "credit": "Ian Taylor, geograph.org.uk/photo/1804106, CC BY-SA 2.0"
+ },
+ {
+  "key": "howgills",
+  "name": "Winder, Howgill Fells",
+  "lat": 54.331764,
+  "lon": -2.528962,
+  "bearing": 112,
+  "focal35": 65,
+  "aspect": [
+   2048,
+   1536
+  ],
+  "horizon": 0.36,
+  "url": "https://s0.geograph.org.uk/geophotos/04/66/60/4666047_7a674e67_original.jpg",
+  "credit": "Mark Percy, geograph.org.uk/photo/4666047, CC BY-SA 2.0"
+ },
+ {
+  "key": "bowland",
+  "name": "Foot of Winny Bank, Forest of Bowland (view S over Vale of Chipping)",
+  "lat": 53.920826,
+  "lon": -2.652948,
+  "bearing": 157,
+  "focal35": 28.8,
+  "aspect": [
+   5184,
+   3456
+  ],
+  "horizon": 0.37,
+  "url": "https://s0.geograph.org.uk/geophotos/05/80/43/5804344_ac58ab1b_original.jpg",
+  "credit": "Chris Heaton, geograph.org.uk/photo/5804344, CC BY-SA 2.0"
+ },
+ {
+  "key": "broadway",
+  "name": "Broadway Tower, Cotswold scarp",
+  "lat": 52.026932,
+  "lon": -1.833582,
+  "bearing": 292,
+  "focal35": 80,
+  "aspect": [
+   4000,
+   3000
+  ],
+  "horizon": 0.3,
+  "url": "https://s0.geograph.org.uk/geophotos/01/77/76/1777607_ff292e73_original.jpg",
+  "credit": "Michael Dibb, geograph.org.uk/photo/1777607, CC BY-SA 2.0"
+ },
+ {
+  "key": "dedham",
+  "name": "Dedham Vale / Stour valley from the Essex Way, Langham",
+  "lat": 51.965863,
+  "lon": 0.960856,
+  "bearing": 67,
+  "focal35": 24,
+  "aspect": [
+   3776,
+   2520
+  ],
+  "horizon": 0.57,
+  "url": "https://s0.geograph.org.uk/geophotos/06/65/81/6658161_f006141e_original.jpg",
+  "credit": "Tim Heaton, geograph.org.uk/photo/6658161, CC BY-SA 2.0"
+ },
+ {
+  "key": "tennyson",
+  "name": "Tennyson Down from West High Down, Isle of Wight",
+  "lat": 50.665018,
+  "lon": -1.558529,
+  "bearing": 82,
+  "focal35": 97,
+  "aspect": [
+   1024,
+   768
+  ],
+  "horizon": 0.32,
+  "url": "https://s0.geograph.org.uk/geophotos/07/71/39/7713971_46e6efdf_original.jpg",
+  "credit": "Ian Capper, geograph.org.uk/photo/7713971, CC BY-SA 2.0"
+ },
+ {
+  "key": "cheddar",
+  "name": "Cheddar Gorge rim, Mendips",
+  "lat": 51.289355,
+  "lon": -2.748152,
+  "bearing": 247,
+  "focal35": 26,
+  "aspect": [
+   3949,
+   1813
+  ],
+  "horizon": 0.39,
+  "url": "https://s0.geograph.org.uk/geophotos/06/86/10/6861068_b152a113_original.jpg",
+  "credit": "Anthony Parkes, geograph.org.uk/photo/6861068, CC BY-SA 2.0"
+ }
+]
