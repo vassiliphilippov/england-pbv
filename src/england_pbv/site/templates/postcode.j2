@@ -24,24 +24,26 @@
   <div class="area-panel">
     <button id="ladder-btn">Show the whole ladder on the map</button>
     <button id="local-btn" hidden>&#8630; Back to the local view</button>
+    <span class="view-toggle" role="group" aria-label="How to show places">
+      <button id="mode-list-btn" class="active" aria-pressed="true">List</button><button
+        id="mode-thumbs-btn" aria-pressed="false">Thumbnails</button>
+    </span>
     <span class="area-note" id="mode-note">numbered pins: the best views within about half an hour's drive</span>
   </div>
 
-  <div class="grid-2">
-    <section>
-      <h2>The ladder: better views, further away</h2>
-      <p class="note">Each row beats everything closer. Times are driving estimates from
-      <span id="pc-label">your postcode</span><span id="refine-note"> (straight-line calibration;
-      refining against road routing&hellip;)</span>.</p>
-      <div id="ladder-results"></div>
-    </section>
-    <section>
-      <h2>Best within ~30 minutes</h2>
-      <p class="note">The strongest view potential scores in your local patch, whether or not
-      they make the national list.</p>
-      <div id="local-results"></div>
-    </section>
-  </div>
+  <section>
+    <h2>The ladder: better views, further away</h2>
+    <p class="note">Each row beats everything closer. Times are driving estimates from
+    <span id="pc-label">your postcode</span><span id="refine-note"> (straight-line calibration;
+    refining against road routing&hellip;)</span>.</p>
+    <div id="ladder-results"></div>
+  </section>
+  <section>
+    <h2>Best within ~30 minutes</h2>
+    <p class="note">The strongest view potential scores in your local patch, whether or not
+    they make the national list.</p>
+    <div id="local-results"></div>
+  </section>
 </div>
 <p class="note" id="pc-error" hidden></p>
 
@@ -84,6 +86,27 @@ function minutesFor(i) {
   return (refined !== null && refined.has(i)) ? refined.get(i) : est[i];
 }
 
+// One thumbnail card per row; items: [{r, minutes, approx}]. Panorama render, not
+// _view1 — micro-tier pages have no camera view, and these lists rebuild often.
+function thumbCardsHtml(items) {
+  return '<div class="thumb-grid">' + items.map((item, k) => {
+    const r = item.r;
+    const t = (item.approx ? '~' : '') + Math.round(item.minutes) + ' min drive';
+    const meta = '<div class="thumb-meta"><span class="thumb-name">' + (k + 1) + '. ' + esc(r[4]) +
+      '</span><span class="score-pill">' + r[2].toFixed(1) + '</span></div>' +
+      '<div class="thumb-region">' + t + '</div>';
+    if (r[5]) {
+      return '<a class="thumb-card" href="viewpoints/' + r[5] + '.html">' +
+        '<img loading="lazy" src="renders/' + r[5] + '.jpg"' +
+        ' onerror="this.style.display=\'none\'" alt="">' + meta + '</a>';
+    }
+    return '<div class="thumb-card no-page">' + meta +
+      '<div class="thumb-region"><a href="https://maps.google.com/?q=' + r[0] + ',' + r[1] +
+      '">map</a></div></div>';
+  }).join('') + '</div>';
+}
+function thumbsMode() { return document.body.classList.contains('thumbs-mode'); }
+
 function frontierWithGain(order, gain) {
   const rows = [];
   let best = -Infinity;
@@ -115,17 +138,22 @@ function computeLadder() {
 
 function renderLadder() {
   ladder = computeLadder();
-  const rows = ladder.map((row, k) => {
-    const r = ALL_POINTS[row.i];
-    const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + esc(r[4]) + '</a>' : esc(r[4]);
-    const t = (row.routed ? '' : '~') + Math.round(row.minutes) + ' min';
-    return '<tr><td class="num">' + (k + 1) + '</td><td>' + name + '</td>' +
-      '<td class="num">' + t + '</td>' +
-      '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
-  }).join('');
-  document.getElementById('ladder-results').innerHTML =
-    '<table class="rank"><tr><th>#</th><th>Place</th><th class="num">Drive</th><th class="num">Score</th></tr>' +
-    rows + '</table>';
+  if (thumbsMode()) {
+    document.getElementById('ladder-results').innerHTML = thumbCardsHtml(
+      ladder.map(row => ({ r: ALL_POINTS[row.i], minutes: row.minutes, approx: !row.routed })));
+  } else {
+    const rows = ladder.map((row, k) => {
+      const r = ALL_POINTS[row.i];
+      const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + esc(r[4]) + '</a>' : esc(r[4]);
+      const t = (row.routed ? '' : '~') + Math.round(row.minutes) + ' min';
+      return '<tr><td class="num">' + (k + 1) + '</td><td>' + name + '</td>' +
+        '<td class="num">' + t + '</td>' +
+        '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
+    }).join('');
+    document.getElementById('ladder-results').innerHTML =
+      '<table class="rank"><tr><th>#</th><th>Place</th><th class="num">Drive</th><th class="num">Score</th></tr>' +
+      rows + '</table>';
+  }
   drawLadderPins();
 }
 
@@ -150,17 +178,23 @@ function renderLocal() {
     pin.bindPopup(pointPopup(r, minutesFor(i)));
     localLayer.addLayer(pin);
   });
-  const rows = top.map((i, k) => {
-    const r = ALL_POINTS[i];
-    const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + esc(r[4]) + '</a>' : esc(r[4]);
-    return '<tr><td class="num">' + (k + 1) + '</td><td>' + name + '</td>' +
-      '<td class="num">~' + Math.round(est[i]) + ' min</td>' +
-      '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
-  }).join('');
+  let body;
+  if (thumbsMode()) {
+    body = thumbCardsHtml(top.map(i => ({ r: ALL_POINTS[i], minutes: est[i], approx: true })));
+  } else {
+    const rows = top.map((i, k) => {
+      const r = ALL_POINTS[i];
+      const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + esc(r[4]) + '</a>' : esc(r[4]);
+      return '<tr><td class="num">' + (k + 1) + '</td><td>' + name + '</td>' +
+        '<td class="num">~' + Math.round(est[i]) + ' min</td>' +
+        '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
+    }).join('');
+    body = '<table class="rank"><tr><th>#</th><th>Place</th><th class="num">Drive</th><th class="num">Score</th></tr>' +
+      rows + '</table>';
+  }
   document.getElementById('local-results').innerHTML = top.length === 0
     ? '<p class="note">No candidate viewpoints within about 30 minutes — try the ladder for the nearest worthwhile drive.</p>'
-    : '<table class="rank"><tr><th>#</th><th>Place</th><th class="num">Drive</th><th class="num">Score</th></tr>' +
-      rows + '</table>';
+    : body;
   return top;
 }
 
@@ -296,5 +330,35 @@ async function start() {
   refineWithRoadRouting();
 }
 start();
+</script>
+<script>
+// --- list / thumbnails toggle ----------------------------------------------
+// Separate script: start() above is async (it yields at its first fetch), so this
+// runs — and applies any stored mode — before the lists first render. Shares the
+// landing page's localStorage key so the preference follows the user. Re-renders
+// are guarded: before a postcode lookup (or if Leaflet failed) the render
+// functions would throw on missing map layers.
+(function () {
+const listBtn = document.getElementById('mode-list-btn');
+const thumbsBtn = document.getElementById('mode-thumbs-btn');
+function applyListMode(mode) {
+  const thumbs = mode === 'thumbs';
+  document.body.classList.toggle('thumbs-mode', thumbs);
+  listBtn.classList.toggle('active', !thumbs);
+  thumbsBtn.classList.toggle('active', thumbs);
+  listBtn.setAttribute('aria-pressed', String(!thumbs));
+  thumbsBtn.setAttribute('aria-pressed', String(thumbs));
+}
+function setListMode(mode) {
+  applyListMode(mode);
+  try { localStorage.setItem('pbv-list-mode', mode); } catch (e) { /* private mode etc. */ }
+  try { renderLadder(); renderLocal(); } catch (e) { /* no results on screen yet */ }
+}
+listBtn.addEventListener('click', () => setListMode('list'));
+thumbsBtn.addEventListener('click', () => setListMode('thumbs'));
+try {
+  if (localStorage.getItem('pbv-list-mode') === 'thumbs') applyListMode('thumbs');
+} catch (e) { /* default to list */ }
+})();
 </script>
 {% endblock %}
