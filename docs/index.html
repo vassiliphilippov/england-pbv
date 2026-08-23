@@ -10,6 +10,15 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Thumbnail images try the best camera view first, fall back to the panorama
+// (micro pages have no camera view), then hide. Defined in head so onerror
+// handlers on lazy images always find it.
+function thumbFallback(img) {
+  if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = 'renders/' + img.dataset.slug + '.jpg'; }
+  else { img.style.display = 'none'; }
+}
+</script>
 
 </head>
 <body>
@@ -60,6 +69,10 @@
 </div>
 <div class="area-panel">
   <button id="england-btn">&#8630; Back to all of England</button>
+  <span class="view-toggle" role="group" aria-label="How to show places">
+    <button id="mode-list-btn" class="active" aria-pressed="true">List</button><button
+      id="mode-thumbs-btn" aria-pressed="false">Thumbnails</button>
+  </span>
   <span class="area-note">the list below follows the map &mdash; zoom or pan anywhere and the best
   views in the visible area rank themselves automatically</span>
   <div id="area-results"></div>
@@ -68,6 +81,7 @@
 <div class="grid-2">
   <section>
     <h2>Top 50 in England</h2>
+    <div class="mode-list-only">
     <table class="rank">
       <tr><th>#</th><th>Place</th><th>Region</th><th class="num">Score</th></tr>
       
@@ -472,6 +486,610 @@
       </tr>
       
     </table>
+    </div>
+    <div class="thumb-grid mode-thumbs-only">
+      
+      
+      <a class="thumb-card" href="viewpoints/the-knoll.html">
+        <img loading="lazy" src="renders/the-knoll_view1.jpg" data-slug="the-knoll"
+             onerror="thumbFallback(this)" alt="Rendered view from The Knoll">
+        <div class="thumb-meta">
+          <span class="thumb-name">1. The Knoll</span>
+          <span class="score-pill">91.0</span>
+        </div>
+        <div class="thumb-region">near West Bexington</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-finsthwaite.html">
+        <img loading="lazy" src="renders/viewpoint-near-finsthwaite_view1.jpg" data-slug="viewpoint-near-finsthwaite"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Finsthwaite">
+        <div class="thumb-meta">
+          <span class="thumb-name">2. Viewpoint near Finsthwaite</span>
+          <span class="score-pill">90.3</span>
+        </div>
+        <div class="thumb-region">near Finsthwaite</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/holdstone-hill.html">
+        <img loading="lazy" src="renders/holdstone-hill_view1.jpg" data-slug="holdstone-hill"
+             onerror="thumbFallback(this)" alt="Rendered view from Holdstone Hill">
+        <div class="thumb-meta">
+          <span class="thumb-name">3. Holdstone Hill</span>
+          <span class="score-pill">90.2</span>
+        </div>
+        <div class="thumb-region">near Combe Martin</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-easington.html">
+        <img loading="lazy" src="renders/viewpoint-near-easington_view1.jpg" data-slug="viewpoint-near-easington"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Easington">
+        <div class="thumb-meta">
+          <span class="thumb-name">4. Viewpoint near Easington</span>
+          <span class="score-pill">90.2</span>
+        </div>
+        <div class="thumb-region">near Easington</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-ravenscar.html">
+        <img loading="lazy" src="renders/viewpoint-near-ravenscar_view1.jpg" data-slug="viewpoint-near-ravenscar"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Ravenscar">
+        <div class="thumb-meta">
+          <span class="thumb-name">5. Viewpoint near Ravenscar</span>
+          <span class="score-pill">90.0</span>
+        </div>
+        <div class="thumb-region">near Ravenscar</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-west-bexington.html">
+        <img loading="lazy" src="renders/viewpoint-near-west-bexington_view1.jpg" data-slug="viewpoint-near-west-bexington"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near West Bexington">
+        <div class="thumb-meta">
+          <span class="thumb-name">6. Viewpoint near West Bexington</span>
+          <span class="score-pill">89.5</span>
+        </div>
+        <div class="thumb-region">near West Bexington</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/long-side.html">
+        <img loading="lazy" src="renders/long-side_view1.jpg" data-slug="long-side"
+             onerror="thumbFallback(this)" alt="Rendered view from Long Side">
+        <div class="thumb-meta">
+          <span class="thumb-name">7. Long Side</span>
+          <span class="score-pill">89.5</span>
+        </div>
+        <div class="thumb-region">near Applethwaite</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/ullock-pike.html">
+        <img loading="lazy" src="renders/ullock-pike_view1.jpg" data-slug="ullock-pike"
+             onerror="thumbFallback(this)" alt="Rendered view from Ullock Pike">
+        <div class="thumb-meta">
+          <span class="thumb-name">8. Ullock Pike</span>
+          <span class="score-pill">89.4</span>
+        </div>
+        <div class="thumb-region">near Applethwaite</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-niton.html">
+        <img loading="lazy" src="renders/viewpoint-near-niton_view1.jpg" data-slug="viewpoint-near-niton"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Niton">
+        <div class="thumb-meta">
+          <span class="thumb-name">9. Viewpoint near Niton</span>
+          <span class="score-pill">89.2</span>
+        </div>
+        <div class="thumb-region">near Niton</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/crag-fell.html">
+        <img loading="lazy" src="renders/crag-fell_view1.jpg" data-slug="crag-fell"
+             onerror="thumbFallback(this)" alt="Rendered view from Crag Fell">
+        <div class="thumb-meta">
+          <span class="thumb-name">10. Crag Fell</span>
+          <span class="score-pill">89.1</span>
+        </div>
+        <div class="thumb-region">near Ennerdale Bridge</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-abbotsbury.html">
+        <img loading="lazy" src="renders/viewpoint-near-abbotsbury_view1.jpg" data-slug="viewpoint-near-abbotsbury"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Abbotsbury">
+        <div class="thumb-meta">
+          <span class="thumb-name">11. Viewpoint near Abbotsbury</span>
+          <span class="score-pill">89.0</span>
+        </div>
+        <div class="thumb-region">near Abbotsbury</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/firle-beacon.html">
+        <img loading="lazy" src="renders/firle-beacon_view1.jpg" data-slug="firle-beacon"
+             onerror="thumbFallback(this)" alt="Rendered view from Firle Beacon">
+        <div class="thumb-meta">
+          <span class="thumb-name">12. Firle Beacon</span>
+          <span class="score-pill">88.9</span>
+        </div>
+        <div class="thumb-region">near Alciston</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-combe-martin.html">
+        <img loading="lazy" src="renders/viewpoint-near-combe-martin_view1.jpg" data-slug="viewpoint-near-combe-martin"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Combe Martin">
+        <div class="thumb-meta">
+          <span class="thumb-name">13. Viewpoint near Combe Martin</span>
+          <span class="score-pill">88.9</span>
+        </div>
+        <div class="thumb-region">near Combe Martin</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-boot.html">
+        <img loading="lazy" src="renders/viewpoint-near-boot_view1.jpg" data-slug="viewpoint-near-boot"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Boot">
+        <div class="thumb-meta">
+          <span class="thumb-name">14. Viewpoint near Boot</span>
+          <span class="score-pill">88.9</span>
+        </div>
+        <div class="thumb-region">near Boot</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-west-bexington-16.html">
+        <img loading="lazy" src="renders/viewpoint-near-west-bexington-16_view1.jpg" data-slug="viewpoint-near-west-bexington-16"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near West Bexington">
+        <div class="thumb-meta">
+          <span class="thumb-name">15. Viewpoint near West Bexington</span>
+          <span class="score-pill">88.8</span>
+        </div>
+        <div class="thumb-region">near West Bexington</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/selworthy-beacon.html">
+        <img loading="lazy" src="renders/selworthy-beacon_view1.jpg" data-slug="selworthy-beacon"
+             onerror="thumbFallback(this)" alt="Rendered view from Selworthy Beacon">
+        <div class="thumb-meta">
+          <span class="thumb-name">16. Selworthy Beacon</span>
+          <span class="score-pill">88.7</span>
+        </div>
+        <div class="thumb-region">near Allerford</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/golden-cap.html">
+        <img loading="lazy" src="renders/golden-cap_view1.jpg" data-slug="golden-cap"
+             onerror="thumbFallback(this)" alt="Rendered view from Golden Cap">
+        <div class="thumb-meta">
+          <span class="thumb-name">17. Golden Cap</span>
+          <span class="score-pill">88.7</span>
+        </div>
+        <div class="thumb-region">near Morcombelake</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-west-quantoxhead.html">
+        <img loading="lazy" src="renders/viewpoint-near-west-quantoxhead_view1.jpg" data-slug="viewpoint-near-west-quantoxhead"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near West Quantoxhead">
+        <div class="thumb-meta">
+          <span class="thumb-name">18. Viewpoint near West Quantoxhead</span>
+          <span class="score-pill">88.7</span>
+        </div>
+        <div class="thumb-region">near West Quantoxhead</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/illgill-head.html">
+        <img loading="lazy" src="renders/illgill-head_view1.jpg" data-slug="illgill-head"
+             onerror="thumbFallback(this)" alt="Rendered view from Illgill Head">
+        <div class="thumb-meta">
+          <span class="thumb-name">19. Illgill Head</span>
+          <span class="score-pill">88.4</span>
+        </div>
+        <div class="thumb-region">near Boot</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-bossington.html">
+        <img loading="lazy" src="renders/viewpoint-near-bossington_view1.jpg" data-slug="viewpoint-near-bossington"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Bossington">
+        <div class="thumb-meta">
+          <span class="thumb-name">20. Viewpoint near Bossington</span>
+          <span class="score-pill">88.3</span>
+        </div>
+        <div class="thumb-region">near Bossington</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-chale.html">
+        <img loading="lazy" src="renders/viewpoint-near-chale_view1.jpg" data-slug="viewpoint-near-chale"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Chale">
+        <div class="thumb-meta">
+          <span class="thumb-name">21. Viewpoint near Chale</span>
+          <span class="score-pill">88.3</span>
+        </div>
+        <div class="thumb-region">near Chale</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/old-tennis-court.html">
+        <img loading="lazy" src="renders/old-tennis-court_view1.jpg" data-slug="old-tennis-court"
+             onerror="thumbFallback(this)" alt="Rendered view from Old Tennis Court">
+        <div class="thumb-meta">
+          <span class="thumb-name">22. Old Tennis Court</span>
+          <span class="score-pill">88.3</span>
+        </div>
+        <div class="thumb-region">near Lynton</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-whitbeck.html">
+        <img loading="lazy" src="renders/viewpoint-near-whitbeck_view1.jpg" data-slug="viewpoint-near-whitbeck"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Whitbeck">
+        <div class="thumb-meta">
+          <span class="thumb-name">23. Viewpoint near Whitbeck</span>
+          <span class="score-pill">88.3</span>
+        </div>
+        <div class="thumb-region">near Whitbeck</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-st-lawrence.html">
+        <img loading="lazy" src="renders/viewpoint-near-st-lawrence_view1.jpg" data-slug="viewpoint-near-st-lawrence"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near St. Lawrence">
+        <div class="thumb-meta">
+          <span class="thumb-name">24. Viewpoint near St. Lawrence</span>
+          <span class="score-pill">88.2</span>
+        </div>
+        <div class="thumb-region">near St. Lawrence</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-chillingham.html">
+        <img loading="lazy" src="renders/viewpoint-near-chillingham_view1.jpg" data-slug="viewpoint-near-chillingham"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Chillingham">
+        <div class="thumb-meta">
+          <span class="thumb-name">25. Viewpoint near Chillingham</span>
+          <span class="score-pill">88.1</span>
+        </div>
+        <div class="thumb-region">near Chillingham</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-oare.html">
+        <img loading="lazy" src="renders/viewpoint-near-oare_view1.jpg" data-slug="viewpoint-near-oare"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Oare">
+        <div class="thumb-meta">
+          <span class="thumb-name">26. Viewpoint near Oare</span>
+          <span class="score-pill">88.1</span>
+        </div>
+        <div class="thumb-region">near Oare</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-whitbeck-30.html">
+        <img loading="lazy" src="renders/viewpoint-near-whitbeck-30_view1.jpg" data-slug="viewpoint-near-whitbeck-30"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Whitbeck">
+        <div class="thumb-meta">
+          <span class="thumb-name">27. Viewpoint near Whitbeck</span>
+          <span class="score-pill">88.1</span>
+        </div>
+        <div class="thumb-region">near Whitbeck</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-crackington-haven.html">
+        <img loading="lazy" src="renders/viewpoint-near-crackington-haven_view1.jpg" data-slug="viewpoint-near-crackington-haven"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Crackington Haven">
+        <div class="thumb-meta">
+          <span class="thumb-name">28. Viewpoint near Crackington Haven</span>
+          <span class="score-pill">88.1</span>
+        </div>
+        <div class="thumb-region">near Crackington Haven</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/rosewall-hill.html">
+        <img loading="lazy" src="renders/rosewall-hill_view1.jpg" data-slug="rosewall-hill"
+             onerror="thumbFallback(this)" alt="Rendered view from Rosewall Hill">
+        <div class="thumb-meta">
+          <span class="thumb-name">29. Rosewall Hill</span>
+          <span class="score-pill">88.0</span>
+        </div>
+        <div class="thumb-region">near Towednack</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-stenalees.html">
+        <img loading="lazy" src="renders/viewpoint-near-stenalees_view1.jpg" data-slug="viewpoint-near-stenalees"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Stenalees">
+        <div class="thumb-meta">
+          <span class="thumb-name">30. Viewpoint near Stenalees</span>
+          <span class="score-pill">88.0</span>
+        </div>
+        <div class="thumb-region">near Stenalees</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-west-quantoxhead-34.html">
+        <img loading="lazy" src="renders/viewpoint-near-west-quantoxhead-34_view1.jpg" data-slug="viewpoint-near-west-quantoxhead-34"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near West Quantoxhead">
+        <div class="thumb-meta">
+          <span class="thumb-name">31. Viewpoint near West Quantoxhead</span>
+          <span class="score-pill">87.9</span>
+        </div>
+        <div class="thumb-region">near West Quantoxhead</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-brendon.html">
+        <img loading="lazy" src="renders/viewpoint-near-brendon_view1.jpg" data-slug="viewpoint-near-brendon"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Brendon">
+        <div class="thumb-meta">
+          <span class="thumb-name">32. Viewpoint near Brendon</span>
+          <span class="score-pill">87.9</span>
+        </div>
+        <div class="thumb-region">near Brendon</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/great-hangman.html">
+        <img loading="lazy" src="renders/great-hangman_view1.jpg" data-slug="great-hangman"
+             onerror="thumbFallback(this)" alt="Rendered view from Great Hangman">
+        <div class="thumb-meta">
+          <span class="thumb-name">33. Great Hangman</span>
+          <span class="score-pill">87.8</span>
+        </div>
+        <div class="thumb-region">near Combe Martin</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-west-quantoxhead-38.html">
+        <img loading="lazy" src="renders/viewpoint-near-west-quantoxhead-38_view1.jpg" data-slug="viewpoint-near-west-quantoxhead-38"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near West Quantoxhead">
+        <div class="thumb-meta">
+          <span class="thumb-name">34. Viewpoint near West Quantoxhead</span>
+          <span class="score-pill">87.8</span>
+        </div>
+        <div class="thumb-region">near West Quantoxhead</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-lesnewth.html">
+        <img loading="lazy" src="renders/viewpoint-near-lesnewth_view1.jpg" data-slug="viewpoint-near-lesnewth"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Lesnewth">
+        <div class="thumb-meta">
+          <span class="thumb-name">35. Viewpoint near Lesnewth</span>
+          <span class="score-pill">87.7</span>
+        </div>
+        <div class="thumb-region">near Lesnewth</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-bossington-42.html">
+        <img loading="lazy" src="renders/viewpoint-near-bossington-42_view1.jpg" data-slug="viewpoint-near-bossington-42"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Bossington">
+        <div class="thumb-meta">
+          <span class="thumb-name">36. Viewpoint near Bossington</span>
+          <span class="score-pill">87.6</span>
+        </div>
+        <div class="thumb-region">near Bossington</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/st-catherines-hill.html">
+        <img loading="lazy" src="renders/st-catherines-hill_view1.jpg" data-slug="st-catherines-hill"
+             onerror="thumbFallback(this)" alt="Rendered view from St Catherines Hill">
+        <div class="thumb-meta">
+          <span class="thumb-name">37. St Catherines Hill</span>
+          <span class="score-pill">87.6</span>
+        </div>
+        <div class="thumb-region">near Chale</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/greensheen-hill.html">
+        <img loading="lazy" src="renders/greensheen-hill_view1.jpg" data-slug="greensheen-hill"
+             onerror="thumbFallback(this)" alt="Rendered view from Greensheen Hill">
+        <div class="thumb-meta">
+          <span class="thumb-name">38. Greensheen Hill</span>
+          <span class="score-pill">87.5</span>
+        </div>
+        <div class="thumb-region">near Fenwick</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-kimmeridge.html">
+        <img loading="lazy" src="renders/viewpoint-near-kimmeridge_view1.jpg" data-slug="viewpoint-near-kimmeridge"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Kimmeridge">
+        <div class="thumb-meta">
+          <span class="thumb-name">39. Viewpoint near Kimmeridge</span>
+          <span class="score-pill">87.5</span>
+        </div>
+        <div class="thumb-region">near Kimmeridge</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/rings-hill.html">
+        <img loading="lazy" src="renders/rings-hill_view1.jpg" data-slug="rings-hill"
+             onerror="thumbFallback(this)" alt="Rendered view from Rings Hill">
+        <div class="thumb-meta">
+          <span class="thumb-name">40. Rings Hill</span>
+          <span class="score-pill">87.5</span>
+        </div>
+        <div class="thumb-region">near East Lulworth</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/whin-rigg.html">
+        <img loading="lazy" src="renders/whin-rigg_view1.jpg" data-slug="whin-rigg"
+             onerror="thumbFallback(this)" alt="Rendered view from Whin Rigg">
+        <div class="thumb-meta">
+          <span class="thumb-name">41. Whin Rigg</span>
+          <span class="score-pill">87.5</span>
+        </div>
+        <div class="thumb-region">near Nether Wasdale</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-bossington-48.html">
+        <img loading="lazy" src="renders/viewpoint-near-bossington-48_view1.jpg" data-slug="viewpoint-near-bossington-48"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Bossington">
+        <div class="thumb-meta">
+          <span class="thumb-name">42. Viewpoint near Bossington</span>
+          <span class="score-pill">87.4</span>
+        </div>
+        <div class="thumb-region">near Bossington</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-ravenscar-49.html">
+        <img loading="lazy" src="renders/viewpoint-near-ravenscar-49_view1.jpg" data-slug="viewpoint-near-ravenscar-49"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Ravenscar">
+        <div class="thumb-meta">
+          <span class="thumb-name">43. Viewpoint near Ravenscar</span>
+          <span class="score-pill">87.3</span>
+        </div>
+        <div class="thumb-region">near Ravenscar</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-west-quantoxhead-50.html">
+        <img loading="lazy" src="renders/viewpoint-near-west-quantoxhead-50_view1.jpg" data-slug="viewpoint-near-west-quantoxhead-50"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near West Quantoxhead">
+        <div class="thumb-meta">
+          <span class="thumb-name">44. Viewpoint near West Quantoxhead</span>
+          <span class="score-pill">87.2</span>
+        </div>
+        <div class="thumb-region">near West Quantoxhead</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-cartmel.html">
+        <img loading="lazy" src="renders/viewpoint-near-cartmel_view1.jpg" data-slug="viewpoint-near-cartmel"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Cartmel">
+        <div class="thumb-meta">
+          <span class="thumb-name">45. Viewpoint near Cartmel</span>
+          <span class="score-pill">87.2</span>
+        </div>
+        <div class="thumb-region">near Cartmel</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/mottistone-down.html">
+        <img loading="lazy" src="renders/mottistone-down_view1.jpg" data-slug="mottistone-down"
+             onerror="thumbFallback(this)" alt="Rendered view from Mottistone Down">
+        <div class="thumb-meta">
+          <span class="thumb-name">46. Mottistone Down</span>
+          <span class="score-pill">87.2</span>
+        </div>
+        <div class="thumb-region">near Brook</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-martinhoe.html">
+        <img loading="lazy" src="renders/viewpoint-near-martinhoe_view1.jpg" data-slug="viewpoint-near-martinhoe"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Martinhoe">
+        <div class="thumb-meta">
+          <span class="thumb-name">47. Viewpoint near Martinhoe</span>
+          <span class="score-pill">87.2</span>
+        </div>
+        <div class="thumb-region">near Martinhoe</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/worcestershire-beacon.html">
+        <img loading="lazy" src="renders/worcestershire-beacon_view1.jpg" data-slug="worcestershire-beacon"
+             onerror="thumbFallback(this)" alt="Rendered view from Worcestershire Beacon">
+        <div class="thumb-meta">
+          <span class="thumb-name">48. Worcestershire Beacon</span>
+          <span class="score-pill">87.1</span>
+        </div>
+        <div class="thumb-region">near Malvern</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-north-chideock.html">
+        <img loading="lazy" src="renders/viewpoint-near-north-chideock_view1.jpg" data-slug="viewpoint-near-north-chideock"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near North Chideock">
+        <div class="thumb-meta">
+          <span class="thumb-name">49. Viewpoint near North Chideock</span>
+          <span class="score-pill">87.1</span>
+        </div>
+        <div class="thumb-region">near North Chideock</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/chanctonbury-ring.html">
+        <img loading="lazy" src="renders/chanctonbury-ring_view1.jpg" data-slug="chanctonbury-ring"
+             onerror="thumbFallback(this)" alt="Rendered view from Chanctonbury Ring">
+        <div class="thumb-meta">
+          <span class="thumb-name">50. Chanctonbury Ring</span>
+          <span class="score-pill">87.0</span>
+        </div>
+        <div class="thumb-region">near Washington</div>
+      </a>
+      
+      
+    </div>
   </section>
   <section>
     <h2>Best inland patchwork views</h2>
@@ -1059,23 +1677,45 @@ function updateArea() {
     pin.bindPopup(popupFor(r[4], r[2], r[5], r[0], r[1]));
     resultsLayer.addLayer(pin);
   });
-  let rows = top.map((r, i) => {
-    const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + r[4] + '</a>' : r[4];
-    const link = ' <a href="https://maps.google.com/?q=' + r[0] + ',' + r[1] + '">map</a>';
-    return '<tr><td class="num">' + (i + 1) + '</td><td>' + name + link + '</td>' +
-      '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
-  }).join('');
   const label = hits.length + ' candidate viewpoints in view; numbered pins on the map show the local top ' + top.length;
+  let body;
+  if (document.body.classList.contains('thumbs-mode')) {
+    body = '<div class="thumb-grid">' + top.map((r, i) => {
+      const meta = '<div class="thumb-meta"><span class="thumb-name">' + (i + 1) + '. ' + r[4] +
+        '</span><span class="score-pill">' + r[2].toFixed(1) + '</span></div>';
+      if (r[5]) {
+        // Panorama, not _view1: micro-tier pages (most rural slugs) have no camera
+        // view, and each map move rebuilds this HTML — a _view1 attempt would re-404
+        // per card per settle.
+        return '<a class="thumb-card" href="viewpoints/' + r[5] + '.html">' +
+          '<img loading="lazy" src="renders/' + r[5] + '.jpg"' +
+          ' onerror="this.style.display=\'none\'" alt="">' + meta + '</a>';
+      }
+      return '<div class="thumb-card no-page">' + meta +
+        '<div class="thumb-region">no page yet &middot; <a href="https://maps.google.com/?q=' +
+        r[0] + ',' + r[1] + '">map</a></div></div>';
+    }).join('') + '</div>';
+  } else {
+    const rows = top.map((r, i) => {
+      const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + r[4] + '</a>' : r[4];
+      const link = ' <a href="https://maps.google.com/?q=' + r[0] + ',' + r[1] + '">map</a>';
+      return '<tr><td class="num">' + (i + 1) + '</td><td>' + name + link + '</td>' +
+        '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
+    }).join('');
+    body = '<table class="rank"><tr><th>#</th><th>Place</th><th class="num">Score</th></tr>' + rows + '</table>';
+  }
   document.getElementById('area-results').innerHTML = hits.length === 0
     ? '<p class="note">No candidate viewpoints in this view — zoom or pan to a land area of England.</p>'
-    : '<p class="note">' + label + ':</p><table class="rank">' +
-      '<tr><th>#</th><th>Place</th><th class="num">Score</th></tr>' + rows + '</table>';
+    : '<p class="note">' + label + ':</p>' + body;
 }
 
 let updateEmaMs = 30;   // running estimate of one update's cost
 let areaTimer = null;
 let lastRunAt = -1e9;
 function runAreaUpdate() {
+  // Direct calls (initial load, mode toggle) must cancel any pending debounce,
+  // or the orphaned timeout re-runs the update moments later.
+  if (areaTimer !== null) clearTimeout(areaTimer);
   areaTimer = null;
   const t0 = performance.now();
   updateArea();
@@ -1099,6 +1739,38 @@ document.getElementById('england-btn').addEventListener('click', () => {
 });
 
 runAreaUpdate();
+</script>
+<script>
+// --- list / thumbnails toggle ----------------------------------------------
+// Separate script on purpose: if the Leaflet CDN is blocked, the map script above
+// throws and never finishes, but the toggle must still work for the server-rendered
+// Top-50 grid. runAreaUpdate is hoisted from that script yet closes over the failed
+// map, so calls to it are guarded.
+(function () {
+const listBtn = document.getElementById('mode-list-btn');
+const thumbsBtn = document.getElementById('mode-thumbs-btn');
+function applyMode(mode) {
+  const thumbs = mode === 'thumbs';
+  document.body.classList.toggle('thumbs-mode', thumbs);
+  listBtn.classList.toggle('active', !thumbs);
+  thumbsBtn.classList.toggle('active', thumbs);
+  listBtn.setAttribute('aria-pressed', String(!thumbs));
+  thumbsBtn.setAttribute('aria-pressed', String(thumbs));
+}
+function refreshAreaList() {
+  try { runAreaUpdate(); } catch (e) { /* map failed to initialize; static grid still toggles */ }
+}
+function setMode(mode) {
+  applyMode(mode);
+  try { localStorage.setItem('pbv-list-mode', mode); } catch (e) { /* private mode etc. */ }
+  refreshAreaList();   // re-render the area list in the new representation
+}
+listBtn.addEventListener('click', () => setMode('list'));
+thumbsBtn.addEventListener('click', () => setMode('thumbs'));
+try {
+  if (localStorage.getItem('pbv-list-mode') === 'thumbs') { applyMode('thumbs'); refreshAreaList(); }
+} catch (e) { /* default to list */ }
+})();
 </script>
 
 </main>

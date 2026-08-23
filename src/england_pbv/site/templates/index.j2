@@ -2,6 +2,15 @@
 {% block head %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Thumbnail images try the best camera view first, fall back to the panorama
+// (micro pages have no camera view), then hide. Defined in head so onerror
+// handlers on lazy images always find it.
+function thumbFallback(img) {
+  if (!img.dataset.fb) { img.dataset.fb = '1'; img.src = 'renders/' + img.dataset.slug + '.jpg'; }
+  else { img.style.display = 'none'; }
+}
+</script>
 {% endblock %}
 {% block content %}
 <section class="hero">
@@ -36,6 +45,10 @@
 </div>
 <div class="area-panel">
   <button id="england-btn">&#8630; Back to all of England</button>
+  <span class="view-toggle" role="group" aria-label="How to show places">
+    <button id="mode-list-btn" class="active" aria-pressed="true">List</button><button
+      id="mode-thumbs-btn" aria-pressed="false">Thumbnails</button>
+  </span>
   <span class="area-note">the list below follows the map &mdash; zoom or pan anywhere and the best
   views in the visible area rank themselves automatically</span>
   <div id="area-results"></div>
@@ -44,6 +57,7 @@
 <div class="grid-2">
   <section>
     <h2>Top 50 in England</h2>
+    <div class="mode-list-only">
     <table class="rank">
       <tr><th>#</th><th>Place</th><th>Region</th><th class="num">Score</th></tr>
       {% for row in top_overall %}
@@ -56,6 +70,30 @@
       </tr>
       {% endfor %}
     </table>
+    </div>
+    <div class="thumb-grid mode-thumbs-only">
+      {% for row in top_overall %}
+      {% if row.slug %}
+      <a class="thumb-card" href="viewpoints/{{ row.slug }}.html">
+        <img loading="lazy" src="renders/{{ row.slug }}_view1.jpg" data-slug="{{ row.slug }}"
+             onerror="thumbFallback(this)" alt="Rendered view from {{ row.name }}">
+        <div class="thumb-meta">
+          <span class="thumb-name">{{ loop.index }}. {{ row.name }}</span>
+          <span class="score-pill">{{ "%.1f"|format(row.score) }}</span>
+        </div>
+        <div class="thumb-region">{{ row.region }}</div>
+      </a>
+      {% else %}
+      <div class="thumb-card">
+        <div class="thumb-meta">
+          <span class="thumb-name">{{ loop.index }}. {{ row.name }}</span>
+          <span class="score-pill">{{ "%.1f"|format(row.score) }}</span>
+        </div>
+        <div class="thumb-region">{{ row.region }}</div>
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
   </section>
   <section>
     <h2>Best inland patchwork views</h2>
@@ -206,23 +244,45 @@ function updateArea() {
     pin.bindPopup(popupFor(r[4], r[2], r[5], r[0], r[1]));
     resultsLayer.addLayer(pin);
   });
-  let rows = top.map((r, i) => {
-    const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + r[4] + '</a>' : r[4];
-    const link = ' <a href="https://maps.google.com/?q=' + r[0] + ',' + r[1] + '">map</a>';
-    return '<tr><td class="num">' + (i + 1) + '</td><td>' + name + link + '</td>' +
-      '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
-  }).join('');
   const label = hits.length + ' candidate viewpoints in view; numbered pins on the map show the local top ' + top.length;
+  let body;
+  if (document.body.classList.contains('thumbs-mode')) {
+    body = '<div class="thumb-grid">' + top.map((r, i) => {
+      const meta = '<div class="thumb-meta"><span class="thumb-name">' + (i + 1) + '. ' + r[4] +
+        '</span><span class="score-pill">' + r[2].toFixed(1) + '</span></div>';
+      if (r[5]) {
+        // Panorama, not _view1: micro-tier pages (most rural slugs) have no camera
+        // view, and each map move rebuilds this HTML — a _view1 attempt would re-404
+        // per card per settle.
+        return '<a class="thumb-card" href="viewpoints/' + r[5] + '.html">' +
+          '<img loading="lazy" src="renders/' + r[5] + '.jpg"' +
+          ' onerror="this.style.display=\'none\'" alt="">' + meta + '</a>';
+      }
+      return '<div class="thumb-card no-page">' + meta +
+        '<div class="thumb-region">no page yet &middot; <a href="https://maps.google.com/?q=' +
+        r[0] + ',' + r[1] + '">map</a></div></div>';
+    }).join('') + '</div>';
+  } else {
+    const rows = top.map((r, i) => {
+      const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + r[4] + '</a>' : r[4];
+      const link = ' <a href="https://maps.google.com/?q=' + r[0] + ',' + r[1] + '">map</a>';
+      return '<tr><td class="num">' + (i + 1) + '</td><td>' + name + link + '</td>' +
+        '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
+    }).join('');
+    body = '<table class="rank"><tr><th>#</th><th>Place</th><th class="num">Score</th></tr>' + rows + '</table>';
+  }
   document.getElementById('area-results').innerHTML = hits.length === 0
     ? '<p class="note">No candidate viewpoints in this view — zoom or pan to a land area of England.</p>'
-    : '<p class="note">' + label + ':</p><table class="rank">' +
-      '<tr><th>#</th><th>Place</th><th class="num">Score</th></tr>' + rows + '</table>';
+    : '<p class="note">' + label + ':</p>' + body;
 }
 
 let updateEmaMs = 30;   // running estimate of one update's cost
 let areaTimer = null;
 let lastRunAt = -1e9;
 function runAreaUpdate() {
+  // Direct calls (initial load, mode toggle) must cancel any pending debounce,
+  // or the orphaned timeout re-runs the update moments later.
+  if (areaTimer !== null) clearTimeout(areaTimer);
   areaTimer = null;
   const t0 = performance.now();
   updateArea();
@@ -246,5 +306,37 @@ document.getElementById('england-btn').addEventListener('click', () => {
 });
 
 runAreaUpdate();
+</script>
+<script>
+// --- list / thumbnails toggle ----------------------------------------------
+// Separate script on purpose: if the Leaflet CDN is blocked, the map script above
+// throws and never finishes, but the toggle must still work for the server-rendered
+// Top-50 grid. runAreaUpdate is hoisted from that script yet closes over the failed
+// map, so calls to it are guarded.
+(function () {
+const listBtn = document.getElementById('mode-list-btn');
+const thumbsBtn = document.getElementById('mode-thumbs-btn');
+function applyMode(mode) {
+  const thumbs = mode === 'thumbs';
+  document.body.classList.toggle('thumbs-mode', thumbs);
+  listBtn.classList.toggle('active', !thumbs);
+  thumbsBtn.classList.toggle('active', thumbs);
+  listBtn.setAttribute('aria-pressed', String(!thumbs));
+  thumbsBtn.setAttribute('aria-pressed', String(thumbs));
+}
+function refreshAreaList() {
+  try { runAreaUpdate(); } catch (e) { /* map failed to initialize; static grid still toggles */ }
+}
+function setMode(mode) {
+  applyMode(mode);
+  try { localStorage.setItem('pbv-list-mode', mode); } catch (e) { /* private mode etc. */ }
+  refreshAreaList();   // re-render the area list in the new representation
+}
+listBtn.addEventListener('click', () => setMode('list'));
+thumbsBtn.addEventListener('click', () => setMode('thumbs'));
+try {
+  if (localStorage.getItem('pbv-list-mode') === 'thumbs') { applyMode('thumbs'); refreshAreaList(); }
+} catch (e) { /* default to list */ }
+})();
 </script>
 {% endblock %}

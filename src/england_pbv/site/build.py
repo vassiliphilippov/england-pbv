@@ -258,7 +258,9 @@ def _load_vote_photos() -> list[dict[str, object]]:
     return photos
 
 
-def build_site(*, max_pages: int | None = None, skip_pages: bool = False) -> None:
+def build_site(
+    *, max_pages: int | None = None, skip_pages: bool = False, skip_renders: bool = False
+) -> None:
     scored = load_scored()
     deduped = _dedupe_by_rank(scored)
     print(f"{len(scored)} scored -> {len(deduped)} deduplicated for presentation")
@@ -282,11 +284,13 @@ def build_site(*, max_pages: int | None = None, skip_pages: bool = False) -> Non
     viewpoints_dir = site_dir / "viewpoints"
     renders_dir = site_dir / "renders"
     if not skip_pages:
-        if viewpoints_dir.exists():
+        # Smoke builds (--max-pages) must be non-destructive: they write their few pages
+        # into the existing tree instead of deleting the full site from the working copy.
+        if viewpoints_dir.exists() and max_pages is None:
             # Slugs change between runs; stale pages must not accumulate.
             shutil.rmtree(viewpoints_dir)
         viewpoints_dir.mkdir(parents=True, exist_ok=True)
-        if renders_dir.exists():
+        if renders_dir.exists() and not skip_renders and max_pages is None:
             shutil.rmtree(renders_dir)
         renders_dir.mkdir(parents=True, exist_ok=True)
     (site_dir / "assets").mkdir(parents=True, exist_ok=True)
@@ -425,27 +429,29 @@ def build_site(*, max_pages: int | None = None, skip_pages: bool = False) -> Non
             slug = slugs[item.candidate.candidate_id]
             is_lite = item.candidate.candidate_id in lite_ids
             is_micro = item.candidate.candidate_id in micro_ids
-            panorama = render_panorama(
-                dem,
-                landcover,
-                easting=item.candidate.easting,
-                northing=item.candidate.northing,
-                dem10=dem10,
-                landcover10=landcover10,
-                satellite10=satellite10,
-            )
-            if is_micro:
-                height = round(panorama.height * MICRO_PANORAMA_WIDTH / panorama.width)
-                panorama = panorama.resize((MICRO_PANORAMA_WIDTH, height), Image.Resampling.LANCZOS)
-                panorama.save(
-                    renders_dir / f"{slug}.jpg", quality=MICRO_JPEG_QUALITY, optimize=True
+            panorama_path = renders_dir / f"{slug}.jpg"
+            if not (skip_renders and panorama_path.exists()):
+                panorama = render_panorama(
+                    dem,
+                    landcover,
+                    easting=item.candidate.easting,
+                    northing=item.candidate.northing,
+                    dem10=dem10,
+                    landcover10=landcover10,
+                    satellite10=satellite10,
                 )
-            else:
-                panorama.save(
-                    renders_dir / f"{slug}.jpg",
-                    quality=LITE_JPEG_QUALITY if is_lite else 76,
-                    optimize=True,
-                )
+                if is_micro:
+                    height = round(panorama.height * MICRO_PANORAMA_WIDTH / panorama.width)
+                    panorama = panorama.resize(
+                        (MICRO_PANORAMA_WIDTH, height), Image.Resampling.LANCZOS
+                    )
+                    panorama.save(panorama_path, quality=MICRO_JPEG_QUALITY, optimize=True)
+                else:
+                    panorama.save(
+                        panorama_path,
+                        quality=LITE_JPEG_QUALITY if is_lite else 76,
+                        optimize=True,
+                    )
 
             view_cards = []
             if not is_micro:
@@ -453,22 +459,24 @@ def build_site(*, max_pages: int | None = None, skip_pages: bool = False) -> Non
                     sweep.d_far_veg_m[index], max_directions=1 if is_lite else 2
                 )
                 for view_index, direction in enumerate(directions, start=1):
-                    view_image = render_view(
-                        dem,
-                        landcover,
-                        easting=item.candidate.easting,
-                        northing=item.candidate.northing,
-                        center_azimuth_deg=direction.azimuth_deg,
-                        dem10=dem10,
-                        landcover10=landcover10,
-                        satellite10=satellite10,
-                    )
                     view_file = f"{slug}_view{view_index}.jpg"
-                    view_image.save(
-                        renders_dir / view_file,
-                        quality=LITE_JPEG_QUALITY if is_lite else 78,
-                        optimize=True,
-                    )
+                    view_path = renders_dir / view_file
+                    if not (skip_renders and view_path.exists()):
+                        view_image = render_view(
+                            dem,
+                            landcover,
+                            easting=item.candidate.easting,
+                            northing=item.candidate.northing,
+                            center_azimuth_deg=direction.azimuth_deg,
+                            dem10=dem10,
+                            landcover10=landcover10,
+                            satellite10=satellite10,
+                        )
+                        view_image.save(
+                            view_path,
+                            quality=LITE_JPEG_QUALITY if is_lite else 78,
+                            optimize=True,
+                        )
                     view_cards.append(
                         {
                             "file": view_file,
@@ -619,8 +627,21 @@ def main() -> None:
         action="store_true",
         help="regenerate only index/postcode/vote/verification/methodology, keeping pages",
     )
+    parser.add_argument(
+        "--skip-renders",
+        action="store_true",
+        help="regenerate page HTML but reuse existing render JPEGs by filename (avoids "
+        "rewriting ~15k byte-different images in git for HTML-only changes). ONLY valid "
+        "when scoring artifacts are unchanged since the last full render: reuse is "
+        "existence-only, so tier or best-direction changes would pair pages with stale "
+        "images. After rerunning scoring, do a full build.",
+    )
     arguments = parser.parse_args()
-    build_site(max_pages=arguments.max_pages, skip_pages=arguments.skip_pages)
+    build_site(
+        max_pages=arguments.max_pages,
+        skip_pages=arguments.skip_pages,
+        skip_renders=arguments.skip_renders,
+    )
 
 
 if __name__ == "__main__":

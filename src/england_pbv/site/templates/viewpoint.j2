@@ -1,4 +1,8 @@
 {% extends "base.j2" %}
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
 {% block title %}{{ vp.name }} — view potential {{ "%.1f"|format(vp.score) }}{% endblock %}
 {% block description %}Objective view metrics for {{ vp.name }}: {{ "%.0f"|format(vp.visible_area) }} km² visible, farthest sightline {{ "%.0f"|format(vp.d_max) }} km{% endblock %}
 {% block content %}
@@ -29,6 +33,15 @@
       {% endfor %}
     </div>
   </div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Where it is</h3>
+  <div id="vp-map"></div>
+  <p class="note">
+    The exact computed spot ({{ vp.grid_ref }}).{% if vp.views %} Green wedges show where the
+    rendered camera views below look.{% endif %} Click the marker for map links.
+  </p>
 </div>
 
 <div class="card">
@@ -129,4 +142,38 @@
   {{ vp.lat }}, {{ vp.lon }} &middot; source: {{ vp.source }} &middot; position refined by local search.
   Computed location &mdash; check access rights before visiting.
 </p>
+
+<script>
+(function () {
+  const lat = {{ vp.lat }}, lon = {{ vp.lon }};
+  const map = L.map('vp-map', { scrollWheelZoom: false }).setView([lat, lon], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 17,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  const name = {{ vp.name|tojson }};
+  // bindPopup parses its string as HTML; names come from open data (OSM/DoBIH tags).
+  const nameHtml = name.replace(/[&<>"]/g,
+    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  L.marker([lat, lon]).addTo(map).bindPopup(
+    '<b>' + nameHtml + '</b><br>' +
+    '<a href="{{ vp.gmaps }}">Google Maps</a> &middot; ' +
+    '<a href="{{ vp.osmaps }}">OS Maps</a> &middot; ' +
+    '<a href="{{ vp.osm }}">OpenStreetMap</a>'
+  );
+  // 68-degree wedges along the rendered camera directions, ~2.5 km deep.
+  const mPerDegLat = 111320;
+  const mPerDegLon = mPerDegLat * Math.cos(lat * Math.PI / 180);
+  function ray(azDeg, meters) {
+    const az = azDeg * Math.PI / 180;
+    return [lat + Math.cos(az) * meters / mPerDegLat,
+            lon + Math.sin(az) * meters / mPerDegLon];
+  }
+  {% for view in vp.views %}
+  L.polygon([[lat, lon], ray({{ view.azimuth }} - 34, 2500), ray({{ view.azimuth }}, 2900),
+             ray({{ view.azimuth }} + 34, 2500)],
+            { color: '#2f6f4f', weight: 1, fillOpacity: 0.13, interactive: false }).addTo(map);
+  {% endfor %}
+})();
+</script>
 {% endblock %}

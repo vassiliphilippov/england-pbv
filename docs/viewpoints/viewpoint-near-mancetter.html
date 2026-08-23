@@ -8,6 +8,9 @@
 <link rel="stylesheet" href="../assets/style.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 </head>
 <body>
 <header class="site">
@@ -82,6 +85,14 @@
       
     </div>
   </div>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0">Where it is</h3>
+  <div id="vp-map"></div>
+  <p class="note">
+    The exact computed spot (SP 31425 95475). Click the marker for map links.
+  </p>
 </div>
 
 <div class="card">
@@ -224,6 +235,36 @@
   52.55621, -1.53792 &middot; source: screening &middot; position refined by local search.
   Computed location &mdash; check access rights before visiting.
 </p>
+
+<script>
+(function () {
+  const lat = 52.55621, lon = -1.53792;
+  const map = L.map('vp-map', { scrollWheelZoom: false }).setView([lat, lon], 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 17,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  const name = "Viewpoint near Mancetter";
+  // bindPopup parses its string as HTML; names come from open data (OSM/DoBIH tags).
+  const nameHtml = name.replace(/[&<>"]/g,
+    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  L.marker([lat, lon]).addTo(map).bindPopup(
+    '<b>' + nameHtml + '</b><br>' +
+    '<a href="https://maps.google.com/?q=52.55621,-1.53792">Google Maps</a> &middot; ' +
+    '<a href="https://explore.osmaps.com/pin?lat=52.55621&amp;lon=-1.53792&amp;zoom=15">OS Maps</a> &middot; ' +
+    '<a href="https://www.openstreetmap.org/?mlat=52.55621&amp;mlon=-1.53792#map=15/52.55621/-1.53792">OpenStreetMap</a>'
+  );
+  // 68-degree wedges along the rendered camera directions, ~2.5 km deep.
+  const mPerDegLat = 111320;
+  const mPerDegLon = mPerDegLat * Math.cos(lat * Math.PI / 180);
+  function ray(azDeg, meters) {
+    const az = azDeg * Math.PI / 180;
+    return [lat + Math.cos(az) * meters / mPerDegLat,
+            lon + Math.sin(az) * meters / mPerDegLon];
+  }
+  
+})();
+</script>
 
 </main>
 <footer class="site">
