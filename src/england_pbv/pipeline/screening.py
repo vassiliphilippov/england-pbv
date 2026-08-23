@@ -124,8 +124,20 @@ def main() -> None:
         key = (pos_row, pos_col)
         existing = candidates.get(key)
         if existing is not None:
-            if existing.name is None and name is not None:
-                candidates[key] = existing.model_copy(update={"name": name, "source": source})
+            if existing.source is CandidateSource.SCREENING:
+                # A named point wins its cell: its surveyed coordinate is the real spot,
+                # the screening winner's cell centre is an artefact of the grid.
+                candidates[key] = existing.model_copy(
+                    update={
+                        "name": existing.name if existing.name is not None else name,
+                        "source": source,
+                        "easting": bng.easting,
+                        "northing": bng.northing,
+                        "lat": lat,
+                        "lon": lon,
+                        "elevation_m": float(dem[pos_row, pos_col]),
+                    }
+                )
             return
         tpi_sample = sample_tpi(pos_row, pos_col)
         candidates[key] = CandidatePoint(

@@ -2,7 +2,11 @@
 
 Two grid passes per candidate (coarse +/-200 m at 50 m, then fine +/-50 m at 12.5 m around
 the coarse winner), scored against the frozen national percentile transforms so results are
-comparable everywhere. Updates candidate coordinates in candidates.jsonl; rerun
+comparable everywhere. Only positions within MAX_TOTAL_OFFSET_M of the original seed are
+considered, so every written coordinate was actually evaluated and stays matchable.
+
+Run EXACTLY ONCE after screening (rerunning would measure the offset budget from
+already-moved positions); pipeline.screening regenerates the seeds. Rerun
 compute_metrics + scoring afterwards.
 
 Run: uv run python -m england_pbv.pipeline.refine
@@ -70,16 +74,24 @@ def _best_offsets(
     dem: NDArray[np.float32],
     landcover: NDArray[np.uint8],
     frozen: FrozenPercentiles,
-    origins_e: NDArray[np.float64],
-    origins_n: NDArray[np.float64],
+    centres_e: NDArray[np.float64],
+    centres_n: NDArray[np.float64],
     offsets: NDArray[np.float64],
+    budget_origin_e: NDArray[np.float64],
+    budget_origin_n: NDArray[np.float64],
 ) -> tuple[NDArray[np.float64], NDArray[np.float64], NDArray[np.float64]]:
-    """Evaluate every origin x offset position; return best easting, northing, score."""
+    """Evaluate every centre x offset position; return the best in-budget position.
+
+    Positions farther than MAX_TOTAL_OFFSET_M from the budget origin are excluded from
+    the argmax, so every returned coordinate was actually evaluated and every candidate
+    stays within matching distance of its original seed. Offset (0,0) is always in
+    budget, so the result never degrades below the centre position.
+    """
     plan = build_sampling_plan()
-    n_origins = len(origins_e)
+    n_origins = len(centres_e)
     n_offsets = len(offsets)
-    all_e = (origins_e[:, None] + offsets[None, :, 0]).ravel()
-    all_n = (origins_n[:, None] + offsets[None, :, 1]).ravel()
+    all_e = (centres_e[:, None] + offsets[None, :, 0]).ravel()
+    all_n = (centres_n[:, None] + offsets[None, :, 1]).ravel()
 
     sweep = sweep_batch(dem, landcover, eastings=all_e, northings=all_n, plan=plan)
     ground = sample_dem_at(dem, eastings=all_e, northings=all_n)
@@ -90,9 +102,17 @@ def _best_offsets(
     )
     vectors = np.array([metric_inputs(m) for m in metrics], dtype=np.float64)
     scores = frozen.composite(vectors).reshape(n_origins, n_offsets)
+
+    drift = np.sqrt(
+        (all_e.reshape(n_origins, n_offsets) - budget_origin_e[:, None]) ** 2
+        + (all_n.reshape(n_origins, n_offsets) - budget_origin_n[:, None]) ** 2
+    )
+    scores = np.where(drift <= MAX_TOTAL_OFFSET_M, scores, -np.inf)
+    assert bool(np.all(np.isfinite(np.max(scores, axis=1)))), "every origin keeps a valid position"
+
     best = np.argmax(scores, axis=1)
-    best_e = origins_e + offsets[best, 0]
-    best_n = origins_n + offsets[best, 1]
+    best_e = centres_e + offsets[best, 0]
+    best_n = centres_n + offsets[best, 1]
     best_scores = scores[np.arange(n_origins), best]
     return best_e, best_n, best_scores
 
@@ -123,24 +143,32 @@ def main() -> None:
         origins_n = np.array([s.candidate.northing for s in chunk], dtype=np.float64)
 
         coarse_e, coarse_n, _ = _best_offsets(
-            dem, landcover, frozen, origins_e=origins_e, origins_n=origins_n, offsets=coarse
+            dem,
+            landcover,
+            frozen,
+            centres_e=origins_e,
+            centres_n=origins_n,
+            offsets=coarse,
+            budget_origin_e=origins_e,
+            budget_origin_n=origins_n,
         )
         fine_e, fine_n, fine_scores = _best_offsets(
-            dem, landcover, frozen, origins_e=coarse_e, origins_n=coarse_n, offsets=fine
+            dem,
+            landcover,
+            frozen,
+            centres_e=coarse_e,
+            centres_n=coarse_n,
+            offsets=fine,
+            budget_origin_e=origins_e,
+            budget_origin_n=origins_n,
         )
 
-        # Clamp total drift so a refined spot still matches its origin (and any
-        # verification coordinate the origin represents).
         drift = np.sqrt((fine_e - origins_e) ** 2 + (fine_n - origins_n) ** 2)
         for index, item in enumerate(chunk):
-            if drift[index] > MAX_TOTAL_OFFSET_M:
-                scale = MAX_TOTAL_OFFSET_M / drift[index]
-                new_e = origins_e[index] + (fine_e[index] - origins_e[index]) * scale
-                new_n = origins_n[index] + (fine_n[index] - origins_n[index]) * scale
-            else:
-                new_e = float(fine_e[index])
-                new_n = float(fine_n[index])
-            refined_positions[item.candidate.candidate_id] = (new_e, new_n)
+            refined_positions[item.candidate.candidate_id] = (
+                float(fine_e[index]),
+                float(fine_n[index]),
+            )
             if drift[index] > 1.0:
                 moved_count += 1
             improvements.append(float(fine_scores[index]) - item.view_potential)

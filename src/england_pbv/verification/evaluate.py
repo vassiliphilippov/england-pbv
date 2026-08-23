@@ -52,7 +52,19 @@ def main() -> None:
     results: list[VerificationResult] = []
     for viewpoint in viewpoints:
         bng = latlon_to_bng(viewpoint.lat, viewpoint.lon)
-        distance, index = tree.query([bng.easting, bng.northing])
+        # Best-ranked candidate within the radius: the question is "did the algorithm
+        # rank a spot AT this viewpoint highly", not "what is the nearest sample".
+        neighbours = tree.query_ball_point([bng.easting, bng.northing], r=MATCH_RADIUS_M)
+        if len(neighbours) == 0:
+            distance, index = tree.query([bng.easting, bng.northing])
+        else:
+            index = min(neighbours, key=lambda i: scored[i].national_rank)
+            distance = float(
+                np.hypot(
+                    scored[index].candidate.easting - bng.easting,
+                    scored[index].candidate.northing - bng.northing,
+                )
+            )
         if float(distance) > MATCH_RADIUS_M:
             results.append(
                 VerificationResult(

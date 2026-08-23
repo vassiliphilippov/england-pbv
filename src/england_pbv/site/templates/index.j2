@@ -96,7 +96,7 @@
 </section>
 
 <script>
-const points = {{ map_points_json }};
+const points = {{ map_points_json|safe }};
 const map = L.map('map').setView([52.8, -1.7], 6);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 17,

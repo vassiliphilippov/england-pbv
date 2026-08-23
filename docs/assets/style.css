@@ -102,7 +102,7 @@ table.rank td.num { text-align: right; font-variant-numeric: tabular-nums; }
 .horizon-chart .veg-line { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 4 3; }
 .horizon-chart .zero-line { stroke: var(--ink-soft); stroke-width: 0.6; stroke-dasharray: 2 4; }
 .axis-label { font-size: 12px; fill: var(--ink-soft); }
-.polar-chart { width: 260px; height: 260px; }
+.polar-chart { width: 260px; max-width: 100%; height: auto; aspect-ratio: 1; }
 .polar-ring { fill: none; stroke: var(--line); stroke-width: 1; }
 .polar-ring-label { font-size: 9px; fill: var(--ink-soft); }
 .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }

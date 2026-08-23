@@ -11,7 +11,7 @@
 <div class="card">
   <div style="display:flex; gap:28px; align-items:flex-start; flex-wrap:wrap;">
     <div class="big-score">{{ "%.1f"|format(vp.score) }}<small>view potential (percentile composite)</small></div>
-    <div class="components" style="flex:1; min-width:340px;">
+    <div class="components" style="flex:1; min-width:min(340px,100%);">
       {% for comp in vp.components %}
       <div class="component">
         <div class="value">{{ "%.0f"|format(comp.value) }}</div>
@@ -25,7 +25,7 @@
 
 <div class="card">
   <h3 style="margin-top:0">The panorama</h3>
-  {{ vp.horizon_svg }}
+  {{ vp.horizon_svg|safe }}
   <p class="note">
     Grey silhouette: terrain skyline in each direction (720 bearings, Earth curvature and
     refraction included). Dashed green: skyline with trees (+15&nbsp;m) and buildings (+8&nbsp;m) as
@@ -34,8 +34,8 @@
 </div>
 
 <div class="two-col-cards">
-  <div class="card" style="display:flex; gap:18px; align-items:center;">
-    {{ vp.polar_svg }}
+  <div class="card" style="display:flex; gap:18px; align-items:center; flex-wrap:wrap;">
+    {{ vp.polar_svg|safe }}
     <div>
       <h3 style="margin-top:0">Where the view opens</h3>
       <p class="note">Wedge length = distance to the farthest visible ground on that bearing

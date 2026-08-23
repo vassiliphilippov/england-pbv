@@ -3,6 +3,7 @@
 Run: uv run python -m england_pbv.site.build
 """
 
+import html
 import json
 import re
 import shutil
@@ -106,9 +107,14 @@ def build_site() -> None:
         used.add(base)
         slugs[item.candidate.candidate_id] = slug
 
-    env = Environment(loader=FileSystemLoader(paths.TEMPLATES_DIR), autoescape=False)
+    # Autoescape everywhere; SVG/JSON blobs are explicitly |safe after their own hardening.
+    env = Environment(loader=FileSystemLoader(paths.TEMPLATES_DIR), autoescape=True)
     site_dir = paths.SITE_DIR
-    (site_dir / "viewpoints").mkdir(parents=True, exist_ok=True)
+    viewpoints_dir = site_dir / "viewpoints"
+    if viewpoints_dir.exists():
+        # Slugs change between runs; stale pages must not accumulate.
+        shutil.rmtree(viewpoints_dir)
+    viewpoints_dir.mkdir(parents=True, exist_ok=True)
     (site_dir / "assets").mkdir(parents=True, exist_ok=True)
     shutil.copy(paths.TEMPLATES_DIR / "style.css", site_dir / "assets" / "style.css")
 
@@ -125,7 +131,8 @@ def build_site() -> None:
                 "la": round(item.candidate.lat, 5),
                 "lo": round(item.candidate.lon, 5),
                 "s": item.view_potential,
-                "n": item.display_name,
+                # Escaped at build time: Leaflet popups render this as HTML.
+                "n": html.escape(item.display_name),
                 "u": slugs.get(item.candidate.candidate_id),
                 "w": round(item.metrics.water_fraction, 3),
             }
@@ -138,7 +145,8 @@ def build_site() -> None:
         root="",
         n_candidates=f"{len(scored):,}",
         n_map_points=len(map_points),
-        map_points_json=json.dumps(map_points, separators=(",", ":")),
+        # "</" escaped so a name can never terminate the <script> element.
+        map_points_json=json.dumps(map_points, separators=(",", ":")).replace("</", "<\\/"),
         top_overall=[_list_row(v, slugs) for v in deduped[:N_TOP_LIST]],
         top_inland=[_list_row(v, slugs) for v in inland[:N_SUBLIST]],
         top_coastal=[_list_row(v, slugs) for v in coastal[:N_SUBLIST]],
@@ -212,8 +220,8 @@ def build_site() -> None:
             "geograph": geograph_square_url(item.candidate.easting, item.candidate.northing),
         }
         slug = slugs[item.candidate.candidate_id]
-        html = template.render(root="../", vp=vp)
-        (site_dir / "viewpoints" / f"{slug}.html").write_text(html, encoding="utf-8")
+        page_html = template.render(root="../", vp=vp)
+        (site_dir / "viewpoints" / f"{slug}.html").write_text(page_html, encoding="utf-8")
     print(f"{len(pages)} viewpoint pages written")
 
     # --- verification page ---
