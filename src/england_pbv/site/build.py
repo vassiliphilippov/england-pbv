@@ -38,6 +38,11 @@ N_MAP_POINTS: int = 1500
 N_PAGES_NATIONAL: int = 600
 REGIONAL_CELL_M: float = 25000.0
 REGIONAL_PAGES_PER_CELL: int = 5
+# Finer fill so even low-scoring pockets link their local champions; these "lite"
+# pages carry one camera view instead of two to keep the published site small.
+FILL_CELL_M: float = 10000.0
+FILL_PAGES_PER_CELL: int = 2
+LITE_JPEG_QUALITY: int = 78
 N_TOP_LIST: int = 50
 N_SUBLIST: int = 20
 COASTAL_WATER_FRACTION: float = 0.08
@@ -119,10 +124,24 @@ def build_site() -> None:
             continue
         cell_counts[cell] = cell_counts.get(cell, 0) + 1
         page_ids.add(item.candidate.candidate_id)
+    lite_ids: set[str] = set()
+    fill_counts: dict[tuple[int, int], int] = {}
+    for item in deduped:
+        cell = (
+            int(item.candidate.easting // FILL_CELL_M),
+            int(item.candidate.northing // FILL_CELL_M),
+        )
+        if fill_counts.get(cell, 0) >= FILL_PAGES_PER_CELL:
+            continue
+        fill_counts[cell] = fill_counts.get(cell, 0) + 1
+        if item.candidate.candidate_id not in page_ids:
+            lite_ids.add(item.candidate.candidate_id)
+            page_ids.add(item.candidate.candidate_id)
     pages = [v for v in deduped if v.candidate.candidate_id in page_ids]
     print(
         f"pages: {len(pages)} ({N_PAGES_NATIONAL} national "
-        f"+ local top-{REGIONAL_PAGES_PER_CELL} per 25 km cell)"
+        f"+ local top-{REGIONAL_PAGES_PER_CELL} per 25 km cell "
+        f"+ {len(lite_ids)} lite fill pages, top-{FILL_PAGES_PER_CELL} per 10 km cell)"
     )
     slugs: dict[str, str] = {}
     used: set[str] = set()
@@ -219,15 +238,18 @@ def build_site() -> None:
     for index, item in enumerate(pages):
         metrics = item.metrics
         slug = slugs[item.candidate.candidate_id]
+        is_lite = item.candidate.candidate_id in lite_ids
         panorama = render_panorama(
             dem,
             landcover,
             easting=item.candidate.easting,
             northing=item.candidate.northing,
         )
-        panorama.save(renders_dir / f"{slug}.jpg", quality=82)
+        panorama.save(renders_dir / f"{slug}.jpg", quality=LITE_JPEG_QUALITY if is_lite else 82)
 
-        directions = best_view_directions(sweep.d_far_veg_m[index])
+        directions = best_view_directions(
+            sweep.d_far_veg_m[index], max_directions=1 if is_lite else 2
+        )
         view_cards = []
         for view_index, direction in enumerate(directions, start=1):
             view_image = render_view(
@@ -238,7 +260,7 @@ def build_site() -> None:
                 center_azimuth_deg=direction.azimuth_deg,
             )
             view_file = f"{slug}_view{view_index}.jpg"
-            view_image.save(renders_dir / view_file, quality=84)
+            view_image.save(renders_dir / view_file, quality=LITE_JPEG_QUALITY if is_lite else 84)
             view_cards.append(
                 {
                     "file": view_file,
