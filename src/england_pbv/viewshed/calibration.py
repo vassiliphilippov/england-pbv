@@ -42,6 +42,11 @@ def fetch_photo(url: str, destination: Path) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Render calibration pairs")
     parser.add_argument("--suffix", default="", help="filename suffix for this iteration")
+    parser.add_argument(
+        "--photos",
+        default="render_calibration_photos.json",
+        help="photo-set file name inside verification/",
+    )
     args = parser.parse_args()
 
     photos_dir = CALIBRATION_DIR / "photos"
@@ -49,9 +54,7 @@ def main() -> None:
     photos_dir.mkdir(parents=True, exist_ok=True)
     pairs_dir.mkdir(parents=True, exist_ok=True)
 
-    entries = json.loads(
-        (paths.VERIFICATION_DIR / "render_calibration_photos.json").read_text(encoding="utf-8")
-    )
+    entries = json.loads((paths.VERIFICATION_DIR / args.photos).read_text(encoding="utf-8"))
     dem = load_dem_grid(paths.DEM_GRID_NPY)
     landcover = load_uint8_grid(paths.LANDCOVER_GRID_NPY)
     dem10 = None

@@ -200,9 +200,7 @@ def _cloud_density(azimuth_deg: float, elev_deg: float, seed_u: float, seed_v: f
     u3 = px * 0.0074 + 3.1
     v3 = py * 0.0074 + 27.9
     return (
-        0.55 * _smooth_noise(u1, v1)
-        + 0.30 * _smooth_noise(u2, v2)
-        + 0.15 * _smooth_noise(u3, v3)
+        0.55 * _smooth_noise(u1, v1) + 0.30 * _smooth_noise(u2, v2) + 0.15 * _smooth_noise(u3, v3)
     )
 
 

@@ -1,0 +1,152 @@
+[
+ {
+  "key": "oldstellcrag",
+  "name": "Old Stell Crag, Simonside Hills \u2014 view over Rothbury & Coquetdale, Northumberland",
+  "lat": 55.279769,
+  "lon": -1.954924,
+  "bearing": 45,
+  "focal35": 42,
+  "aspect": [
+   3,
+   2
+  ],
+  "horizon": 0.13,
+  "url": "https://s0.geograph.org.uk/geophotos/06/54/44/6544432_5bb2ee6e_1024x1024.jpg",
+  "credit": "Andrew Curtis, geograph.org.uk/photo/6544432, CC BY-SA 2.0"
+ },
+ {
+  "key": "highshield",
+  "name": "Highshield Crags above Crag Lough, Hadrian's Wall, Northumberland",
+  "lat": 55.004592,
+  "lon": -2.370669,
+  "bearing": 45,
+  "focal35": 29,
+  "aspect": [
+   4,
+   3
+  ],
+  "horizon": 0.19,
+  "url": "https://s3.geograph.org.uk/geophotos/06/42/19/6421983_a7228c59_1024x1024.jpg",
+  "credit": "Anthony Foster, geograph.org.uk/photo/6421983, CC BY-SA 2.0"
+ },
+ {
+  "key": "porlockbay",
+  "name": "Porlock Bay & Bossington Beach from the Worthy toll road above Porlock, Exmoor, Somerset",
+  "lat": 51.20687,
+  "lon": -3.634071,
+  "bearing": 67,
+  "focal35": 29,
+  "aspect": [
+   4,
+   3
+  ],
+  "horizon": 0.48,
+  "url": "https://s0.geograph.org.uk/geophotos/07/00/31/7003123_36ef6ad5_original.jpg",
+  "credit": "Marika Reinholds, geograph.org.uk/photo/7003123, CC BY-SA 2.0"
+ },
+ {
+  "key": "valleyofrocks",
+  "name": "Valley of Rocks & Castle Rock in evening light, Lynton, Exmoor coast, North Devon",
+  "lat": 51.229425,
+  "lon": -3.859017,
+  "bearing": 45,
+  "focal35": 24,
+  "aspect": [
+   4,
+   3
+  ],
+  "horizon": 0.3,
+  "url": "https://s0.geograph.org.uk/geophotos/07/12/25/7122599_a084400f_original.jpg",
+  "credit": "David Smith, geograph.org.uk/photo/7122599, CC BY-SA 2.0"
+ },
+ {
+  "key": "wyedowns",
+  "name": "Wye Downs escarpment at Devil's Kneading Trough, North Downs, Kent",
+  "lat": 51.168853,
+  "lon": 0.967938,
+  "bearing": 292,
+  "focal35": 48,
+  "aspect": [
+   4,
+   3
+  ],
+  "horizon": 0.13,
+  "url": "https://s0.geograph.org.uk/geophotos/03/76/14/3761473_48b8a7bd.jpg",
+  "credit": "Marathon, geograph.org.uk/photo/3761473, CC BY-SA 2.0"
+ },
+ {
+  "key": "swaledale",
+  "name": "Swaledale above Low Row (view W towards Muker), Yorkshire Dales",
+  "lat": 54.378342,
+  "lon": -2.053926,
+  "bearing": 270,
+  "focal35": 58,
+  "aspect": [
+   4,
+   3
+  ],
+  "horizon": 0.38,
+  "url": "https://s0.geograph.org.uk/geophotos/03/48/04/3480446_57160fec_original.jpg",
+  "credit": "Gordon Hatton, geograph.org.uk/photo/3480446, CC BY-SA 2.0"
+ },
+ {
+  "key": "conistonepie",
+  "name": "Conistone Pie viewpoint over Wharfedale, Kilnsey area, Yorkshire Dales",
+  "lat": 54.114006,
+  "lon": -2.019797,
+  "bearing": 315,
+  "focal35": 25,
+  "aspect": [
+   16,
+   9
+  ],
+  "horizon": 0.05,
+  "url": "https://s0.geograph.org.uk/geophotos/07/22/63/7226358_8495ff29_original.jpg",
+  "credit": "David Kilvington, geograph.org.uk/photo/7226358, CC BY-SA 2.0"
+ },
+ {
+  "key": "wensleydale",
+  "name": "Wensleydale from above Carperby (view WSW towards Askrigg), Yorkshire Dales",
+  "lat": 54.307109,
+  "lon": -2.002494,
+  "bearing": 247,
+  "focal35": 21,
+  "aspect": [
+   3,
+   2
+  ],
+  "horizon": 0.51,
+  "url": "https://s0.geograph.org.uk/geophotos/07/32/96/7329699_409cefb8_original.jpg",
+  "credit": "Julian Paren, geograph.org.uk/photo/7329699, CC BY-SA 2.0"
+ },
+ {
+  "key": "lawley",
+  "name": "The Lawley looking to Caer Caradoc & Long Mynd, Shropshire Hills",
+  "lat": 52.571144,
+  "lon": -2.749117,
+  "bearing": 225,
+  "focal35": 24,
+  "aspect": [
+   4,
+   3
+  ],
+  "horizon": 0.28,
+  "url": "https://s3.geograph.org.uk/geophotos/07/87/53/7875379_a4d0d69a.jpg",
+  "credit": "TCExplorer, geograph.org.uk/photo/7875379, CC BY-SA 2.0"
+ },
+ {
+  "key": "wrekin",
+  "name": "The Wrekin summit view NW over the Shropshire plain",
+  "lat": 52.669636,
+  "lon": -2.552208,
+  "bearing": 292,
+  "focal35": 31,
+  "aspect": [
+   3,
+   2
+  ],
+  "horizon": 0.4,
+  "url": "https://s0.geograph.org.uk/geophotos/06/10/06/6100624_21e24c93.jpg",
+  "credit": "Robert Eva, geograph.org.uk/photo/6100624, CC BY-SA 2.0"
+ }
+]

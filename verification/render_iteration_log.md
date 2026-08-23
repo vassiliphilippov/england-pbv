@@ -82,6 +82,24 @@ Mam Tor's valley reads green-pasture-to-brown-moor like the photo.
 Remaining niggles: concentric arc patterns inside near tree crowns; Mam Tor's crown
 foreground (flat 10 m crest, nudge cannot fire — bounded known limitation).
 
+## Cycle 5 — generalization check with a fresh photo set — PASS (no overfitting)
+
+Set 2 (verification/render_calibration_photos_set2.json): ten new documented photos in
+regions set 1 never touched (Exmoor coast, Swaledale/Wensleydale/Wharfedale, Simonside,
+Hadrian's Wall, Shropshire, Kent Downs). Rendered with the engine UNCHANGED.
+
+Verdict: improvements generalize — Wrekin (plain to hazy horizon), Swaledale's far dale
+sides (walled patchwork, moor tops), clouds/haze/colours all transfer to unseen sites. The
+one systematic residual appears in both sets: cameras standing ON steep hillsides or at
+break-of-slope show too much of their own slope (Mam Tor set 1; Swaledale set 2) — a ±10 m
+camera-position sensitivity, not a data or palette failure.
+
+Queued for cycle 6 (consolidated): (1) micro-optimized render camera — search ±30 m for
+the spot that minimizes near-ground angular occupancy toward the view bearing ("stand
+where the view opens", what photographers actually do); (2) OSM footpaths drawn as worn
+lines — the depth cue that makes descending foregrounds read as descending; (3)
+grazing-angle darkening to break the "lit dome" reading of convex foregrounds.
+
 ## Failures ledger (do not repeat)
 
 - (from pre-loop) Fixed march steps near the observer paint terrace bands — step must scale
