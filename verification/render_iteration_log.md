@@ -206,6 +206,34 @@ painting by distance-to-polyline instead of cell-centre; (3) review the set-2 pa
 recently inspected (High Shield, Old Stell Crag, Porlock, Lawley, Wrekin); (4) built-up
 mauve sprawl (Keswick) still reads as speckle, not town.
 
+## Cycle 10 — OSM rock material + corduroy fix — ACCEPTED after three near-field retunes
+
+Changes: (1) OSM rock features (natural=bare_rock/scree/rock/stone/shingle areas,
+natural=cliff lines) fetched for all 20 sites (`england_pbv.data.rocks`, 38,212 cells)
+and burned as a +3 flag (rock wins over the moor flag; the path flag wins over rock);
+(2) renderer paints flagged cells as grey crag blended through vegetation by near-binary
+~8 m coverage noise, faded out below 150 m; (3) the c9 tussock-patch octave is gated by
+view incidence — seen edge-on it had compressed into horizontal "corduroy" stripes
+(High Shield, Old Stell Crag foregrounds).
+
+Verdict: accept. Valley of Rocks is the showcase — Castle Rock and its neighbour tors
+render as grey crag masses and the pair finally reads as the same place; High Shield and
+Surprise View gain believable crag accents on the Whin Sill and Borrowdale fells.
+
+Three near-field failures on the way (all recorded): 100% grey paint made Conistone's
+limestone hillside a concrete dome; a smooth 0.35–0.9 blend still averaged into a
+grey-green wash; near-binary clusters AND a 2 m geometry bump both collapsed at grazing
+view — the bump actually widened the grey (bumped samples occlude more spans). Root
+cause: below ~150 m at grazing incidence, adjacent rays sample the world centimetres
+apart, so the whole foreground reflects a single noise strip — no world-space pattern
+survives. Near rock paint now fades out; near-field outcrops (Conistone's pavement, Old
+Stell Crag's framing tors at the camera) are a bounded limitation, honestly unrendered.
+
+Queued for cycle 11: (1) Sentinel-2 real-imagery far-field texture (research in
+progress — user-suggested; would replace procedural patchwork beyond a few km with the
+real one); (2) built-up mauve sprawl; (3) consider photo set 3 — most set-2 pairs are
+now structurally close.
+
 ## Failures ledger (do not repeat)
 
 - (from pre-loop) Fixed march steps near the observer paint terrace bands — step must scale
@@ -228,3 +256,10 @@ mauve sprawl (Keswick) still reads as speckle, not town.
   tapering it by dome height changes nothing visible) — they come from per-clump height
   variance (0.6+0.8×noise). Contour rings on crowns seen close-from-above need STRONGER
   near-range roughness, not redistribution.
+- (c10) Painting a mapped surface class at 100% over broad areas makes concrete-uniform
+  ground — blend materials through the underlying vegetation with near-binary coverage
+  noise instead.
+- (c10) Below ~150 m at grazing incidence NO world-space pattern survives — colour
+  patches, thresholded clusters and 2 m geometry bumps all collapse into a uniform wash
+  (adjacent rays sample centimetres apart; bumps just widen occluding spans). Fade
+  world-pattern materials out near the camera; don't fight this with amplitude.

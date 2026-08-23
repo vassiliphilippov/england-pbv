@@ -308,6 +308,8 @@ def _render_kernel(
                     ) * (1.0 - 0.5 * rough_amp + rough_amp * _smooth_noise(x * 0.31, y * 0.31))
             elif lc_bin == 5:
                 z_surf = z + clearing * BUILT_HEIGHT_M * (0.5 + _cell_noise(x, y, 45.0))
+            code10_here = _landcover_code10(landcover10, has10_lc, x, y)
+            rock_flag = code10_here >= 0 and code10_here % 10 == 3
 
             z_eff = z_surf - RENDER_CURVATURE * r * r
             ang = math.atan((z_eff - eye_z) / r)
@@ -395,7 +397,13 @@ def _render_kernel(
                     # Conistone's own-slope reading as polished domes.
                     near_amp = 0.16 * math.exp(-r / 500.0)
                     grain *= 1.0 + near_amp * (2.0 * _smooth_noise(x * 0.22, y * 0.22) - 1.0)
+                    # Gate the patches by view incidence: seen edge-on, world-space
+                    # noise iso-lines compress into horizontal "corduroy" stripes.
                     patch_amp = 0.10 * math.exp(-r / 700.0)
+                    graze_gate = incidence * 12.0
+                    if graze_gate > 1.0:
+                        graze_gate = 1.0
+                    patch_amp *= graze_gate
                     grain *= 1.0 + patch_amp * (
                         2.0 * _smooth_noise(x * 0.055 + 91.0, y * 0.055) - 1.0
                     )
@@ -435,7 +443,7 @@ def _render_kernel(
                 # vegetation actually is; altitude proxies only fill in where 10 m data
                 # is absent (Wales, offshore) — altitude alone paints Mam Tor's grazed
                 # green crest tawny and misses Valley of Rocks' sea-level bracken.
-                code10 = _landcover_code10(landcover10, has10_lc, x, y)
+                code10 = code10_here
                 habitat_known = code10 >= 0
                 habitat_moor = habitat_known and code10 % 10 == 2
                 if lc_color == 3 and (
@@ -486,6 +494,30 @@ def _render_kernel(
                         red = red + (122.0 - red) * heather * 0.7
                         green = green + (98.0 - green) * heather * 0.7
                         blue = blue + (104.0 - blue) * heather * 0.7
+                if rock_flag:
+                    # OSM-mapped crag/scree/tor (natural=bare_rock/cliff/...): grey rock
+                    # BLENDED through the vegetation by ~8 m coverage noise — flagged
+                    # areas painted 100% grey turn limestone hillsides into concrete
+                    # domes (Conistone Pie, c10 first attempt); real outcrops are rock
+                    # broken by turf.
+                    rock_tone = 0.72 + 0.55 * _cell_noise(x + 5.0, y + 9.0, 22.0)
+                    # Near-binary coverage: most cells stay turf, the rest form hard
+                    # ~10 m outcrop clusters — a smooth 0.35..0.9 wash still averaged
+                    # into a grey-green dome over broad flagged areas.
+                    rock_cover = (_smooth_noise(x * 0.13 + 41.0, y * 0.13) - 0.42) * 3.0
+                    if rock_cover < 0.08:
+                        rock_cover = 0.08
+                    elif rock_cover > 0.95:
+                        rock_cover = 0.95
+                    # Below ~150 m ANY world-space pattern collapses at grazing view
+                    # (adjacent rays sample centimetres apart), so rock paint washed
+                    # the whole own-slope grey — fade it out and leave near turf
+                    # (failures ledger, c10).
+                    if r < 150.0:
+                        rock_cover *= r / 150.0
+                    red = red + (148.0 * rock_tone - red) * rock_cover
+                    green = green + (144.0 * rock_tone - green) * rock_cover
+                    blue = blue + (136.0 * rock_tone - blue) * rock_cover
                 if habitat_known and code10 % 10 == 1 and lc_color != 8 and r < 2500.0:
                     # A worn footpath line: pale trodden earth, fading with distance.
                     # Sampled at the RAW march position — colour jitter (up to 30 m) smears
