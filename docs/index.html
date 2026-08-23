@@ -1018,6 +1018,7 @@ map.on('zoomend', () => {
   }
 });
 
+const resultsLayer = L.layerGroup().addTo(map);
 document.getElementById('area-btn').addEventListener('click', () => {
   ensureAllPoints();
   if (!map.hasLayer(allLayer)) map.addLayer(allLayer);
@@ -1025,13 +1026,28 @@ document.getElementById('area-btn').addEventListener('click', () => {
   const hits = allPointsData().filter(r => b.contains([r[0], r[1]]));
   hits.sort((x, y) => y[2] - x[2]);
   const top = hits.slice(0, 15);
+  resultsLayer.clearLayers();
+  top.forEach((r, i) => {
+    const pin = L.marker([r[0], r[1]], {
+      icon: L.divIcon({
+        className: 'rank-pin-wrap',
+        html: '<div class="rank-pin">' + (i + 1) + '</div>',
+        iconSize: [26, 26],
+        iconAnchor: [13, 13]
+      }),
+      zIndexOffset: 1000 - i
+    });
+    pin.bindPopup(popupFor(r[4], r[2], r[5]));
+    resultsLayer.addLayer(pin);
+  });
+  if (top.length > 0) resultsLayer.getLayers()[0].openPopup();
   let rows = top.map((r, i) => {
     const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + r[4] + '</a>' : r[4];
     const link = ' <a href="https://maps.google.com/?q=' + r[0] + ',' + r[1] + '">map</a>';
     return '<tr><td class="num">' + (i + 1) + '</td><td>' + name + link + '</td>' +
       '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
   }).join('');
-  const label = hits.length + ' candidate viewpoints in view; local top ' + top.length;
+  const label = hits.length + ' candidate viewpoints in view; numbered pins on the map show the local top ' + top.length;
   document.getElementById('area-results').innerHTML = hits.length === 0
     ? '<p class="note">No candidate viewpoints in this view — zoom or pan to a land area of England.</p>'
     : '<p class="note">' + label + ':</p><table class="rank">' +
