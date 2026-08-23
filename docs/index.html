@@ -990,10 +990,17 @@ L.control.layers(null, {'Inland views': inland, 'Coastal views': coastal}, {coll
 // Rows: [lat, lon, score, water_fraction, name, slug].
 const allLayer = L.layerGroup();
 let allLoaded = false;
+function allPointsData() {
+  // data/points.js may fail to load (offline, partial deploy): degrade to the top set.
+  if (typeof ALL_POINTS === 'undefined') {
+    return points.map(p => [p.la, p.lo, p.s, p.w, p.n, p.u || '']);
+  }
+  return ALL_POINTS;
+}
 function ensureAllPoints() {
   if (allLoaded) return;
   allLoaded = true;
-  ALL_POINTS.forEach(r => {
+  allPointsData().forEach(r => {
     const m = L.circleMarker([r[0], r[1]], {
       renderer: canvas, radius: 3.2,
       fillColor: colorFor(r[2]), color: 'rgba(255,255,255,0.6)', weight: 0.7, fillOpacity: 0.75
@@ -1015,7 +1022,7 @@ document.getElementById('area-btn').addEventListener('click', () => {
   ensureAllPoints();
   if (!map.hasLayer(allLayer)) map.addLayer(allLayer);
   const b = map.getBounds();
-  const hits = ALL_POINTS.filter(r => b.contains([r[0], r[1]]));
+  const hits = allPointsData().filter(r => b.contains([r[0], r[1]]));
   hits.sort((x, y) => y[2] - x[2]);
   const top = hits.slice(0, 15);
   let rows = top.map((r, i) => {
