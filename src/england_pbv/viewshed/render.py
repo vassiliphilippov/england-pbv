@@ -180,12 +180,30 @@ def _smooth_noise(u: float, v: float) -> float:
     return a + (b - a) * fu + (c - a) * fv + (d - c - b + a) * fu * fv
 
 
+CLOUD_BASE_M: float = 1500.0
+
+
 @njit(cache=True, inline="always")
 def _cloud_density(azimuth_deg: float, elev_deg: float, seed_u: float, seed_v: float) -> float:
-    """Two-octave stretched noise: cumulus clumps elongated along the horizon."""
-    u = azimuth_deg * 0.055 + seed_u
-    v = elev_deg * 0.55 + seed_v
-    return 0.65 * _smooth_noise(u, v) + 0.35 * _smooth_noise(u * 2.7 + 13.7, v * 2.7 + 71.3)
+    """Cumulus on a world-space plane at CLOUD_BASE_M: clouds shrink toward the horizon
+    with true perspective instead of being painted in angular sky coordinates."""
+    if elev_deg < 1.2:
+        return 0.0
+    az = math.radians(azimuth_deg)
+    d = CLOUD_BASE_M / math.tan(math.radians(elev_deg))
+    px = math.sin(az) * d
+    py = math.cos(az) * d
+    u1 = px * 0.00055 + seed_u * 37.0
+    v1 = py * 0.00055 + seed_v * 23.0
+    u2 = px * 0.0021 + 13.7
+    v2 = py * 0.0021 + seed_u * 11.0
+    u3 = px * 0.0074 + 3.1
+    v3 = py * 0.0074 + 27.9
+    return (
+        0.55 * _smooth_noise(u1, v1)
+        + 0.30 * _smooth_noise(u2, v2)
+        + 0.15 * _smooth_noise(u3, v3)
+    )
 
 
 @njit(cache=True, parallel=True, fastmath=True)
@@ -258,8 +276,14 @@ def _render_kernel(
                 clump = _cell_noise(x, y, 35.0)
                 if clump < clearing:
                     tree_here = True
-                    z_surf = z + TREE_HEIGHT_M * (
-                        0.55 + 0.9 * _cell_noise(x + 17.0, y + 31.0, 35.0)
+                    # Rounded crowns: a dome profile across each 35 m clump cell.
+                    fx35 = x / 35.0 - math.floor(x / 35.0) - 0.5
+                    fy35 = y / 35.0 - math.floor(y / 35.0) - 0.5
+                    dome_sq = 1.0 - 3.2 * (fx35 * fx35 + fy35 * fy35)
+                    if dome_sq < 0.15:
+                        dome_sq = 0.15
+                    z_surf = z + TREE_HEIGHT_M * math.sqrt(dome_sq) * (
+                        0.6 + 0.8 * _cell_noise(x + 17.0, y + 31.0, 35.0)
                     )
             elif lc_bin == 5:
                 z_surf = z + clearing * BUILT_HEIGHT_M * (0.5 + _cell_noise(x, y, 45.0))
@@ -369,6 +393,30 @@ def _render_kernel(
                     red = red + (152.0 - red) * moor
                     green = green + (142.0 - green) * moor
                     blue = blue + (92.0 - blue) * moor
+                if lc_color == 3 or lc_color == 2:
+                    # Bracken russet on steep upland slopes (the orange fellsides of
+                    # every Lakeland photo); heather dusk on high shrub.
+                    slope_mag = math.sqrt(grad_x * grad_x + grad_y * grad_y)
+                    bracken = 0.0
+                    if z > 280.0 and slope_mag > 0.17:
+                        bracken = (z - 280.0) / 200.0
+                        if bracken > 1.0:
+                            bracken = 1.0
+                        steep = (slope_mag - 0.17) * 4.0
+                        if steep > 1.0:
+                            steep = 1.0
+                        bracken *= steep * (0.2 + 0.35 * _cell_noise(x, y, 90.0))
+                    if bracken > 0.0:
+                        red = red + (164.0 - red) * bracken
+                        green = green + (118.0 - green) * bracken
+                        blue = blue + (66.0 - blue) * bracken
+                    if lc_color == 2 and z > 300.0:
+                        heather = (z - 300.0) / 200.0
+                        if heather > 1.0:
+                            heather = 1.0
+                        red = red + (122.0 - red) * heather * 0.7
+                        green = green + (98.0 - green) * heather * 0.7
+                        blue = blue + (104.0 - blue) * heather * 0.7
                 if lc_color == 8:
                     # Open water mirrors the sky's brightness.
                     red = red + (sky_horizon[0] - red) * 0.45
@@ -458,15 +506,28 @@ def _render_kernel(
             blue = sky_top[2] + (sky_horizon[2] - sky_top[2]) * f
 
             cloud = _cloud_density(az_deg, elev_deg, cloud_seed_u, cloud_seed_v)
-            alpha = (cloud - 0.56) * 3.2
+            alpha = (cloud - 0.52) * 2.4
             if alpha > 0.0:
                 if alpha > 1.0:
                     alpha = 1.0
-                # Clouds thin towards the zenith and melt into the horizon haze.
-                alpha *= 0.30 + 0.45 * math.exp(-2.5 * elev_norm)
-                red = red + (cloud_color[0] - red) * alpha
-                green = green + (cloud_color[1] - green) * alpha
-                blue = blue + (cloud_color[2] - blue) * alpha
+                alpha = alpha * alpha * (3.0 - 2.0 * alpha)  # smooth edges
+                # Melt into the horizon haze; strongest cover mid-sky.
+                fade = (elev_deg - 1.2) / 5.0
+                if fade > 1.0:
+                    fade = 1.0
+                alpha *= 0.72 * fade
+                # Grey underside fringe where the cloud is thin.
+                if alpha < 0.45:
+                    cr = cloud_color[0] - 42.0
+                    cg = cloud_color[1] - 40.0
+                    cb = cloud_color[2] - 32.0
+                else:
+                    cr = cloud_color[0]
+                    cg = cloud_color[1]
+                    cb = cloud_color[2]
+                red = red + (cr - red) * alpha
+                green = green + (cg - green) * alpha
+                blue = blue + (cb - blue) * alpha
             image[row, col, 0] = np.uint8(red)
             image[row, col, 1] = np.uint8(green)
             image[row, col, 2] = np.uint8(blue)
@@ -526,9 +587,9 @@ def _run_kernel(
         # of slope those metres decide whether the foreground hides the valley.
         bx = math.sin(view_bearing_rad)
         by = math.cos(view_bearing_rad)
-        for _ in range(2):
+        for _ in range(4):
             ahead = _sample_elev(dem, dem10, has10, easting + bx * 12.0, northing + by * 12.0)
-            if ahead < ground - 1.0:
+            if ahead < ground - 0.4:
                 easting += bx * 12.0
                 northing += by * 12.0
                 ground = ahead

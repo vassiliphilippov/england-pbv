@@ -65,6 +65,23 @@ colours — bracken russet/heather on steep acid upland (photo Latrigg foregroun
 bracken); (c) round tree canopy tops; (d) photo-like cumulus sky; (e) consider swapping in
 a fresh photo set soon — Latrigg/Coaley/Uffington/Devil's Dyke are close.
 
+## Cycle 4 — canopy domes, bracken/heather, perspective clouds, nudge retune — ACCEPTED after retune
+
+Changes: rounded tree crowns (dome profile per 35 m clump); bracken russet on steep upland
+grass (z>280 m, slope>0.17, capped ~0.55 strength) + heather dusk on high shrub; cumulus
+projected onto a world-space 1500 m cloud plane (perspective shrink toward horizon) with a
+3-octave density and smoothstep alpha; brow nudge relaxed to 0.4 m per 12 m step x4.
+
+First attempt FAILED two ways (recorded): (1) bracken at z>220/slope>0.12 painted Edale's
+green walled fields orange — improved-pasture vs open-fell cannot be told apart by slope
+alone, so thresholds must stay conservative; (2) 2-octave plane clouds with hard alpha ramp
+rendered as paper-cutout blobs — clouds need a fine erosion octave and smoothstep edges.
+Both fixed in the same cycle; after retune, Latrigg shows russet fell accents + soft wisps,
+Mam Tor's valley reads green-pasture-to-brown-moor like the photo.
+
+Remaining niggles: concentric arc patterns inside near tree crowns; Mam Tor's crown
+foreground (flat 10 m crest, nudge cannot fire — bounded known limitation).
+
 ## Failures ledger (do not repeat)
 
 - (from pre-loop) Fixed march steps near the observer paint terrace bands — step must scale
@@ -73,3 +90,7 @@ a fresh photo set soon — Latrigg/Coaley/Uffington/Devil's Dyke are close.
   when >2.5 m below the crest.
 - (from pre-loop) Height-scaling trees near the viewpoint builds canopy staircases — thin
   density, keep full height.
+- (c4) Bracken by slope+altitude alone at z>220 m paints improved valley pasture orange —
+  keep z>280 m and steep-slope gates; farmland vs fell needs a better discriminator.
+- (c4) World-plane cumulus with a hard 2-octave threshold = paper cutouts — always include
+  a fine erosion octave and smoothstep the alpha.
