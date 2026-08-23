@@ -40,6 +40,7 @@ VERIFICATION_REPORT_JSON: Path = OUTPUTS_DIR / "verification_report.json"
 
 # Curated inputs (committed)
 VERIFICATION_VIEWPOINTS_JSON: Path = VERIFICATION_DIR / "viewpoints.json"
+VOTE_PHOTOS_JSON: Path = VERIFICATION_DIR / "vote_photos.json"
 
 
 def ensure_dirs() -> None:

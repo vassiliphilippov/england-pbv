@@ -1,0 +1,175 @@
+{% extends "base.j2" %}
+{% block title %}Which view is more beautiful? — Potentially Beautiful Views of England{% endblock %}
+{% block description %}Pair-vote real photographs of English views to help calibrate the objective view-potential formula against human judgement.{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Which view is more beautiful?</h1>
+  <p class="lede">The score on this site is pure geometry &mdash; it has never been told what people
+  actually like. Help fix that: two real photographs of English views, taken from known spots.
+  Pick the one you find more beautiful. Every vote sharpens the comparison between the formula
+  and human taste.</p>
+  <p class="fine">{{ n_photos }} photographs, all free-licensed with camera location. Votes are
+  stored only in your browser &mdash; use the export button to contribute them.</p>
+</section>
+
+<div class="vote-arena">
+  <figure class="vote-figure" id="fig-a">
+    <button class="vote-btn" id="btn-a">&#9650; This one is more beautiful</button>
+    <img id="img-a" alt="Candidate view A" referrerpolicy="no-referrer">
+    <figcaption id="cap-a"></figcaption>
+  </figure>
+  <div class="vote-middle">
+    <button class="vote-skip" id="btn-skip">Can&rsquo;t decide &mdash; show another pair</button>
+    <span class="area-note" id="vote-count"></span>
+  </div>
+  <figure class="vote-figure" id="fig-b">
+    <button class="vote-btn" id="btn-b">&#9660; This one is more beautiful</button>
+    <img id="img-b" alt="Candidate view B" referrerpolicy="no-referrer">
+    <figcaption id="cap-b"></figcaption>
+  </figure>
+</div>
+
+<div class="card" style="margin-top:26px">
+  <h3 style="margin-top:0">Your votes stay on this device</h3>
+  <p class="note">Nothing is uploaded. When you have voted a while, export the file and send it
+  to the project (e.g. attach it to a GitHub issue) &mdash; it will be used to fit a model of
+  human preference over the objective metrics, and to re-weight the view-potential formula.</p>
+  <div class="links-row">
+    <a href="#" id="export-btn" download="england-pbv-votes.json">Download my votes (JSON)</a>
+    <a href="https://github.com/vassiliphilippov/england-pbv/issues">Open a GitHub issue</a>
+    <a href="#" id="reset-btn">Erase my votes</a>
+  </div>
+</div>
+
+<script>
+const PHOTOS = {{ photos_json|safe }};
+const VOTES_KEY = 'pbv_votes_v1';
+const BROKEN_KEY = 'pbv_broken_v1';
+
+function loadJson(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (err) { return fallback; }
+}
+function saveJson(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch (err) { /* private mode */ }
+}
+
+let votes = loadJson(VOTES_KEY, []);
+let broken = new Set(loadJson(BROKEN_KEY, []));
+let shownCount = {};
+votes.forEach(v => {
+  shownCount[v.a] = (shownCount[v.a] || 0) + 1;
+  shownCount[v.b] = (shownCount[v.b] || 0) + 1;
+});
+
+let pair = null;      // [photoA, photoB]
+let nextPair = null;
+
+function usablePhotos() {
+  return PHOTOS.filter(p => !broken.has(p.id));
+}
+
+function pickPair() {
+  // Prefer the least-shown photos so coverage stays even; pair partners are
+  // random so all beauty levels meet each other.
+  const pool = usablePhotos();
+  if (pool.length < 2) return null;
+  const jitter = p => (shownCount[p.id] || 0) + Math.random();
+  const sorted = pool.slice().sort((x, y) => jitter(x) - jitter(y));
+  const a = sorted[0];
+  const rest = sorted.slice(1, Math.max(8, Math.floor(sorted.length / 4)));
+  const b = rest[Math.floor(Math.random() * rest.length)];
+  return Math.random() < 0.5 ? [a, b] : [b, a];
+}
+
+function preload(p) {
+  const img = new Image();
+  img.src = p[0].image_url;
+  const img2 = new Image();
+  img2.src = p[1].image_url;
+}
+
+function escHtml(s) {
+  return String(s).replace(/[&<>"']/g,
+    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function caption(p) {
+  const area = p.area ? escHtml(p.area) + ' &middot; ' : '';
+  return area + escHtml(p.title) + ' &mdash; <a href="' + escHtml(p.page_url) + '">' +
+    escHtml(p.author) + '</a>, ' + escHtml(p.license);
+}
+
+function showPair(p) {
+  pair = p;
+  ['a', 'b'].forEach((side, k) => {
+    const photo = p[k];
+    const img = document.getElementById('img-' + side);
+    img.dataset.photoId = photo.id;
+    img.src = photo.image_url;
+    document.getElementById('cap-' + side).innerHTML = caption(photo);
+  });
+  shownCount[p[0].id] = (shownCount[p[0].id] || 0) + 1;
+  shownCount[p[1].id] = (shownCount[p[1].id] || 0) + 1;
+  nextPair = pickPair();
+  if (nextPair) preload(nextPair);
+  updateCount();
+}
+
+function updateCount() {
+  const n = votes.filter(v => v.w !== null).length;
+  document.getElementById('vote-count').textContent =
+    n === 0 ? 'no votes yet on this device' : n + ' vote' + (n === 1 ? '' : 's') + ' recorded on this device';
+}
+
+function record(winnerId) {
+  votes.push({ a: pair[0].id, b: pair[1].id, w: winnerId, t: new Date().toISOString() });
+  saveJson(VOTES_KEY, votes);
+  advance();
+}
+
+function advance() {
+  const p = nextPair && nextPair[0] && !broken.has(nextPair[0].id) && !broken.has(nextPair[1].id)
+    ? nextPair : pickPair();
+  if (p) showPair(p);
+}
+
+document.getElementById('btn-a').addEventListener('click', () => record(pair[0].id));
+document.getElementById('btn-b').addEventListener('click', () => record(pair[1].id));
+document.getElementById('img-a').addEventListener('click', () => record(pair[0].id));
+document.getElementById('img-b').addEventListener('click', () => record(pair[1].id));
+document.getElementById('btn-skip').addEventListener('click', () => record(null));
+document.addEventListener('keydown', e => {
+  if (e.key === '1' || e.key === 'ArrowUp') record(pair[0].id);
+  else if (e.key === '2' || e.key === 'ArrowDown') record(pair[1].id);
+  else if (e.key === 's') record(null);
+});
+
+['a', 'b'].forEach(side => {
+  document.getElementById('img-' + side).addEventListener('error', e => {
+    const id = e.target.dataset.photoId;
+    if (!id) return;
+    broken.add(id);
+    saveJson(BROKEN_KEY, Array.from(broken));
+    showPair(pickPair());
+  });
+});
+
+document.getElementById('export-btn').addEventListener('click', e => {
+  const payload = { site: 'england-pbv', exported: new Date().toISOString(),
+                    n_photos: PHOTOS.length, votes: votes };
+  e.target.href = URL.createObjectURL(
+    new Blob([JSON.stringify(payload, null, 1)], { type: 'application/json' }));
+});
+document.getElementById('reset-btn').addEventListener('click', e => {
+  e.preventDefault();
+  if (!confirm('Erase all votes stored in this browser?')) return;
+  votes = [];
+  saveJson(VOTES_KEY, votes);
+  updateCount();
+});
+
+showPair(pickPair());
+</script>
+{% endblock %}
