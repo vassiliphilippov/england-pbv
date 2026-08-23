@@ -20,7 +20,7 @@ SEA_LEVEL_M: float = 0.0  # missing OS Terrain 50 tiles are open sea
 EYE_HEIGHT_M: float = 1.7
 
 # --- Viewshed geometry ---
-MAX_VIEW_DISTANCE_M: float = 40000.0
+MAX_VIEW_DISTANCE_M: float = 60000.0
 EARTH_RADIUS_M: float = 6371000.0
 REFRACTION_K: float = 1.0 / 7.0  # conventional optical refraction coefficient
 N_AZIMUTHS: int = 720  # 0.5 degree step
@@ -29,7 +29,8 @@ N_AZIMUTHS: int = 720  # 0.5 degree step
 RAY_SEGMENTS: list[tuple[float, float]] = [
     (2000.0, 50.0),
     (8000.0, 100.0),
-    (MAX_VIEW_DISTANCE_M, 200.0),
+    (20000.0, 200.0),
+    (MAX_VIEW_DISTANCE_M, 400.0),
 ]
 MIN_SAMPLE_DISTANCE_M: float = 75.0  # skip the observer's own cell
 
@@ -42,8 +43,16 @@ FAR_VIEW_DISTANCE_M: float = 10000.0  # a bearing "sees far" if terrain visible 
 
 # --- Screening (candidate generation) ---
 TPI_RADII_M: list[float] = [500.0, 2000.0, 10000.0]
-SCREENING_KEEP_FRACTION: float = 0.02  # keep top 2% of England cells by screening score
-NMS_RADIUS_M: float = 300.0  # non-maximum suppression radius between candidates
+SCREENING_KEEP_FRACTION: float = 0.10  # keep top 10% of England cells by screening score
+NMS_RADIUS_M: float = 150.0  # non-maximum suppression radius between candidates
+
+# --- Local refinement (fine grid search around promising candidates) ---
+REFINE_TOP_N: int = 8000
+REFINE_DEDUPE_RADIUS_M: float = 250.0
+REFINE_COARSE_SPAN_M: float = 200.0  # +/- span of the first refinement grid
+REFINE_COARSE_STEP_M: float = 50.0
+REFINE_FINE_SPAN_M: float = 50.0  # +/- span of the second grid around the coarse winner
+REFINE_FINE_STEP_M: float = 12.5
 
 # --- Scoring ---
 REGIONAL_PERCENTILE_RADIUS_M: float = 30000.0

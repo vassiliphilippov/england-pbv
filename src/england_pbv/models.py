@@ -51,13 +51,20 @@ class ViewMetrics(BaseModel):
     p90_horizon_deg: float
     skyline_total_variation_deg: float
 
-    # Openness and reach.
+    # Openness and reach (bare terrain).
     open_fraction: float
     far_fraction: float
     longest_far_arc_deg: float
     d_far_median_km: float
     d_far_p90_km: float
     d_far_max_km: float
+
+    # Vegetation-aware reach: trees (+15 m) and buildings (+8 m) act as blockers.
+    far_fraction_veg: float
+    longest_far_arc_veg_deg: float
+    d_far_veg_p90_km: float
+    visible_area_veg_km2: float
+    veg_retention: float  # visible_area_veg / visible_area (1.0 when nothing to lose)
 
     # Downward prospect and relief.
     mean_depression_deg: float

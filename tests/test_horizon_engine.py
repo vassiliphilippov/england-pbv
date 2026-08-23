@@ -131,3 +131,33 @@ def test_near_tree_ring_flags_obstruction() -> None:
     metrics = _run_single(dem, landcover, easting=CENTRE_M, northing=CENTRE_M)
 
     assert metrics.near_tree_fraction > 0.9, "woodland ring flags nearly every bearing"
+
+
+def test_vegetation_blocks_summit_view_but_not_scarp_slope() -> None:
+    # A 100 m cone summit: with a woodland ring around the summit, the leaf-on view dies.
+    centre_cell = int(CENTRE_M / GRID_CELL_M)
+    rows, cols = np.mgrid[0:GRID_SIDE_CELLS, 0:GRID_SIDE_CELLS]
+    dist_cells = np.sqrt((rows - centre_cell) ** 2 + (cols - centre_cell) ** 2)
+    dem = np.maximum(0.0, 100.0 * (1.0 - dist_cells / 40)).astype(np.float32)
+
+    landcover = _grass_cover()
+    ring = 8
+    landcover[
+        centre_cell - ring : centre_cell + ring + 1,
+        centre_cell - ring : centre_cell + ring + 1,
+    ] = int(LandCoverClass.TREE_COVER)
+    blocked = _run_single(dem, landcover, easting=CENTRE_M, northing=CENTRE_M)
+    assert blocked.far_fraction == 1.0, "bare-earth view reaches far in every direction"
+    assert blocked.far_fraction_veg < 0.1, "summit woodland ring kills the leaf-on view"
+    assert blocked.veg_retention < 0.3, "little visible area survives the woodland ring"
+
+    # Same woodland placed on a steep scarp slope BELOW an escarpment-edge observer:
+    # tree tops stay below the sightline, so the leaf-on view survives.
+    dem2 = _flat_world(0.0)
+    edge_col = centre_cell
+    dem2[:, :edge_col] = 200.0
+    landcover2 = _grass_cover()
+    landcover2[:, edge_col + 2 : edge_col + 8] = int(LandCoverClass.TREE_COVER)  # 100-400 m out
+    observer_e = (edge_col - 1) * GRID_CELL_M + 25.0
+    open_view = _run_single(dem2, landcover2, easting=observer_e, northing=CENTRE_M)
+    assert open_view.far_fraction_veg > 0.3, "trees below the escarpment lip do not block"

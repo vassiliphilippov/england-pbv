@@ -6,6 +6,7 @@ from enum import Enum, IntEnum
 class CandidateSource(Enum):
     SCREENING = "screening"
     OSM_VIEWPOINT = "osm_viewpoint"
+    OSM_PEAK = "osm_peak"
     DOBIH_HILL = "dobih_hill"
     VERIFICATION = "verification"
 

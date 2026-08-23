@@ -33,6 +33,11 @@ N_SECTORS: int = 12  # 30-degree sectors for directional drop
 SECTOR_RING_MIN_M: float = 500.0
 SECTOR_RING_MAX_M: float = 3000.0
 TREE_BIN: int = 1  # WorldCover TREE_COVER (10) // 10
+BUILT_BIN: int = 5  # WorldCover BUILT_UP (50) // 10
+
+# Obstacle heights added to blockers (not targets) for the vegetation-aware horizon.
+TREE_OBSTACLE_M: float = 15.0
+BUILT_OBSTACLE_M: float = 8.0
 
 CURVATURE_PER_M: float = (1.0 - REFRACTION_K) / (2.0 * EARTH_RADIUS_M)
 
@@ -55,11 +60,13 @@ class SweepResult:
     to obtain steradians.
     """
 
-    horizon_rad: NDArray[np.float32]  # (n, n_az) final horizon angle
+    horizon_rad: NDArray[np.float32]  # (n, n_az) final horizon angle (bare terrain)
     alpha0_rad: NDArray[np.float32]  # (n, n_az) angle to nearest sampled ground
-    d_far_m: NDArray[np.float32]  # (n, n_az) farthest visible terrain distance
+    d_far_m: NDArray[np.float32]  # (n, n_az) farthest visible terrain distance (bare)
+    d_far_veg_m: NDArray[np.float32]  # (n, n_az) farthest ground visible past trees/buildings
     tree_blocked: NDArray[np.uint8]  # (n, n_az) near ring dominated by tree cover
-    plan_area: NDArray[np.float32]  # (n, n_bands) sum of r*dr for visible samples
+    plan_area: NDArray[np.float32]  # (n, n_bands) sum of r*dr for visible samples (bare)
+    plan_area_veg: NDArray[np.float32]  # (n, n_bands) same with tree/building blockers
     ang_area: NDArray[np.float32]  # (n, n_bands) sum of angle increments (rad)
     landcover_ang: NDArray[np.float32]  # (n, N_LANDCOVER_BINS) angle increments by class
     vis_z_min: NDArray[np.float32]  # (n,)
@@ -165,8 +172,10 @@ def _sweep_kernel(  # noqa: PLR0913
     horizon_rad: NDArray[np.float32],
     alpha0_rad: NDArray[np.float32],
     d_far_m: NDArray[np.float32],
+    d_far_veg_m: NDArray[np.float32],
     tree_blocked: NDArray[np.uint8],
     plan_area: NDArray[np.float32],
+    plan_area_veg: NDArray[np.float32],
     ang_area: NDArray[np.float32],
     landcover_ang: NDArray[np.float32],
     vis_z_min: NDArray[np.float32],
@@ -192,8 +201,10 @@ def _sweep_kernel(  # noqa: PLR0913
             dy = cos_az[j]
             sector = (j * N_SECTORS) // n_az
             max_ang = -10.0
+            max_ang_veg = -10.0
             alpha0 = 0.0
             far = 0.0
+            far_veg = 0.0
             tree_near = 0
 
             for s in range(n_samples):
@@ -201,7 +212,8 @@ def _sweep_kernel(  # noqa: PLR0913
                 x = e0 + dx * r
                 y = n0 + dy * r
                 z = _bilinear(dem, x, y)
-                if s < near_sample_count and _landcover_at(landcover, x, y) == TREE_BIN:
+                lc_bin = _landcover_at(landcover, x, y)
+                if s < near_sample_count and lc_bin == TREE_BIN:
                     tree_near += 1
                 if ring_start <= s < ring_stop:
                     sec_sum[sector] += z
@@ -212,13 +224,27 @@ def _sweep_kernel(  # noqa: PLR0913
                 if s == 0:
                     alpha0 = ang
 
+                # Vegetation-aware pass: bare ground is the target, trees/buildings block.
+                if ang > max_ang_veg:
+                    band = band_index[s]
+                    plan_area_veg[i, band] += r * steps[s]
+                    far_veg = r
+                obstacle = 0.0
+                if lc_bin == TREE_BIN:
+                    obstacle = TREE_OBSTACLE_M
+                elif lc_bin == BUILT_BIN:
+                    obstacle = BUILT_OBSTACLE_M
+                blocker_ang = ang if obstacle == 0.0 else math.atan((z_eff + obstacle - eye_z) / r)
+                if blocker_ang > max_ang_veg:
+                    max_ang_veg = blocker_ang
+
                 delta = ang - max_ang
                 if delta > 0.0:
                     band = band_index[s]
                     plan_area[i, band] += r * steps[s]
                     if s > 0:
                         ang_area[i, band] += delta
-                        landcover_ang[i, _landcover_at(landcover, x, y)] += delta
+                        landcover_ang[i, lc_bin] += delta
                     if z < z_min:
                         z_min = z
                     if z > z_max:
@@ -229,6 +255,7 @@ def _sweep_kernel(  # noqa: PLR0913
             horizon_rad[i, j] = max_ang
             alpha0_rad[i, j] = alpha0
             d_far_m[i, j] = far
+            d_far_veg_m[i, j] = far_veg
             tree_blocked[i, j] = 1 if tree_near * 2 >= near_sample_count else 0
 
         vis_z_min[i] = z_min
@@ -270,8 +297,10 @@ def sweep_batch(
         horizon_rad=np.zeros((n_obs, N_AZIMUTHS), dtype=np.float32),
         alpha0_rad=np.zeros((n_obs, N_AZIMUTHS), dtype=np.float32),
         d_far_m=np.zeros((n_obs, N_AZIMUTHS), dtype=np.float32),
+        d_far_veg_m=np.zeros((n_obs, N_AZIMUTHS), dtype=np.float32),
         tree_blocked=np.zeros((n_obs, N_AZIMUTHS), dtype=np.uint8),
         plan_area=np.zeros((n_obs, n_bands), dtype=np.float32),
+        plan_area_veg=np.zeros((n_obs, n_bands), dtype=np.float32),
         ang_area=np.zeros((n_obs, n_bands), dtype=np.float32),
         landcover_ang=np.zeros((n_obs, N_LANDCOVER_BINS), dtype=np.float32),
         vis_z_min=np.zeros(n_obs, dtype=np.float32),
@@ -296,8 +325,10 @@ def sweep_batch(
         result.horizon_rad,
         result.alpha0_rad,
         result.d_far_m,
+        result.d_far_veg_m,
         result.tree_blocked,
         result.plan_area,
+        result.plan_area_veg,
         result.ang_area,
         result.landcover_ang,
         result.vis_z_min,

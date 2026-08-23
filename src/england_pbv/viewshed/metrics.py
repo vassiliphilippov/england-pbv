@@ -98,6 +98,15 @@ def reduce_sweep(
     far_fraction = np.mean(far_mask, axis=1)
     longest_arc_deg = _longest_true_arcs(far_mask) * 360.0
 
+    far_mask_veg = sweep.d_far_veg_m > FAR_VIEW_DISTANCE_M
+    far_fraction_veg = np.mean(far_mask_veg, axis=1)
+    longest_arc_veg_deg = _longest_true_arcs(far_mask_veg) * 360.0
+    d_far_veg_p90 = np.percentile(sweep.d_far_veg_m / 1000.0, 90, axis=1)
+    plan_area_veg_km2 = sweep.plan_area_veg * AZIMUTH_STEP_RAD / 1.0e6
+    total_area = np.sum(plan_area_km2, axis=1)
+    total_area_veg = np.sum(plan_area_veg_km2, axis=1)
+    veg_retention = np.where(total_area > 0.0, total_area_veg / np.maximum(total_area, 1e-9), 1.0)
+
     d_far_km = sweep.d_far_m / 1000.0
     d_far_median = np.median(d_far_km, axis=1)
     d_far_p90 = np.percentile(d_far_km, 90, axis=1)
@@ -139,7 +148,7 @@ def reduce_sweep(
             ViewMetrics(
                 candidate_id=candidate_ids[i],
                 visible_area_km2_by_band=[float(plan_area_km2[i, b]) for b in range(n_bands)],
-                total_visible_area_km2=float(np.sum(plan_area_km2[i])),
+                total_visible_area_km2=float(total_area[i]),
                 angular_area_deg2_by_band=[float(ang_area_deg2[i, b]) for b in range(n_bands)],
                 total_terrain_angular_deg2=float(np.sum(ang_area_deg2[i])),
                 mean_horizon_deg=float(mean_h[i]),
@@ -152,6 +161,11 @@ def reduce_sweep(
                 d_far_median_km=float(d_far_median[i]),
                 d_far_p90_km=float(d_far_p90[i]),
                 d_far_max_km=float(d_far_max[i]),
+                far_fraction_veg=float(far_fraction_veg[i]),
+                longest_far_arc_veg_deg=float(longest_arc_veg_deg[i]),
+                d_far_veg_p90_km=float(d_far_veg_p90[i]),
+                visible_area_veg_km2=float(total_area_veg[i]),
+                veg_retention=float(min(1.0, veg_retention[i])),
                 mean_depression_deg=float(depression[i]),
                 max_sector_drop_m=float(max_sector_drop[i]),
                 visible_relief_m=float(visible_relief[i]),
