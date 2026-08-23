@@ -367,16 +367,28 @@ def _render_kernel(
             image[row, col, 2] = np.uint8(blue)
 
 
+CREST_SNAP_MIN_GAIN_M: float = 2.5
+
+
 def _crest_snap(
     dem: NDArray[np.float32], easting: float, northing: float
 ) -> tuple[float, float, float]:
-    best_e, best_n, ground = easting, northing, _bilinear(dem, easting, northing)
+    """Move the camera to the local crest only when clearly below it.
+
+    Rescues cone summits sampled off-centre (Glastonbury Tor) without retreating
+    from slope tops and escarpment brows, where the cell behind is always slightly
+    higher and snapping would add 50 m of foreground field to every render.
+    """
+    origin_ground = _bilinear(dem, easting, northing)
+    best_e, best_n, ground = easting, northing, origin_ground
     for de in (-50.0, 0.0, 50.0):
         for dn in (-50.0, 0.0, 50.0):
             z_here = _bilinear(dem, easting + de, northing + dn)
             if z_here > ground:
                 ground = z_here
                 best_e, best_n = easting + de, northing + dn
+    if ground - origin_ground < CREST_SNAP_MIN_GAIN_M:
+        return easting, northing, float(origin_ground)
     return best_e, best_n, float(ground)
 
 
