@@ -234,6 +234,35 @@ progress — user-suggested; would replace procedural patchwork beyond a few km 
 real one); (2) built-up mauve sprawl; (3) consider photo set 3 — most set-2 pairs are
 now structurally close.
 
+## Cycle 11 — real Sentinel-2 far-field texture — ACCEPTED after lighting retune
+
+Changes (user-suggested data source): a 10 m true-colour England mosaic
+(`england_pbv.data.satellite`, 1.37 B cells) built from the least-cloudy May–September
+Sentinel-2 scene per MGRS tile (AWS Open Data, anonymous TCI COGs; all 66 scenes ≤12%
+cloud, most 0%). The renderer blends the real imagery in beyond 2 km (full by 3.5 km,
+85% strength, ×1.22 gain) — nearer than that, grazing incidence collapses any
+world-space texture (c10 lesson), so the procedural surface remains.
+
+First attempt blended RAW satellite colour after our shading — distant hillsides went
+flat and washed (the imagery's own baked shading is too subtle at distance to carry
+relief). Retuned: satellite is treated as albedo lit by our sun — multiplied by the
+sun+cloud shade WITHOUT the procedural field/grain noise it replaces.
+
+Verdict (A/B crops c10 vs c11): accept. Mam Tor's Edale mid-distance swaps repeating
+procedural patchwork for the real irregular field mosaic; Wensleydale's horizon gains
+the actual dark moor line; Kinder's russet moor reads organically mottled. Near fields
+stay procedural and identical.
+
+Also this cycle: satellite/aerial imagery research (workflow, 18 sources, endpoints
+probed live) recorded in specifications/data_sources.md — EA Vertical Aerial
+Photography (10–25 cm, OGL) noted as a future near-field source; Google/Bing/Esri/
+Mapbox ruled out on licence terms; EOX cloudless ruled out on NC+SA propagation.
+
+Queued for cycle 12: (1) satellite tone match (TCI runs slightly pale vs the graded
+palette — consider saturation lift on satellite pixels); (2) check remaining pairs for
+scene-date seams; (3) built-up mauve sprawl; (4) photo set 3 — the set-2 pairs are now
+structurally close across the board.
+
 ## Failures ledger (do not repeat)
 
 - (from pre-loop) Fixed march steps near the observer paint terrace bands — step must scale
