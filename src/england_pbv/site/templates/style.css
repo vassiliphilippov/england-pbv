@@ -166,39 +166,68 @@ footer.site {
 
 .rank-pin.ladder-pin { background: var(--gold); }
 
-.vote-arena { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+/* Voting is a one-screen experience: compact header, the two photos side by
+   side, and one utility row — image height is tied to the viewport so nothing
+   scrolls on desktop. Small screens fall back to stacking. */
+.vote-head { margin: 4px 0 0; }
+.vote-head h1 { font-size: 24px; margin: 0 0 4px; }
+.vote-arena {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 10px;
+  align-items: start;
+}
 .vote-figure {
   margin: 0; background: var(--surface); border-radius: var(--radius);
-  box-shadow: var(--shadow); padding: 14px;
+  box-shadow: var(--shadow); padding: 10px;
 }
 .vote-figure img {
-  width: 100%; max-height: 62vh; object-fit: contain; border-radius: 8px;
+  width: 100%; height: clamp(240px, calc(100vh - 330px), 72vh);
+  object-fit: contain; border-radius: 8px;
   display: block; cursor: pointer; background: var(--bg);
 }
-.vote-figure figcaption { font-size: 12.5px; color: var(--ink-soft); margin-top: 8px; }
+.vote-figure figcaption {
+  font-size: 12px; color: var(--ink-soft); margin-top: 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .vote-btn {
-  font: inherit; font-size: 15px; font-weight: 650; width: 100%; margin-bottom: 10px;
-  padding: 10px 16px; border-radius: 8px; cursor: pointer;
+  font: inherit; font-size: 15px; font-weight: 650; width: 100%; margin-top: 8px;
+  padding: 9px 16px; border-radius: 8px; cursor: pointer;
   border: 1px solid var(--accent); background: var(--accent); color: #fff;
 }
 .vote-btn:hover { filter: brightness(1.08); }
-.vote-middle { display: flex; align-items: center; gap: 14px; justify-content: center; }
+.vote-middle {
+  display: flex; align-items: center; gap: 14px; justify-content: center;
+  flex-wrap: wrap; margin-top: 10px;
+}
 .vote-skip {
   font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 8px; cursor: pointer;
   border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft);
 }
 .vote-skip:hover { border-color: var(--ink-soft); }
+@media (max-width: 760px) {
+  .vote-arena { grid-template-columns: 1fr; }
+  .vote-figure img { height: clamp(200px, 38vh, 420px); }
+}
 
 /* --- list / thumbnails toggle + thumbnail cards ---------------------------- */
 .view-toggle {
   display: inline-flex; margin-left: 10px; vertical-align: middle;
   border: 1px solid var(--line); border-radius: 8px; overflow: hidden;
 }
-.area-panel .view-toggle button {
+/* span.view-toggle button outranks .area-panel button, so toggles keep their
+   segmented look inside the area panel too. */
+span.view-toggle button {
+  font: inherit; cursor: pointer;
   border: none; border-radius: 0; background: var(--surface); color: var(--ink-soft);
   padding: 8px 14px; font-size: 14px;
 }
-.area-panel .view-toggle button.active { background: var(--accent); color: #fff; }
+span.view-toggle button.active { background: var(--accent); color: #fff; }
+.list-head {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  justify-content: space-between;
+  /* Carries the vertical rhythm the wrapped h2's global margins used to provide. */
+  margin: 38px 0 12px;
+}
+.list-head h2 { margin: 0; }
 .thumb-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 14px; margin-top: 10px;
@@ -220,8 +249,8 @@ a.thumb-card:hover { border-color: var(--accent); }
 .thumb-name { font-weight: 650; font-size: 14px; line-height: 1.25; }
 .thumb-region { font-size: 12.5px; color: var(--ink-soft); padding: 0 11px 10px; }
 .thumb-card.no-page { opacity: 0.85; }
-body.thumbs-mode .mode-list-only { display: none; }
-body:not(.thumbs-mode) .mode-thumbs-only { display: none; }
+[data-list].thumbs .mode-list-only { display: none; }
+[data-list]:not(.thumbs) .mode-thumbs-only { display: none; }
 
 /* --- per-viewpoint location map -------------------------------------------- */
 #vp-map { height: 340px; border-radius: var(--radius); box-shadow: var(--shadow); z-index: 0; }

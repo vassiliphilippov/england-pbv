@@ -11,20 +11,28 @@ function thumbFallback(img) {
   else { img.style.display = 'none'; }
 }
 </script>
+<script src="assets/listmode.js"></script>
 {% endblock %}
 {% block content %}
-{% macro place_rows(rows) %}
-    {# One ranked list in both representations; the List/Thumbnails toggle picks
-       which is visible via body.thumbs-mode. #}
+{% macro mode_toggle() %}
+  <span class="view-toggle" role="group" aria-label="How to show this list">
+    <button class="mode-list active" aria-pressed="true">List</button><button
+      class="mode-thumbs" aria-pressed="false">Thumbnails</button>
+  </span>
+{% endmacro %}
+{% macro place_rows(rows, show_nat_rank=false) %}
+    {# One ranked list in both representations; each list's own toggle picks which
+       is visible via a .thumbs class on its data-list container. #}
     <div class="mode-list-only">
     <table class="rank">
-      <tr><th>#</th><th>Place</th><th>Region</th><th class="num">Score</th></tr>
+      <tr><th>#</th><th>Place</th><th>Region</th>{% if show_nat_rank %}<th class="num">Nat. rank</th>{% endif %}<th class="num">Score</th></tr>
       {% for row in rows %}
       <tr>
         <td class="num">{{ loop.index }}</td>
         <td>{% if row.slug %}<a href="viewpoints/{{ row.slug }}.html">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}
             {% if row.is_discovery %}<span class="tag">discovery</span>{% endif %}</td>
         <td>{{ row.region }}</td>
+        {% if show_nat_rank %}<td class="num">{{ row.rank }}</td>{% endif %}
         <td class="num"><span class="score-pill">{{ "%.1f"|format(row.score) }}</span></td>
       </tr>
       {% endfor %}
@@ -84,51 +92,37 @@ function thumbFallback(img) {
   &middot; click a point for details &middot; zoomed out: the national top {{ n_map_points }};
   zoom in and every one of the {{ n_all_points }} candidate viewpoints appears.
 </div>
-<div class="area-panel">
+<div class="area-panel" data-list="area">
   <button id="england-btn">&#8630; Back to all of England</button>
-  <span class="view-toggle" role="group" aria-label="How to show places">
-    <button id="mode-list-btn" class="active" aria-pressed="true">List</button><button
-      id="mode-thumbs-btn" aria-pressed="false">Thumbnails</button>
-  </span>
+  {{ mode_toggle() }}
   <span class="area-note">the list below follows the map &mdash; zoom or pan anywhere and the best
   views in the visible area rank themselves automatically</span>
   <div id="area-results"></div>
 </div>
 
-<section>
-  <h2>Top 50 in England</h2>
+<section data-list="top50">
+  <div class="list-head"><h2>Top 50 in England</h2>{{ mode_toggle() }}</div>
   {{ place_rows(top_overall) }}
 </section>
 
-<section>
-  <h2>Best inland patchwork views</h2>
+<section data-list="inland">
+  <div class="list-head"><h2>Best inland patchwork views</h2>{{ mode_toggle() }}</div>
   <p class="note">The Coombe Hill kind: escarpments and hills over farmland vales (little visible sea).</p>
   {{ place_rows(top_inland) }}
 </section>
 
-<section>
-  <h2>Best coastal panoramas</h2>
+<section data-list="coastal">
+  <div class="list-head"><h2>Best coastal panoramas</h2>{{ mode_toggle() }}</div>
   {{ place_rows(top_coastal) }}
 </section>
 
-<section>
-  <h2>Hidden gems</h2>
+<section data-list="gems">
+  <div class="list-head"><h2>Hidden gems</h2>{{ mode_toggle() }}</div>
   <p class="note">
     High-scoring spots with no marked viewpoint, no named hill &mdash; places the algorithm found on its
     own that nobody has tagged on a map. Potentially beautiful, genuinely unheralded.
   </p>
-  <table class="rank">
-    <tr><th>#</th><th>Location</th><th>Region</th><th class="num">Nat. rank</th><th class="num">Score</th></tr>
-    {% for row in hidden_gems %}
-    <tr>
-      <td class="num">{{ loop.index }}</td>
-      <td>{% if row.slug %}<a href="viewpoints/{{ row.slug }}.html">{{ row.name }}</a>{% else %}{{ row.name }}{% endif %}</td>
-      <td>{{ row.region }}</td>
-      <td class="num">{{ row.rank }}</td>
-      <td class="num"><span class="score-pill">{{ "%.1f"|format(row.score) }}</span></td>
-    </tr>
-    {% endfor %}
-  </table>
+  {{ place_rows(hidden_gems, show_nat_rank=true) }}
 </section>
 
 <script src="data/points.js"></script>
@@ -231,7 +225,7 @@ function updateArea() {
   });
   const label = hits.length + ' candidate viewpoints in view; numbered pins on the map show the local top ' + top.length;
   let body;
-  if (document.body.classList.contains('thumbs-mode')) {
+  if (ListMode.get('area') === 'thumbs') {
     body = '<div class="thumb-grid">' + top.map((r, i) => {
       const meta = '<div class="thumb-meta"><span class="thumb-name">' + (i + 1) + '. ' + r[4] +
         '</span><span class="score-pill">' + r[2].toFixed(1) + '</span></div>';
@@ -293,35 +287,12 @@ document.getElementById('england-btn').addEventListener('click', () => {
 runAreaUpdate();
 </script>
 <script>
-// --- list / thumbnails toggle ----------------------------------------------
+// --- per-list toggles -------------------------------------------------------
 // Separate script on purpose: if the Leaflet CDN is blocked, the map script above
-// throws and never finishes, but the toggle must still work for the server-rendered
-// Top-50 grid. runAreaUpdate is hoisted from that script yet closes over the failed
-// map, so calls to it are guarded.
-(function () {
-const listBtn = document.getElementById('mode-list-btn');
-const thumbsBtn = document.getElementById('mode-thumbs-btn');
-function applyMode(mode) {
-  const thumbs = mode === 'thumbs';
-  document.body.classList.toggle('thumbs-mode', thumbs);
-  listBtn.classList.toggle('active', !thumbs);
-  thumbsBtn.classList.toggle('active', thumbs);
-  listBtn.setAttribute('aria-pressed', String(!thumbs));
-  thumbsBtn.setAttribute('aria-pressed', String(thumbs));
-}
-function refreshAreaList() {
-  try { runAreaUpdate(); } catch (e) { /* map failed to initialize; static grid still toggles */ }
-}
-function setMode(mode) {
-  applyMode(mode);
-  try { localStorage.setItem('pbv-list-mode', mode); } catch (e) { /* private mode etc. */ }
-  refreshAreaList();   // re-render the area list in the new representation
-}
-listBtn.addEventListener('click', () => setMode('list'));
-thumbsBtn.addEventListener('click', () => setMode('thumbs'));
-try {
-  if (localStorage.getItem('pbv-list-mode') === 'thumbs') { applyMode('thumbs'); refreshAreaList(); }
-} catch (e) { /* default to list */ }
-})();
+// throws and never finishes, but the server-rendered lists must still toggle.
+// runAreaUpdate is hoisted from that script yet closes over the failed map, so the
+// area re-render callback is guarded (ListMode swallows callback errors too).
+ListMode.onChange('area', () => runAreaUpdate());
+ListMode.wireAll();
 </script>
 {% endblock %}

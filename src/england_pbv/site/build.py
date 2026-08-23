@@ -296,6 +296,7 @@ def build_site(
     (site_dir / "assets").mkdir(parents=True, exist_ok=True)
     (site_dir / "data").mkdir(parents=True, exist_ok=True)
     shutil.copy(paths.TEMPLATES_DIR / "style.css", site_dir / "assets" / "style.css")
+    shutil.copy(paths.TEMPLATES_DIR / "listmode.js", site_dir / "assets" / "listmode.js")
 
     coombe_photo: str | None = None
     photo_source = site_dir / "assets" / "coombe-hill.jpg"

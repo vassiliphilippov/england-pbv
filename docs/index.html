@@ -19,6 +19,7 @@ function thumbFallback(img) {
   else { img.style.display = 'none'; }
 }
 </script>
+<script src="assets/listmode.js"></script>
 
 </head>
 <body>
@@ -36,6 +37,7 @@ function thumbFallback(img) {
   </div>
 </header>
 <main class="wrap">
+
 
 
 <section class="hero">
@@ -68,19 +70,26 @@ function thumbFallback(img) {
   &middot; click a point for details &middot; zoomed out: the national top 1500;
   zoom in and every one of the 39,042 candidate viewpoints appears.
 </div>
-<div class="area-panel">
+<div class="area-panel" data-list="area">
   <button id="england-btn">&#8630; Back to all of England</button>
-  <span class="view-toggle" role="group" aria-label="How to show places">
-    <button id="mode-list-btn" class="active" aria-pressed="true">List</button><button
-      id="mode-thumbs-btn" aria-pressed="false">Thumbnails</button>
+  
+  <span class="view-toggle" role="group" aria-label="How to show this list">
+    <button class="mode-list active" aria-pressed="true">List</button><button
+      class="mode-thumbs" aria-pressed="false">Thumbnails</button>
   </span>
+
   <span class="area-note">the list below follows the map &mdash; zoom or pan anywhere and the best
   views in the visible area rank themselves automatically</span>
   <div id="area-results"></div>
 </div>
 
-<section>
-  <h2>Top 50 in England</h2>
+<section data-list="top50">
+  <div class="list-head"><h2>Top 50 in England</h2>
+  <span class="view-toggle" role="group" aria-label="How to show this list">
+    <button class="mode-list active" aria-pressed="true">List</button><button
+      class="mode-thumbs" aria-pressed="false">Thumbnails</button>
+  </span>
+</div>
   
     
     <div class="mode-list-only">
@@ -92,6 +101,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/the-knoll.html">The Knoll</a>
             </td>
         <td>near West Bexington</td>
+        
         <td class="num"><span class="score-pill">91.0</span></td>
       </tr>
       
@@ -100,6 +110,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-finsthwaite.html">Viewpoint near Finsthwaite</a>
             <span class="tag">discovery</span></td>
         <td>near Finsthwaite</td>
+        
         <td class="num"><span class="score-pill">90.3</span></td>
       </tr>
       
@@ -108,6 +119,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/holdstone-hill.html">Holdstone Hill</a>
             </td>
         <td>near Combe Martin</td>
+        
         <td class="num"><span class="score-pill">90.2</span></td>
       </tr>
       
@@ -116,6 +128,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-easington.html">Viewpoint near Easington</a>
             <span class="tag">discovery</span></td>
         <td>near Easington</td>
+        
         <td class="num"><span class="score-pill">90.2</span></td>
       </tr>
       
@@ -124,6 +137,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-ravenscar.html">Viewpoint near Ravenscar</a>
             <span class="tag">discovery</span></td>
         <td>near Ravenscar</td>
+        
         <td class="num"><span class="score-pill">90.0</span></td>
       </tr>
       
@@ -132,6 +146,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-west-bexington.html">Viewpoint near West Bexington</a>
             <span class="tag">discovery</span></td>
         <td>near West Bexington</td>
+        
         <td class="num"><span class="score-pill">89.5</span></td>
       </tr>
       
@@ -140,6 +155,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/long-side.html">Long Side</a>
             </td>
         <td>near Applethwaite</td>
+        
         <td class="num"><span class="score-pill">89.5</span></td>
       </tr>
       
@@ -148,6 +164,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/ullock-pike.html">Ullock Pike</a>
             </td>
         <td>near Applethwaite</td>
+        
         <td class="num"><span class="score-pill">89.4</span></td>
       </tr>
       
@@ -156,6 +173,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-niton.html">Viewpoint near Niton</a>
             <span class="tag">discovery</span></td>
         <td>near Niton</td>
+        
         <td class="num"><span class="score-pill">89.2</span></td>
       </tr>
       
@@ -164,6 +182,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/crag-fell.html">Crag Fell</a>
             </td>
         <td>near Ennerdale Bridge</td>
+        
         <td class="num"><span class="score-pill">89.1</span></td>
       </tr>
       
@@ -172,6 +191,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-abbotsbury.html">Viewpoint near Abbotsbury</a>
             <span class="tag">discovery</span></td>
         <td>near Abbotsbury</td>
+        
         <td class="num"><span class="score-pill">89.0</span></td>
       </tr>
       
@@ -180,6 +200,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/firle-beacon.html">Firle Beacon</a>
             </td>
         <td>near Alciston</td>
+        
         <td class="num"><span class="score-pill">88.9</span></td>
       </tr>
       
@@ -188,6 +209,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-combe-martin.html">Viewpoint near Combe Martin</a>
             <span class="tag">discovery</span></td>
         <td>near Combe Martin</td>
+        
         <td class="num"><span class="score-pill">88.9</span></td>
       </tr>
       
@@ -196,6 +218,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-boot.html">Viewpoint near Boot</a>
             <span class="tag">discovery</span></td>
         <td>near Boot</td>
+        
         <td class="num"><span class="score-pill">88.9</span></td>
       </tr>
       
@@ -204,6 +227,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-west-bexington-16.html">Viewpoint near West Bexington</a>
             <span class="tag">discovery</span></td>
         <td>near West Bexington</td>
+        
         <td class="num"><span class="score-pill">88.8</span></td>
       </tr>
       
@@ -212,6 +236,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/selworthy-beacon.html">Selworthy Beacon</a>
             </td>
         <td>near Allerford</td>
+        
         <td class="num"><span class="score-pill">88.7</span></td>
       </tr>
       
@@ -220,6 +245,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/golden-cap.html">Golden Cap</a>
             </td>
         <td>near Morcombelake</td>
+        
         <td class="num"><span class="score-pill">88.7</span></td>
       </tr>
       
@@ -228,6 +254,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-west-quantoxhead.html">Viewpoint near West Quantoxhead</a>
             <span class="tag">discovery</span></td>
         <td>near West Quantoxhead</td>
+        
         <td class="num"><span class="score-pill">88.7</span></td>
       </tr>
       
@@ -236,6 +263,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/illgill-head.html">Illgill Head</a>
             </td>
         <td>near Boot</td>
+        
         <td class="num"><span class="score-pill">88.4</span></td>
       </tr>
       
@@ -244,6 +272,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-bossington.html">Viewpoint near Bossington</a>
             <span class="tag">discovery</span></td>
         <td>near Bossington</td>
+        
         <td class="num"><span class="score-pill">88.3</span></td>
       </tr>
       
@@ -252,6 +281,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-chale.html">Viewpoint near Chale</a>
             <span class="tag">discovery</span></td>
         <td>near Chale</td>
+        
         <td class="num"><span class="score-pill">88.3</span></td>
       </tr>
       
@@ -260,6 +290,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/old-tennis-court.html">Old Tennis Court</a>
             </td>
         <td>near Lynton</td>
+        
         <td class="num"><span class="score-pill">88.3</span></td>
       </tr>
       
@@ -268,6 +299,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-whitbeck.html">Viewpoint near Whitbeck</a>
             <span class="tag">discovery</span></td>
         <td>near Whitbeck</td>
+        
         <td class="num"><span class="score-pill">88.3</span></td>
       </tr>
       
@@ -276,6 +308,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-st-lawrence.html">Viewpoint near St. Lawrence</a>
             <span class="tag">discovery</span></td>
         <td>near St. Lawrence</td>
+        
         <td class="num"><span class="score-pill">88.2</span></td>
       </tr>
       
@@ -284,6 +317,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-chillingham.html">Viewpoint near Chillingham</a>
             <span class="tag">discovery</span></td>
         <td>near Chillingham</td>
+        
         <td class="num"><span class="score-pill">88.1</span></td>
       </tr>
       
@@ -292,6 +326,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-oare.html">Viewpoint near Oare</a>
             <span class="tag">discovery</span></td>
         <td>near Oare</td>
+        
         <td class="num"><span class="score-pill">88.1</span></td>
       </tr>
       
@@ -300,6 +335,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-whitbeck-30.html">Viewpoint near Whitbeck</a>
             <span class="tag">discovery</span></td>
         <td>near Whitbeck</td>
+        
         <td class="num"><span class="score-pill">88.1</span></td>
       </tr>
       
@@ -308,6 +344,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-crackington-haven.html">Viewpoint near Crackington Haven</a>
             <span class="tag">discovery</span></td>
         <td>near Crackington Haven</td>
+        
         <td class="num"><span class="score-pill">88.1</span></td>
       </tr>
       
@@ -316,6 +353,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/rosewall-hill.html">Rosewall Hill</a>
             </td>
         <td>near Towednack</td>
+        
         <td class="num"><span class="score-pill">88.0</span></td>
       </tr>
       
@@ -324,6 +362,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-stenalees.html">Viewpoint near Stenalees</a>
             <span class="tag">discovery</span></td>
         <td>near Stenalees</td>
+        
         <td class="num"><span class="score-pill">88.0</span></td>
       </tr>
       
@@ -332,6 +371,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-west-quantoxhead-34.html">Viewpoint near West Quantoxhead</a>
             <span class="tag">discovery</span></td>
         <td>near West Quantoxhead</td>
+        
         <td class="num"><span class="score-pill">87.9</span></td>
       </tr>
       
@@ -340,6 +380,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-brendon.html">Viewpoint near Brendon</a>
             <span class="tag">discovery</span></td>
         <td>near Brendon</td>
+        
         <td class="num"><span class="score-pill">87.9</span></td>
       </tr>
       
@@ -348,6 +389,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/great-hangman.html">Great Hangman</a>
             </td>
         <td>near Combe Martin</td>
+        
         <td class="num"><span class="score-pill">87.8</span></td>
       </tr>
       
@@ -356,6 +398,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-west-quantoxhead-38.html">Viewpoint near West Quantoxhead</a>
             <span class="tag">discovery</span></td>
         <td>near West Quantoxhead</td>
+        
         <td class="num"><span class="score-pill">87.8</span></td>
       </tr>
       
@@ -364,6 +407,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-lesnewth.html">Viewpoint near Lesnewth</a>
             <span class="tag">discovery</span></td>
         <td>near Lesnewth</td>
+        
         <td class="num"><span class="score-pill">87.7</span></td>
       </tr>
       
@@ -372,6 +416,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-bossington-42.html">Viewpoint near Bossington</a>
             <span class="tag">discovery</span></td>
         <td>near Bossington</td>
+        
         <td class="num"><span class="score-pill">87.6</span></td>
       </tr>
       
@@ -380,6 +425,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/st-catherines-hill.html">St Catherines Hill</a>
             </td>
         <td>near Chale</td>
+        
         <td class="num"><span class="score-pill">87.6</span></td>
       </tr>
       
@@ -388,6 +434,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/greensheen-hill.html">Greensheen Hill</a>
             </td>
         <td>near Fenwick</td>
+        
         <td class="num"><span class="score-pill">87.5</span></td>
       </tr>
       
@@ -396,6 +443,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-kimmeridge.html">Viewpoint near Kimmeridge</a>
             <span class="tag">discovery</span></td>
         <td>near Kimmeridge</td>
+        
         <td class="num"><span class="score-pill">87.5</span></td>
       </tr>
       
@@ -404,6 +452,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/rings-hill.html">Rings Hill</a>
             </td>
         <td>near East Lulworth</td>
+        
         <td class="num"><span class="score-pill">87.5</span></td>
       </tr>
       
@@ -412,6 +461,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/whin-rigg.html">Whin Rigg</a>
             </td>
         <td>near Nether Wasdale</td>
+        
         <td class="num"><span class="score-pill">87.5</span></td>
       </tr>
       
@@ -420,6 +470,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-bossington-48.html">Viewpoint near Bossington</a>
             <span class="tag">discovery</span></td>
         <td>near Bossington</td>
+        
         <td class="num"><span class="score-pill">87.4</span></td>
       </tr>
       
@@ -428,6 +479,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-ravenscar-49.html">Viewpoint near Ravenscar</a>
             <span class="tag">discovery</span></td>
         <td>near Ravenscar</td>
+        
         <td class="num"><span class="score-pill">87.3</span></td>
       </tr>
       
@@ -436,6 +488,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-west-quantoxhead-50.html">Viewpoint near West Quantoxhead</a>
             <span class="tag">discovery</span></td>
         <td>near West Quantoxhead</td>
+        
         <td class="num"><span class="score-pill">87.2</span></td>
       </tr>
       
@@ -444,6 +497,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-cartmel.html">Viewpoint near Cartmel</a>
             <span class="tag">discovery</span></td>
         <td>near Cartmel</td>
+        
         <td class="num"><span class="score-pill">87.2</span></td>
       </tr>
       
@@ -452,6 +506,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/mottistone-down.html">Mottistone Down</a>
             </td>
         <td>near Brook</td>
+        
         <td class="num"><span class="score-pill">87.2</span></td>
       </tr>
       
@@ -460,6 +515,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-martinhoe.html">Viewpoint near Martinhoe</a>
             <span class="tag">discovery</span></td>
         <td>near Martinhoe</td>
+        
         <td class="num"><span class="score-pill">87.2</span></td>
       </tr>
       
@@ -468,6 +524,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/worcestershire-beacon.html">Worcestershire Beacon</a>
             </td>
         <td>near Malvern</td>
+        
         <td class="num"><span class="score-pill">87.1</span></td>
       </tr>
       
@@ -476,6 +533,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-north-chideock.html">Viewpoint near North Chideock</a>
             <span class="tag">discovery</span></td>
         <td>near North Chideock</td>
+        
         <td class="num"><span class="score-pill">87.1</span></td>
       </tr>
       
@@ -484,6 +542,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/chanctonbury-ring.html">Chanctonbury Ring</a>
             </td>
         <td>near Washington</td>
+        
         <td class="num"><span class="score-pill">87.0</span></td>
       </tr>
       
@@ -1095,8 +1154,13 @@ function thumbFallback(img) {
 
 </section>
 
-<section>
-  <h2>Best inland patchwork views</h2>
+<section data-list="inland">
+  <div class="list-head"><h2>Best inland patchwork views</h2>
+  <span class="view-toggle" role="group" aria-label="How to show this list">
+    <button class="mode-list active" aria-pressed="true">List</button><button
+      class="mode-thumbs" aria-pressed="false">Thumbnails</button>
+  </span>
+</div>
   <p class="note">The Coombe Hill kind: escarpments and hills over farmland vales (little visible sea).</p>
   
     
@@ -1109,6 +1173,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/firle-beacon.html">Firle Beacon</a>
             </td>
         <td>near Alciston</td>
+        
         <td class="num"><span class="score-pill">88.9</span></td>
       </tr>
       
@@ -1117,6 +1182,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-chillingham.html">Viewpoint near Chillingham</a>
             <span class="tag">discovery</span></td>
         <td>near Chillingham</td>
+        
         <td class="num"><span class="score-pill">88.1</span></td>
       </tr>
       
@@ -1125,6 +1191,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-stenalees.html">Viewpoint near Stenalees</a>
             <span class="tag">discovery</span></td>
         <td>near Stenalees</td>
+        
         <td class="num"><span class="score-pill">88.0</span></td>
       </tr>
       
@@ -1133,6 +1200,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/greensheen-hill.html">Greensheen Hill</a>
             </td>
         <td>near Fenwick</td>
+        
         <td class="num"><span class="score-pill">87.5</span></td>
       </tr>
       
@@ -1141,6 +1209,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-cartmel.html">Viewpoint near Cartmel</a>
             <span class="tag">discovery</span></td>
         <td>near Cartmel</td>
+        
         <td class="num"><span class="score-pill">87.2</span></td>
       </tr>
       
@@ -1149,6 +1218,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/worcestershire-beacon.html">Worcestershire Beacon</a>
             </td>
         <td>near Malvern</td>
+        
         <td class="num"><span class="score-pill">87.1</span></td>
       </tr>
       
@@ -1157,6 +1227,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/chanctonbury-ring.html">Chanctonbury Ring</a>
             </td>
         <td>near Washington</td>
+        
         <td class="num"><span class="score-pill">87.0</span></td>
       </tr>
       
@@ -1165,6 +1236,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-cartmel-57.html">Viewpoint near Cartmel</a>
             <span class="tag">discovery</span></td>
         <td>near Cartmel</td>
+        
         <td class="num"><span class="score-pill">87.0</span></td>
       </tr>
       
@@ -1173,6 +1245,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/blake-fell.html">Blake Fell</a>
             </td>
         <td>near Lamplugh</td>
+        
         <td class="num"><span class="score-pill">86.9</span></td>
       </tr>
       
@@ -1181,6 +1254,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/millennium-hill.html">Millennium Hill</a>
             </td>
         <td>near Little Malvern</td>
+        
         <td class="num"><span class="score-pill">86.9</span></td>
       </tr>
       
@@ -1189,6 +1263,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/north-hill.html">North Hill</a>
             </td>
         <td>near West Malvern</td>
+        
         <td class="num"><span class="score-pill">86.8</span></td>
       </tr>
       
@@ -1197,6 +1272,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-alciston.html">Viewpoint near Alciston</a>
             <span class="tag">discovery</span></td>
         <td>near Alciston</td>
+        
         <td class="num"><span class="score-pill">86.8</span></td>
       </tr>
       
@@ -1205,6 +1281,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/pillar.html">Pillar</a>
             </td>
         <td>near Buttermere</td>
+        
         <td class="num"><span class="score-pill">86.8</span></td>
       </tr>
       
@@ -1213,6 +1290,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-little-wenlock.html">Viewpoint near Little Wenlock</a>
             <span class="tag">discovery</span></td>
         <td>near Little Wenlock</td>
+        
         <td class="num"><span class="score-pill">86.6</span></td>
       </tr>
       
@@ -1221,6 +1299,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-lazenby.html">Viewpoint near Lazenby</a>
             <span class="tag">discovery</span></td>
         <td>near Lazenby</td>
+        
         <td class="num"><span class="score-pill">86.4</span></td>
       </tr>
       
@@ -1229,6 +1308,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-kirknewton.html">Viewpoint near Kirknewton</a>
             <span class="tag">discovery</span></td>
         <td>near Kirknewton</td>
+        
         <td class="num"><span class="score-pill">86.1</span></td>
       </tr>
       
@@ -1237,6 +1317,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/the-lawley.html">The Lawley</a>
             </td>
         <td>near Leebotwood</td>
+        
         <td class="num"><span class="score-pill">85.8</span></td>
       </tr>
       
@@ -1245,6 +1326,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/roseberry-topping.html">Roseberry Topping</a>
             </td>
         <td>near Newton Under Roseberry</td>
+        
         <td class="num"><span class="score-pill">85.8</span></td>
       </tr>
       
@@ -1253,6 +1335,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-alciston-113.html">Viewpoint near Alciston</a>
             <span class="tag">discovery</span></td>
         <td>near Alciston</td>
+        
         <td class="num"><span class="score-pill">85.8</span></td>
       </tr>
       
@@ -1261,6 +1344,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/herefordshire-beacon.html">Herefordshire Beacon</a>
             </td>
         <td>near Little Malvern</td>
+        
         <td class="num"><span class="score-pill">85.8</span></td>
       </tr>
       
@@ -1512,8 +1596,13 @@ function thumbFallback(img) {
 
 </section>
 
-<section>
-  <h2>Best coastal panoramas</h2>
+<section data-list="coastal">
+  <div class="list-head"><h2>Best coastal panoramas</h2>
+  <span class="view-toggle" role="group" aria-label="How to show this list">
+    <button class="mode-list active" aria-pressed="true">List</button><button
+      class="mode-thumbs" aria-pressed="false">Thumbnails</button>
+  </span>
+</div>
   
     
     <div class="mode-list-only">
@@ -1525,6 +1614,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/the-knoll.html">The Knoll</a>
             </td>
         <td>near West Bexington</td>
+        
         <td class="num"><span class="score-pill">91.0</span></td>
       </tr>
       
@@ -1533,6 +1623,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-finsthwaite.html">Viewpoint near Finsthwaite</a>
             <span class="tag">discovery</span></td>
         <td>near Finsthwaite</td>
+        
         <td class="num"><span class="score-pill">90.3</span></td>
       </tr>
       
@@ -1541,6 +1632,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/holdstone-hill.html">Holdstone Hill</a>
             </td>
         <td>near Combe Martin</td>
+        
         <td class="num"><span class="score-pill">90.2</span></td>
       </tr>
       
@@ -1549,6 +1641,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-easington.html">Viewpoint near Easington</a>
             <span class="tag">discovery</span></td>
         <td>near Easington</td>
+        
         <td class="num"><span class="score-pill">90.2</span></td>
       </tr>
       
@@ -1557,6 +1650,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-ravenscar.html">Viewpoint near Ravenscar</a>
             <span class="tag">discovery</span></td>
         <td>near Ravenscar</td>
+        
         <td class="num"><span class="score-pill">90.0</span></td>
       </tr>
       
@@ -1565,6 +1659,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-west-bexington.html">Viewpoint near West Bexington</a>
             <span class="tag">discovery</span></td>
         <td>near West Bexington</td>
+        
         <td class="num"><span class="score-pill">89.5</span></td>
       </tr>
       
@@ -1573,6 +1668,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/long-side.html">Long Side</a>
             </td>
         <td>near Applethwaite</td>
+        
         <td class="num"><span class="score-pill">89.5</span></td>
       </tr>
       
@@ -1581,6 +1677,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/ullock-pike.html">Ullock Pike</a>
             </td>
         <td>near Applethwaite</td>
+        
         <td class="num"><span class="score-pill">89.4</span></td>
       </tr>
       
@@ -1589,6 +1686,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-niton.html">Viewpoint near Niton</a>
             <span class="tag">discovery</span></td>
         <td>near Niton</td>
+        
         <td class="num"><span class="score-pill">89.2</span></td>
       </tr>
       
@@ -1597,6 +1695,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/crag-fell.html">Crag Fell</a>
             </td>
         <td>near Ennerdale Bridge</td>
+        
         <td class="num"><span class="score-pill">89.1</span></td>
       </tr>
       
@@ -1605,6 +1704,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-abbotsbury.html">Viewpoint near Abbotsbury</a>
             <span class="tag">discovery</span></td>
         <td>near Abbotsbury</td>
+        
         <td class="num"><span class="score-pill">89.0</span></td>
       </tr>
       
@@ -1613,6 +1713,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-combe-martin.html">Viewpoint near Combe Martin</a>
             <span class="tag">discovery</span></td>
         <td>near Combe Martin</td>
+        
         <td class="num"><span class="score-pill">88.9</span></td>
       </tr>
       
@@ -1621,6 +1722,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-boot.html">Viewpoint near Boot</a>
             <span class="tag">discovery</span></td>
         <td>near Boot</td>
+        
         <td class="num"><span class="score-pill">88.9</span></td>
       </tr>
       
@@ -1629,6 +1731,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-west-bexington-16.html">Viewpoint near West Bexington</a>
             <span class="tag">discovery</span></td>
         <td>near West Bexington</td>
+        
         <td class="num"><span class="score-pill">88.8</span></td>
       </tr>
       
@@ -1637,6 +1740,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/selworthy-beacon.html">Selworthy Beacon</a>
             </td>
         <td>near Allerford</td>
+        
         <td class="num"><span class="score-pill">88.7</span></td>
       </tr>
       
@@ -1645,6 +1749,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/golden-cap.html">Golden Cap</a>
             </td>
         <td>near Morcombelake</td>
+        
         <td class="num"><span class="score-pill">88.7</span></td>
       </tr>
       
@@ -1653,6 +1758,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-west-quantoxhead.html">Viewpoint near West Quantoxhead</a>
             <span class="tag">discovery</span></td>
         <td>near West Quantoxhead</td>
+        
         <td class="num"><span class="score-pill">88.7</span></td>
       </tr>
       
@@ -1661,6 +1767,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/illgill-head.html">Illgill Head</a>
             </td>
         <td>near Boot</td>
+        
         <td class="num"><span class="score-pill">88.4</span></td>
       </tr>
       
@@ -1669,6 +1776,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-bossington.html">Viewpoint near Bossington</a>
             <span class="tag">discovery</span></td>
         <td>near Bossington</td>
+        
         <td class="num"><span class="score-pill">88.3</span></td>
       </tr>
       
@@ -1677,6 +1785,7 @@ function thumbFallback(img) {
         <td><a href="viewpoints/viewpoint-near-chale.html">Viewpoint near Chale</a>
             <span class="tag">discovery</span></td>
         <td>near Chale</td>
+        
         <td class="num"><span class="score-pill">88.3</span></td>
       </tr>
       
@@ -1928,176 +2037,449 @@ function thumbFallback(img) {
 
 </section>
 
-<section>
-  <h2>Hidden gems</h2>
+<section data-list="gems">
+  <div class="list-head"><h2>Hidden gems</h2>
+  <span class="view-toggle" role="group" aria-label="How to show this list">
+    <button class="mode-list active" aria-pressed="true">List</button><button
+      class="mode-thumbs" aria-pressed="false">Thumbnails</button>
+  </span>
+</div>
   <p class="note">
     High-scoring spots with no marked viewpoint, no named hill &mdash; places the algorithm found on its
     own that nobody has tagged on a map. Potentially beautiful, genuinely unheralded.
   </p>
-  <table class="rank">
-    <tr><th>#</th><th>Location</th><th>Region</th><th class="num">Nat. rank</th><th class="num">Score</th></tr>
+  
     
-    <tr>
-      <td class="num">1</td>
-      <td><a href="viewpoints/viewpoint-near-finsthwaite.html">Viewpoint near Finsthwaite</a></td>
-      <td>near Finsthwaite</td>
-      <td class="num">2</td>
-      <td class="num"><span class="score-pill">90.3</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">2</td>
-      <td><a href="viewpoints/viewpoint-near-easington.html">Viewpoint near Easington</a></td>
-      <td>near Easington</td>
-      <td class="num">4</td>
-      <td class="num"><span class="score-pill">90.2</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">3</td>
-      <td><a href="viewpoints/viewpoint-near-ravenscar.html">Viewpoint near Ravenscar</a></td>
-      <td>near Ravenscar</td>
-      <td class="num">6</td>
-      <td class="num"><span class="score-pill">90.0</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">4</td>
-      <td><a href="viewpoints/viewpoint-near-west-bexington.html">Viewpoint near West Bexington</a></td>
-      <td>near West Bexington</td>
-      <td class="num">7</td>
-      <td class="num"><span class="score-pill">89.5</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">5</td>
-      <td><a href="viewpoints/viewpoint-near-niton.html">Viewpoint near Niton</a></td>
-      <td>near Niton</td>
-      <td class="num">10</td>
-      <td class="num"><span class="score-pill">89.2</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">6</td>
-      <td><a href="viewpoints/viewpoint-near-abbotsbury.html">Viewpoint near Abbotsbury</a></td>
-      <td>near Abbotsbury</td>
-      <td class="num">12</td>
-      <td class="num"><span class="score-pill">89.0</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">7</td>
-      <td><a href="viewpoints/viewpoint-near-combe-martin.html">Viewpoint near Combe Martin</a></td>
-      <td>near Combe Martin</td>
-      <td class="num">14</td>
-      <td class="num"><span class="score-pill">88.9</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">8</td>
-      <td><a href="viewpoints/viewpoint-near-boot.html">Viewpoint near Boot</a></td>
-      <td>near Boot</td>
-      <td class="num">15</td>
-      <td class="num"><span class="score-pill">88.9</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">9</td>
-      <td><a href="viewpoints/viewpoint-near-west-bexington-16.html">Viewpoint near West Bexington</a></td>
-      <td>near West Bexington</td>
-      <td class="num">16</td>
-      <td class="num"><span class="score-pill">88.8</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">10</td>
-      <td><a href="viewpoints/viewpoint-near-west-quantoxhead.html">Viewpoint near West Quantoxhead</a></td>
-      <td>near West Quantoxhead</td>
-      <td class="num">19</td>
-      <td class="num"><span class="score-pill">88.7</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">11</td>
-      <td><a href="viewpoints/viewpoint-near-bossington.html">Viewpoint near Bossington</a></td>
-      <td>near Bossington</td>
-      <td class="num">22</td>
-      <td class="num"><span class="score-pill">88.3</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">12</td>
-      <td><a href="viewpoints/viewpoint-near-chale.html">Viewpoint near Chale</a></td>
-      <td>near Chale</td>
-      <td class="num">23</td>
-      <td class="num"><span class="score-pill">88.3</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">13</td>
-      <td><a href="viewpoints/viewpoint-near-whitbeck.html">Viewpoint near Whitbeck</a></td>
-      <td>near Whitbeck</td>
-      <td class="num">25</td>
-      <td class="num"><span class="score-pill">88.3</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">14</td>
-      <td><a href="viewpoints/viewpoint-near-st-lawrence.html">Viewpoint near St. Lawrence</a></td>
-      <td>near St. Lawrence</td>
-      <td class="num">26</td>
-      <td class="num"><span class="score-pill">88.2</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">15</td>
-      <td><a href="viewpoints/viewpoint-near-chillingham.html">Viewpoint near Chillingham</a></td>
-      <td>near Chillingham</td>
-      <td class="num">27</td>
-      <td class="num"><span class="score-pill">88.1</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">16</td>
-      <td><a href="viewpoints/viewpoint-near-oare.html">Viewpoint near Oare</a></td>
-      <td>near Oare</td>
-      <td class="num">28</td>
-      <td class="num"><span class="score-pill">88.1</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">17</td>
-      <td><a href="viewpoints/viewpoint-near-whitbeck-30.html">Viewpoint near Whitbeck</a></td>
-      <td>near Whitbeck</td>
-      <td class="num">30</td>
-      <td class="num"><span class="score-pill">88.1</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">18</td>
-      <td><a href="viewpoints/viewpoint-near-crackington-haven.html">Viewpoint near Crackington Haven</a></td>
-      <td>near Crackington Haven</td>
-      <td class="num">31</td>
-      <td class="num"><span class="score-pill">88.1</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">19</td>
-      <td><a href="viewpoints/viewpoint-near-stenalees.html">Viewpoint near Stenalees</a></td>
-      <td>near Stenalees</td>
-      <td class="num">33</td>
-      <td class="num"><span class="score-pill">88.0</span></td>
-    </tr>
-    
-    <tr>
-      <td class="num">20</td>
-      <td><a href="viewpoints/viewpoint-near-west-quantoxhead-34.html">Viewpoint near West Quantoxhead</a></td>
-      <td>near West Quantoxhead</td>
-      <td class="num">34</td>
-      <td class="num"><span class="score-pill">87.9</span></td>
-    </tr>
-    
-  </table>
+    <div class="mode-list-only">
+    <table class="rank">
+      <tr><th>#</th><th>Place</th><th>Region</th><th class="num">Nat. rank</th><th class="num">Score</th></tr>
+      
+      <tr>
+        <td class="num">1</td>
+        <td><a href="viewpoints/viewpoint-near-finsthwaite.html">Viewpoint near Finsthwaite</a>
+            <span class="tag">discovery</span></td>
+        <td>near Finsthwaite</td>
+        <td class="num">2</td>
+        <td class="num"><span class="score-pill">90.3</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">2</td>
+        <td><a href="viewpoints/viewpoint-near-easington.html">Viewpoint near Easington</a>
+            <span class="tag">discovery</span></td>
+        <td>near Easington</td>
+        <td class="num">4</td>
+        <td class="num"><span class="score-pill">90.2</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">3</td>
+        <td><a href="viewpoints/viewpoint-near-ravenscar.html">Viewpoint near Ravenscar</a>
+            <span class="tag">discovery</span></td>
+        <td>near Ravenscar</td>
+        <td class="num">6</td>
+        <td class="num"><span class="score-pill">90.0</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">4</td>
+        <td><a href="viewpoints/viewpoint-near-west-bexington.html">Viewpoint near West Bexington</a>
+            <span class="tag">discovery</span></td>
+        <td>near West Bexington</td>
+        <td class="num">7</td>
+        <td class="num"><span class="score-pill">89.5</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">5</td>
+        <td><a href="viewpoints/viewpoint-near-niton.html">Viewpoint near Niton</a>
+            <span class="tag">discovery</span></td>
+        <td>near Niton</td>
+        <td class="num">10</td>
+        <td class="num"><span class="score-pill">89.2</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">6</td>
+        <td><a href="viewpoints/viewpoint-near-abbotsbury.html">Viewpoint near Abbotsbury</a>
+            <span class="tag">discovery</span></td>
+        <td>near Abbotsbury</td>
+        <td class="num">12</td>
+        <td class="num"><span class="score-pill">89.0</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">7</td>
+        <td><a href="viewpoints/viewpoint-near-combe-martin.html">Viewpoint near Combe Martin</a>
+            <span class="tag">discovery</span></td>
+        <td>near Combe Martin</td>
+        <td class="num">14</td>
+        <td class="num"><span class="score-pill">88.9</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">8</td>
+        <td><a href="viewpoints/viewpoint-near-boot.html">Viewpoint near Boot</a>
+            <span class="tag">discovery</span></td>
+        <td>near Boot</td>
+        <td class="num">15</td>
+        <td class="num"><span class="score-pill">88.9</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">9</td>
+        <td><a href="viewpoints/viewpoint-near-west-bexington-16.html">Viewpoint near West Bexington</a>
+            <span class="tag">discovery</span></td>
+        <td>near West Bexington</td>
+        <td class="num">16</td>
+        <td class="num"><span class="score-pill">88.8</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">10</td>
+        <td><a href="viewpoints/viewpoint-near-west-quantoxhead.html">Viewpoint near West Quantoxhead</a>
+            <span class="tag">discovery</span></td>
+        <td>near West Quantoxhead</td>
+        <td class="num">19</td>
+        <td class="num"><span class="score-pill">88.7</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">11</td>
+        <td><a href="viewpoints/viewpoint-near-bossington.html">Viewpoint near Bossington</a>
+            <span class="tag">discovery</span></td>
+        <td>near Bossington</td>
+        <td class="num">22</td>
+        <td class="num"><span class="score-pill">88.3</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">12</td>
+        <td><a href="viewpoints/viewpoint-near-chale.html">Viewpoint near Chale</a>
+            <span class="tag">discovery</span></td>
+        <td>near Chale</td>
+        <td class="num">23</td>
+        <td class="num"><span class="score-pill">88.3</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">13</td>
+        <td><a href="viewpoints/viewpoint-near-whitbeck.html">Viewpoint near Whitbeck</a>
+            <span class="tag">discovery</span></td>
+        <td>near Whitbeck</td>
+        <td class="num">25</td>
+        <td class="num"><span class="score-pill">88.3</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">14</td>
+        <td><a href="viewpoints/viewpoint-near-st-lawrence.html">Viewpoint near St. Lawrence</a>
+            <span class="tag">discovery</span></td>
+        <td>near St. Lawrence</td>
+        <td class="num">26</td>
+        <td class="num"><span class="score-pill">88.2</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">15</td>
+        <td><a href="viewpoints/viewpoint-near-chillingham.html">Viewpoint near Chillingham</a>
+            <span class="tag">discovery</span></td>
+        <td>near Chillingham</td>
+        <td class="num">27</td>
+        <td class="num"><span class="score-pill">88.1</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">16</td>
+        <td><a href="viewpoints/viewpoint-near-oare.html">Viewpoint near Oare</a>
+            <span class="tag">discovery</span></td>
+        <td>near Oare</td>
+        <td class="num">28</td>
+        <td class="num"><span class="score-pill">88.1</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">17</td>
+        <td><a href="viewpoints/viewpoint-near-whitbeck-30.html">Viewpoint near Whitbeck</a>
+            <span class="tag">discovery</span></td>
+        <td>near Whitbeck</td>
+        <td class="num">30</td>
+        <td class="num"><span class="score-pill">88.1</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">18</td>
+        <td><a href="viewpoints/viewpoint-near-crackington-haven.html">Viewpoint near Crackington Haven</a>
+            <span class="tag">discovery</span></td>
+        <td>near Crackington Haven</td>
+        <td class="num">31</td>
+        <td class="num"><span class="score-pill">88.1</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">19</td>
+        <td><a href="viewpoints/viewpoint-near-stenalees.html">Viewpoint near Stenalees</a>
+            <span class="tag">discovery</span></td>
+        <td>near Stenalees</td>
+        <td class="num">33</td>
+        <td class="num"><span class="score-pill">88.0</span></td>
+      </tr>
+      
+      <tr>
+        <td class="num">20</td>
+        <td><a href="viewpoints/viewpoint-near-west-quantoxhead-34.html">Viewpoint near West Quantoxhead</a>
+            <span class="tag">discovery</span></td>
+        <td>near West Quantoxhead</td>
+        <td class="num">34</td>
+        <td class="num"><span class="score-pill">87.9</span></td>
+      </tr>
+      
+    </table>
+    </div>
+    <div class="thumb-grid mode-thumbs-only">
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-finsthwaite.html">
+        <img loading="lazy" src="renders/viewpoint-near-finsthwaite_view1.jpg" data-slug="viewpoint-near-finsthwaite"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Finsthwaite">
+        <div class="thumb-meta">
+          <span class="thumb-name">1. Viewpoint near Finsthwaite</span>
+          <span class="score-pill">90.3</span>
+        </div>
+        <div class="thumb-region">near Finsthwaite</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-easington.html">
+        <img loading="lazy" src="renders/viewpoint-near-easington_view1.jpg" data-slug="viewpoint-near-easington"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Easington">
+        <div class="thumb-meta">
+          <span class="thumb-name">2. Viewpoint near Easington</span>
+          <span class="score-pill">90.2</span>
+        </div>
+        <div class="thumb-region">near Easington</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-ravenscar.html">
+        <img loading="lazy" src="renders/viewpoint-near-ravenscar_view1.jpg" data-slug="viewpoint-near-ravenscar"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Ravenscar">
+        <div class="thumb-meta">
+          <span class="thumb-name">3. Viewpoint near Ravenscar</span>
+          <span class="score-pill">90.0</span>
+        </div>
+        <div class="thumb-region">near Ravenscar</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-west-bexington.html">
+        <img loading="lazy" src="renders/viewpoint-near-west-bexington_view1.jpg" data-slug="viewpoint-near-west-bexington"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near West Bexington">
+        <div class="thumb-meta">
+          <span class="thumb-name">4. Viewpoint near West Bexington</span>
+          <span class="score-pill">89.5</span>
+        </div>
+        <div class="thumb-region">near West Bexington</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-niton.html">
+        <img loading="lazy" src="renders/viewpoint-near-niton_view1.jpg" data-slug="viewpoint-near-niton"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Niton">
+        <div class="thumb-meta">
+          <span class="thumb-name">5. Viewpoint near Niton</span>
+          <span class="score-pill">89.2</span>
+        </div>
+        <div class="thumb-region">near Niton</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-abbotsbury.html">
+        <img loading="lazy" src="renders/viewpoint-near-abbotsbury_view1.jpg" data-slug="viewpoint-near-abbotsbury"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Abbotsbury">
+        <div class="thumb-meta">
+          <span class="thumb-name">6. Viewpoint near Abbotsbury</span>
+          <span class="score-pill">89.0</span>
+        </div>
+        <div class="thumb-region">near Abbotsbury</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-combe-martin.html">
+        <img loading="lazy" src="renders/viewpoint-near-combe-martin_view1.jpg" data-slug="viewpoint-near-combe-martin"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Combe Martin">
+        <div class="thumb-meta">
+          <span class="thumb-name">7. Viewpoint near Combe Martin</span>
+          <span class="score-pill">88.9</span>
+        </div>
+        <div class="thumb-region">near Combe Martin</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-boot.html">
+        <img loading="lazy" src="renders/viewpoint-near-boot_view1.jpg" data-slug="viewpoint-near-boot"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Boot">
+        <div class="thumb-meta">
+          <span class="thumb-name">8. Viewpoint near Boot</span>
+          <span class="score-pill">88.9</span>
+        </div>
+        <div class="thumb-region">near Boot</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-west-bexington-16.html">
+        <img loading="lazy" src="renders/viewpoint-near-west-bexington-16_view1.jpg" data-slug="viewpoint-near-west-bexington-16"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near West Bexington">
+        <div class="thumb-meta">
+          <span class="thumb-name">9. Viewpoint near West Bexington</span>
+          <span class="score-pill">88.8</span>
+        </div>
+        <div class="thumb-region">near West Bexington</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-west-quantoxhead.html">
+        <img loading="lazy" src="renders/viewpoint-near-west-quantoxhead_view1.jpg" data-slug="viewpoint-near-west-quantoxhead"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near West Quantoxhead">
+        <div class="thumb-meta">
+          <span class="thumb-name">10. Viewpoint near West Quantoxhead</span>
+          <span class="score-pill">88.7</span>
+        </div>
+        <div class="thumb-region">near West Quantoxhead</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-bossington.html">
+        <img loading="lazy" src="renders/viewpoint-near-bossington_view1.jpg" data-slug="viewpoint-near-bossington"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Bossington">
+        <div class="thumb-meta">
+          <span class="thumb-name">11. Viewpoint near Bossington</span>
+          <span class="score-pill">88.3</span>
+        </div>
+        <div class="thumb-region">near Bossington</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-chale.html">
+        <img loading="lazy" src="renders/viewpoint-near-chale_view1.jpg" data-slug="viewpoint-near-chale"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Chale">
+        <div class="thumb-meta">
+          <span class="thumb-name">12. Viewpoint near Chale</span>
+          <span class="score-pill">88.3</span>
+        </div>
+        <div class="thumb-region">near Chale</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-whitbeck.html">
+        <img loading="lazy" src="renders/viewpoint-near-whitbeck_view1.jpg" data-slug="viewpoint-near-whitbeck"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Whitbeck">
+        <div class="thumb-meta">
+          <span class="thumb-name">13. Viewpoint near Whitbeck</span>
+          <span class="score-pill">88.3</span>
+        </div>
+        <div class="thumb-region">near Whitbeck</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-st-lawrence.html">
+        <img loading="lazy" src="renders/viewpoint-near-st-lawrence_view1.jpg" data-slug="viewpoint-near-st-lawrence"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near St. Lawrence">
+        <div class="thumb-meta">
+          <span class="thumb-name">14. Viewpoint near St. Lawrence</span>
+          <span class="score-pill">88.2</span>
+        </div>
+        <div class="thumb-region">near St. Lawrence</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-chillingham.html">
+        <img loading="lazy" src="renders/viewpoint-near-chillingham_view1.jpg" data-slug="viewpoint-near-chillingham"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Chillingham">
+        <div class="thumb-meta">
+          <span class="thumb-name">15. Viewpoint near Chillingham</span>
+          <span class="score-pill">88.1</span>
+        </div>
+        <div class="thumb-region">near Chillingham</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-oare.html">
+        <img loading="lazy" src="renders/viewpoint-near-oare_view1.jpg" data-slug="viewpoint-near-oare"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Oare">
+        <div class="thumb-meta">
+          <span class="thumb-name">16. Viewpoint near Oare</span>
+          <span class="score-pill">88.1</span>
+        </div>
+        <div class="thumb-region">near Oare</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-whitbeck-30.html">
+        <img loading="lazy" src="renders/viewpoint-near-whitbeck-30_view1.jpg" data-slug="viewpoint-near-whitbeck-30"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Whitbeck">
+        <div class="thumb-meta">
+          <span class="thumb-name">17. Viewpoint near Whitbeck</span>
+          <span class="score-pill">88.1</span>
+        </div>
+        <div class="thumb-region">near Whitbeck</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-crackington-haven.html">
+        <img loading="lazy" src="renders/viewpoint-near-crackington-haven_view1.jpg" data-slug="viewpoint-near-crackington-haven"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Crackington Haven">
+        <div class="thumb-meta">
+          <span class="thumb-name">18. Viewpoint near Crackington Haven</span>
+          <span class="score-pill">88.1</span>
+        </div>
+        <div class="thumb-region">near Crackington Haven</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-stenalees.html">
+        <img loading="lazy" src="renders/viewpoint-near-stenalees_view1.jpg" data-slug="viewpoint-near-stenalees"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near Stenalees">
+        <div class="thumb-meta">
+          <span class="thumb-name">19. Viewpoint near Stenalees</span>
+          <span class="score-pill">88.0</span>
+        </div>
+        <div class="thumb-region">near Stenalees</div>
+      </a>
+      
+      
+      
+      <a class="thumb-card" href="viewpoints/viewpoint-near-west-quantoxhead-34.html">
+        <img loading="lazy" src="renders/viewpoint-near-west-quantoxhead-34_view1.jpg" data-slug="viewpoint-near-west-quantoxhead-34"
+             onerror="thumbFallback(this)" alt="Rendered view from Viewpoint near West Quantoxhead">
+        <div class="thumb-meta">
+          <span class="thumb-name">20. Viewpoint near West Quantoxhead</span>
+          <span class="score-pill">87.9</span>
+        </div>
+        <div class="thumb-region">near West Quantoxhead</div>
+      </a>
+      
+      
+    </div>
+
 </section>
 
 <script src="data/points.js"></script>
@@ -2200,7 +2582,7 @@ function updateArea() {
   });
   const label = hits.length + ' candidate viewpoints in view; numbered pins on the map show the local top ' + top.length;
   let body;
-  if (document.body.classList.contains('thumbs-mode')) {
+  if (ListMode.get('area') === 'thumbs') {
     body = '<div class="thumb-grid">' + top.map((r, i) => {
       const meta = '<div class="thumb-meta"><span class="thumb-name">' + (i + 1) + '. ' + r[4] +
         '</span><span class="score-pill">' + r[2].toFixed(1) + '</span></div>';
@@ -2262,36 +2644,13 @@ document.getElementById('england-btn').addEventListener('click', () => {
 runAreaUpdate();
 </script>
 <script>
-// --- list / thumbnails toggle ----------------------------------------------
+// --- per-list toggles -------------------------------------------------------
 // Separate script on purpose: if the Leaflet CDN is blocked, the map script above
-// throws and never finishes, but the toggle must still work for the server-rendered
-// Top-50 grid. runAreaUpdate is hoisted from that script yet closes over the failed
-// map, so calls to it are guarded.
-(function () {
-const listBtn = document.getElementById('mode-list-btn');
-const thumbsBtn = document.getElementById('mode-thumbs-btn');
-function applyMode(mode) {
-  const thumbs = mode === 'thumbs';
-  document.body.classList.toggle('thumbs-mode', thumbs);
-  listBtn.classList.toggle('active', !thumbs);
-  thumbsBtn.classList.toggle('active', thumbs);
-  listBtn.setAttribute('aria-pressed', String(!thumbs));
-  thumbsBtn.setAttribute('aria-pressed', String(thumbs));
-}
-function refreshAreaList() {
-  try { runAreaUpdate(); } catch (e) { /* map failed to initialize; static grid still toggles */ }
-}
-function setMode(mode) {
-  applyMode(mode);
-  try { localStorage.setItem('pbv-list-mode', mode); } catch (e) { /* private mode etc. */ }
-  refreshAreaList();   // re-render the area list in the new representation
-}
-listBtn.addEventListener('click', () => setMode('list'));
-thumbsBtn.addEventListener('click', () => setMode('thumbs'));
-try {
-  if (localStorage.getItem('pbv-list-mode') === 'thumbs') { applyMode('thumbs'); refreshAreaList(); }
-} catch (e) { /* default to list */ }
-})();
+// throws and never finishes, but the server-rendered lists must still toggle.
+// runAreaUpdate is hoisted from that script yet closes over the failed map, so the
+// area re-render callback is guarded (ListMode swallows callback errors too).
+ListMode.onChange('area', () => runAreaUpdate());
+ListMode.wireAll();
 </script>
 
 </main>

@@ -10,6 +10,7 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="assets/listmode.js"></script>
 
 </head>
 <body>
@@ -46,22 +47,28 @@
   <div class="area-panel">
     <button id="ladder-btn">Show the whole ladder on the map</button>
     <button id="local-btn" hidden>&#8630; Back to the local view</button>
-    <span class="view-toggle" role="group" aria-label="How to show places">
-      <button id="mode-list-btn" class="active" aria-pressed="true">List</button><button
-        id="mode-thumbs-btn" aria-pressed="false">Thumbnails</button>
-    </span>
     <span class="area-note" id="mode-note">numbered pins: the best views within about half an hour's drive</span>
   </div>
 
-  <section>
-    <h2>The ladder: better views, further away</h2>
+  <section data-list="ladder">
+    <div class="list-head"><h2>The ladder: better views, further away</h2>
+      <span class="view-toggle" role="group" aria-label="How to show this list">
+        <button class="mode-list active" aria-pressed="true">List</button><button
+          class="mode-thumbs" aria-pressed="false">Thumbnails</button>
+      </span>
+    </div>
     <p class="note">Each row beats everything closer. Times are driving estimates from
     <span id="pc-label">your postcode</span><span id="refine-note"> (straight-line calibration;
     refining against road routing&hellip;)</span>.</p>
     <div id="ladder-results"></div>
   </section>
-  <section>
-    <h2>Best within ~30 minutes</h2>
+  <section data-list="local">
+    <div class="list-head"><h2>Best within ~30 minutes</h2>
+      <span class="view-toggle" role="group" aria-label="How to show this list">
+        <button class="mode-list active" aria-pressed="true">List</button><button
+          class="mode-thumbs" aria-pressed="false">Thumbnails</button>
+      </span>
+    </div>
     <p class="note">The strongest view potential scores in your local patch, whether or not
     they make the national list.</p>
     <div id="local-results"></div>
@@ -127,7 +134,6 @@ function thumbCardsHtml(items) {
       '">map</a></div></div>';
   }).join('') + '</div>';
 }
-function thumbsMode() { return document.body.classList.contains('thumbs-mode'); }
 
 function frontierWithGain(order, gain) {
   const rows = [];
@@ -160,7 +166,7 @@ function computeLadder() {
 
 function renderLadder() {
   ladder = computeLadder();
-  if (thumbsMode()) {
+  if (ListMode.get('ladder') === 'thumbs') {
     document.getElementById('ladder-results').innerHTML = thumbCardsHtml(
       ladder.map(row => ({ r: ALL_POINTS[row.i], minutes: row.minutes, approx: !row.routed })));
   } else {
@@ -201,7 +207,7 @@ function renderLocal() {
     localLayer.addLayer(pin);
   });
   let body;
-  if (thumbsMode()) {
+  if (ListMode.get('local') === 'thumbs') {
     body = thumbCardsHtml(top.map(i => ({ r: ALL_POINTS[i], minutes: est[i], approx: true })));
   } else {
     const rows = top.map((i, k) => {
@@ -354,34 +360,14 @@ async function start() {
 start();
 </script>
 <script>
-// --- list / thumbnails toggle ----------------------------------------------
+// --- per-list toggles -------------------------------------------------------
 // Separate script: start() above is async (it yields at its first fetch), so this
-// runs — and applies any stored mode — before the lists first render. Shares the
-// landing page's localStorage key so the preference follows the user. Re-renders
-// are guarded: before a postcode lookup (or if Leaflet failed) the render
-// functions would throw on missing map layers.
-(function () {
-const listBtn = document.getElementById('mode-list-btn');
-const thumbsBtn = document.getElementById('mode-thumbs-btn');
-function applyListMode(mode) {
-  const thumbs = mode === 'thumbs';
-  document.body.classList.toggle('thumbs-mode', thumbs);
-  listBtn.classList.toggle('active', !thumbs);
-  thumbsBtn.classList.toggle('active', thumbs);
-  listBtn.setAttribute('aria-pressed', String(!thumbs));
-  thumbsBtn.setAttribute('aria-pressed', String(thumbs));
-}
-function setListMode(mode) {
-  applyListMode(mode);
-  try { localStorage.setItem('pbv-list-mode', mode); } catch (e) { /* private mode etc. */ }
-  try { renderLadder(); renderLocal(); } catch (e) { /* no results on screen yet */ }
-}
-listBtn.addEventListener('click', () => setListMode('list'));
-thumbsBtn.addEventListener('click', () => setListMode('thumbs'));
-try {
-  if (localStorage.getItem('pbv-list-mode') === 'thumbs') applyListMode('thumbs');
-} catch (e) { /* default to list */ }
-})();
+// wires the toggles before the lists first render; the render functions read
+// ListMode.get() directly at build time. Re-render callbacks throw before a
+// postcode lookup (or if Leaflet failed) — ListMode guards each callback.
+ListMode.onChange('ladder', () => renderLadder());
+ListMode.onChange('local', () => renderLocal());
+ListMode.wireAll();
 </script>
 
 </main>

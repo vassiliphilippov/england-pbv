@@ -2,43 +2,35 @@
 {% block title %}Which view is more beautiful? — Potentially Beautiful Views of England{% endblock %}
 {% block description %}Pair-vote real photographs of English views to help calibrate the objective view-potential formula against human judgement.{% endblock %}
 {% block content %}
-<section class="hero">
+<div class="vote-head">
   <h1>Which view is more beautiful?</h1>
-  <p class="lede">The score on this site is pure geometry &mdash; it has never been told what people
-  actually like. Help fix that: two real photographs of English views, taken from known spots.
-  Pick the one you find more beautiful. Every vote sharpens the comparison between the formula
-  and human taste.</p>
-  <p class="fine">{{ n_photos }} photographs, all free-licensed with camera location. Votes are
-  stored only in your browser &mdash; use the export button to contribute them.</p>
-</section>
+  <p class="note">Two real photographs of English views from known spots &mdash; click the more
+  beautiful one (or press &larr;/&rarr;). The formula here is pure geometry; your taste
+  calibrates it. {{ n_photos }} free-licensed photos &middot; votes stay in your browser until
+  you export them.</p>
+</div>
 
 <div class="vote-arena">
   <figure class="vote-figure" id="fig-a">
-    <button class="vote-btn" id="btn-a">&#9650; This one is more beautiful</button>
     <img id="img-a" alt="Candidate view A" referrerpolicy="no-referrer">
+    <button class="vote-btn" id="btn-a">&#9664; This one is more beautiful</button>
     <figcaption id="cap-a"></figcaption>
   </figure>
-  <div class="vote-middle">
-    <button class="vote-skip" id="btn-skip">Can&rsquo;t decide &mdash; show another pair</button>
-    <span class="area-note" id="vote-count"></span>
-  </div>
   <figure class="vote-figure" id="fig-b">
-    <button class="vote-btn" id="btn-b">&#9660; This one is more beautiful</button>
     <img id="img-b" alt="Candidate view B" referrerpolicy="no-referrer">
+    <button class="vote-btn" id="btn-b">This one is more beautiful &#9654;</button>
     <figcaption id="cap-b"></figcaption>
   </figure>
 </div>
 
-<div class="card" style="margin-top:26px">
-  <h3 style="margin-top:0">Your votes stay on this device</h3>
-  <p class="note">Nothing is uploaded. When you have voted a while, export the file and send it
-  to the project (e.g. attach it to a GitHub issue) &mdash; it will be used to fit a model of
-  human preference over the objective metrics, and to re-weight the view-potential formula.</p>
-  <div class="links-row">
-    <a href="#" id="export-btn" download="england-pbv-votes.json">Download my votes (JSON)</a>
-    <a href="https://github.com/vassiliphilippov/england-pbv/issues">Open a GitHub issue</a>
-    <a href="#" id="reset-btn">Erase my votes</a>
-  </div>
+<div class="vote-middle">
+  <button class="vote-skip" id="btn-skip">Can&rsquo;t decide &mdash; another pair</button>
+  <span class="area-note" id="vote-count"></span>
+  <span class="area-note">
+    <a href="#" id="export-btn" download="england-pbv-votes.json">Download my votes</a> &middot;
+    <a href="https://github.com/vassiliphilippov/england-pbv/issues">send via GitHub issue</a> &middot;
+    <a href="#" id="reset-btn">erase</a>
+  </span>
 </div>
 
 <script>
@@ -141,9 +133,11 @@ document.getElementById('img-a').addEventListener('click', () => record(pair[0].
 document.getElementById('img-b').addEventListener('click', () => record(pair[1].id));
 document.getElementById('btn-skip').addEventListener('click', () => record(null));
 document.addEventListener('keydown', e => {
-  if (e.key === '1' || e.key === 'ArrowUp') record(pair[0].id);
-  else if (e.key === '2' || e.key === 'ArrowDown') record(pair[1].id);
+  if (e.key === '1' || e.key === 'ArrowLeft' || e.key === 'ArrowUp') record(pair[0].id);
+  else if (e.key === '2' || e.key === 'ArrowRight' || e.key === 'ArrowDown') record(pair[1].id);
   else if (e.key === 's') record(null);
+  else return;
+  e.preventDefault();   // handled keys must not scroll the page
 });
 
 ['a', 'b'].forEach(side => {
