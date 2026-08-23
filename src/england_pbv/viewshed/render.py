@@ -472,21 +472,30 @@ def render_view(
     easting: float,
     northing: float,
     center_azimuth_deg: float,
+    hfov_deg: float = VIEW_HFOV_DEG,
+    width: int = VIEW_WIDTH,
+    height: int = VIEW_HEIGHT,
+    pitch_deg: float = VIEW_PITCH_DEG,
+    horizon_fraction: float = VIEW_HORIZON_FRACTION,
 ) -> Image.Image:
-    """Rectilinear 'camera' view toward one bearing (68-degree lens, slight down-tilt)."""
+    """Rectilinear 'camera' view toward one bearing.
+
+    hfov_deg/width/height model the lens and frame; horizon_fraction places the level
+    horizon in the frame (0 = top) when pitch_deg is 0, matching a reference photograph.
+    """
     scale = SUPERSAMPLE
-    width = VIEW_WIDTH * scale
-    height = VIEW_HEIGHT * scale
-    f_h = (width / 2.0) / math.tan(math.radians(VIEW_HFOV_DEG) / 2.0)
+    render_w = width * scale
+    render_h = height * scale
+    f_h = (render_w / 2.0) / math.tan(math.radians(hfov_deg) / 2.0)
     center = math.radians(center_azimuth_deg)
-    offsets = (np.arange(width, dtype=np.float64) + 0.5) - width / 2.0
+    offsets = (np.arange(render_w, dtype=np.float64) + 0.5) - render_w / 2.0
     col_azimuth = center + np.arctan(offsets / f_h)
 
-    pitch = math.radians(VIEW_PITCH_DEG)
-    cy = height * VIEW_HORIZON_FRACTION
+    pitch = math.radians(pitch_deg)
+    cy = render_h * horizon_fraction
     f_v = f_h  # square pixels
     top_rad = math.atan(cy / f_v) + pitch
-    bottom_rad = math.atan((cy - height) / f_v) + pitch
+    bottom_rad = math.atan((cy - render_h) / f_v) + pitch
     image = _run_kernel(
         dem,
         landcover,
@@ -494,14 +503,14 @@ def render_view(
         northing,
         col_azimuth,
         PROJECTION_RECTILINEAR,
-        height,
+        render_h,
         top_rad,
         bottom_rad,
         f_v,
         cy,
         pitch,
     )
-    return _downsample(image, VIEW_WIDTH, VIEW_HEIGHT)
+    return _downsample(image, width, height)
 
 
 def best_view_directions(
