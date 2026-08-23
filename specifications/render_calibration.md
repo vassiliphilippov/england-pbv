@@ -42,6 +42,20 @@ errors) drove five iterations (v1→v5). Applied findings:
   capped visible distance (veg-aware); second direction kept when ≥55% of the best and ≥75°
   apart.
 
+## v7: the near-field terrace bug (worth remembering)
+
+Camera views showed the bottom half of the frame as flat stacked "terraces". Diagnosis by
+instrumenting a ray: with a fixed march step, the sample at r = 9 m painted 182 pixel rows in
+one colour, r = 12 m painted 93, and so on — the terraces were the march samples themselves.
+The step size near the observer must be governed by VERTICAL angular resolution
+(dr = dtheta * r^2 / eye-height, i.e. quadratic in r), not a fixed floor; azimuthal
+resolution (dr ~ r * 0.7 deg) only binds far away. Fixed alongside: slope shading now only
+updates between consecutively visible samples (no bright false stripes at re-emergence
+lines); the clearing ramp thins tree DENSITY (scattered full-height trees) instead of
+scaling height (which grew a staircase of canopy fronts); colour is sampled at a
+world-anchored jittered position near the observer so 50 m cell borders dither into organic
+shapes; standing trees always take foliage colour.
+
 ## Known remaining gaps (honest)
 
 - 50 m facets still band on smooth near domes; field boundaries are noise-driven, not mapped.

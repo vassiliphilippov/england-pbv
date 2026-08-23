@@ -157,10 +157,13 @@ def _render_kernel(
         max_ang = bottom_rad
         prev_z = eye_z - EYE_HEIGHT_M
         prev_slope = 0.0
+        prev_visible = True
         prev_field_ix = -(10**9)
         prev_field_iy = -(10**9)
-        r = 60.0
-        step = 12.0
+        # Start at the observer's feet: the bottom of a down-tilted frame is ground
+        # only metres away and must be finely sampled, not extrapolated as one span.
+        r = 4.0
+        step = 0.05
         while r < MAX_RENDER_DISTANCE_M:
             x = obs_e + dx * r
             y = obs_n + dy * r
@@ -172,27 +175,64 @@ def _render_kernel(
             elif clearing > 1.0:
                 clearing = 1.0
             z_surf = z
+            tree_here = False
             if lc_bin == 1:
-                z_surf = z + clearing * TREE_HEIGHT_M * (0.55 + 0.9 * _cell_noise(x, y, 35.0))
+                # The clearing ramp thins tree DENSITY, not height: near the observer only
+                # scattered full-height trees stand (like a real clearing edge). Scaling
+                # height instead would grow a staircase of canopy fronts with distance.
+                clump = _cell_noise(x, y, 35.0)
+                if clump < clearing:
+                    tree_here = True
+                    z_surf = z + TREE_HEIGHT_M * (
+                        0.55 + 0.9 * _cell_noise(x + 17.0, y + 31.0, 35.0)
+                    )
             elif lc_bin == 5:
                 z_surf = z + clearing * BUILT_HEIGHT_M * (0.5 + _cell_noise(x, y, 45.0))
 
             z_eff = z_surf - RENDER_CURVATURE * r * r
             ang = math.atan((z_eff - eye_z) / r)
             if ang > max_ang:
-                radial_slope = 0.5 * (z - prev_z) / step + 0.5 * prev_slope
+                # Slope drives shading, so it must come from consecutively VISIBLE
+                # samples: across an occluded dip, (z - prev_z) spans the hidden hollow
+                # and would paint a bright false stripe at every re-emergence line.
+                if prev_visible:
+                    slope_alpha = 0.5 - 0.42 * math.exp(-r / 350.0)
+                    radial_slope = (
+                        slope_alpha * (z - prev_z) / step + (1.0 - slope_alpha) * prev_slope
+                    )
+                else:
+                    radial_slope = prev_slope
                 prev_slope = radial_slope
+                prev_visible = True
+                # Colour is sampled at a world-anchored jittered position near the
+                # observer, so 50 m cell borders dither into organic transitions
+                # instead of crisp terrace lines across the foreground.
+                jitter = 30.0 * math.exp(-r / 450.0)
+                if jitter > 1.5:
+                    xc = x + (_smooth_noise(x * 0.11 + 7.7, y * 0.11) - 0.5) * 2.0 * jitter
+                    yc = y + (_smooth_noise(x * 0.11, y * 0.11 + 3.3) - 0.5) * 2.0 * jitter
+                    lc_color = _landcover_at(landcover, xc, yc)
+                else:
+                    xc = x
+                    yc = y
+                    lc_color = lc_bin
+                if tree_here:
+                    # A standing tree is foliage regardless of what colour jitter found.
+                    lc_color = 1
                 shade = SHADE_AMBIENT + SHADE_GAIN * radial_slope * sun_facing
-                if lc_bin == 8:
+                if lc_color == 8:
                     shade = 1.02
                 if shade < 0.6:
                     shade = 0.6
                 elif shade > 1.15:
                     shade = 1.15
-                field = 0.88 + 0.24 * _cell_noise(x, y, FIELD_CELL_M)
-                grain = 0.94 + 0.12 * _cell_noise(x, y, 18.0)
-                if lc_bin == 1:
-                    grain = 0.78 + 0.44 * _cell_noise(x, y, 22.0)
+                field = 0.88 + 0.24 * _cell_noise(xc, yc, FIELD_CELL_M)
+                # The field you stand in is one field: patchwork contrast (and its
+                # vertical column banding) only makes sense beyond a few hundred metres.
+                field = 1.0 + (field - 1.0) * min(1.0, r / 800.0)
+                grain = 0.94 + 0.12 * _cell_noise(xc, yc, 18.0)
+                if lc_color == 1:
+                    grain = 0.78 + 0.44 * _cell_noise(xc, yc, 22.0)
                 elif r < 1200.0:
                     # Fine grass/crop mottling so the near foreground is not a smooth wall.
                     near_amp = 0.14 * math.exp(-r / 500.0)
@@ -205,7 +245,7 @@ def _render_kernel(
                 if (
                     (field_ix != prev_field_ix or field_iy != prev_field_iy)
                     and prev_field_ix != -(10**9)
-                    and (lc_bin == 3 or lc_bin == 4)
+                    and (lc_color == 3 or lc_color == 4)
                 ):
                     shade *= HEDGE_SHADE
                 prev_field_ix = field_ix
@@ -214,10 +254,15 @@ def _render_kernel(
                 haze = 1.0 - math.exp(-r / HAZE_DISTANCE_M)
                 shade = 1.0 + (shade - 1.0) * (1.0 - 0.75 * haze)
 
-                red = base_colors[lc_bin, 0]
-                green = base_colors[lc_bin, 1]
-                blue = base_colors[lc_bin, 2]
-                if lc_bin == 3 and z > MOOR_GRASS_START_M:
+                red = base_colors[lc_color, 0]
+                green = base_colors[lc_color, 1]
+                blue = base_colors[lc_color, 2]
+                if lc_color == 1 and lc_bin == 1 and not tree_here:
+                    # Ground between the scattered near trees reads as rough scrub.
+                    red = red + (base_colors[3, 0] - red) * 0.45
+                    green = green + (base_colors[3, 1] - green) * 0.45
+                    blue = blue + (base_colors[3, 2] - blue) * 0.45
+                if lc_color == 3 and z > MOOR_GRASS_START_M:
                     moor = (z - MOOR_GRASS_START_M) / (MOOR_GRASS_FULL_M - MOOR_GRASS_START_M)
                     if moor > 1.0:
                         moor = 1.0
@@ -242,14 +287,14 @@ def _render_kernel(
                 if row_hi > height:
                     row_hi = height
                 near_boost = 0.12 * math.exp(-r / 400.0)
-                texture_amp = (1.0 - haze) * ((0.16 + near_boost) if lc_bin != 1 else 0.30)
+                texture_amp = (1.0 - haze) * ((0.16 + near_boost) if lc_color != 1 else 0.30)
                 span_rows = row_hi - row_lo
                 for row in range(row_lo, row_hi):
                     hsh = ((col * 7919) ^ (row * 104729)) & 0x7FFFFFFF
                     hsh = (hsh ^ (hsh >> 11)) * 2654435761
                     noise = ((hsh >> 8) & 0xFFFF) / 65535.0 - 0.5
                     tex = 1.0 + texture_amp * noise
-                    if lc_bin == 1 and span_rows > 3:
+                    if lc_color == 1 and span_rows > 3:
                         depth_in_span = (row - row_lo) / span_rows
                         tex *= (1.14 - 0.42 * depth_in_span) * (1.0 - haze) + haze
                     rr = red * tex
@@ -265,12 +310,21 @@ def _render_kernel(
                     image[row, col, 1] = np.uint8(gg)
                     image[row, col, 2] = np.uint8(bb)
                 max_ang = ang
+            else:
+                prev_visible = False
 
             prev_z = z
             r += step
+            # Two resolution limits: azimuthal (step ~ r * 0.7 deg) far out, and VERTICAL
+            # angular resolution near the observer, where a span of dtheta covers
+            # dr = dtheta * r^2 / eye-height — without this, each near sample paints a
+            # tall flat terrace band across the foreground.
             step = r * 0.012
-            if step < 12.0:
-                step = 12.0
+            vertical_step = 0.0008 * r * r
+            if vertical_step < step:
+                step = vertical_step
+            if step < 0.05:
+                step = 0.05
             elif step > 400.0:
                 step = 400.0
 
