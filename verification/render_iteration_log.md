@@ -156,6 +156,35 @@ fortress walls; (3) distant moor tops too pale (Swaledale far rim vs photo's dar
 line); (4) rock material for tors/limestone pavement (Valley of Rocks' Castle Rock,
 Conistone Pie) — OSM natural=bare_rock/cliff as a data source.
 
+## Cycle 8 — crag-lip cameras, deeper distant moor, crown-notch retune — ACCEPTED (one revert)
+
+Changes: (1) crest-snap no longer runs when a view bearing is known — at a crag lip the
+ground behind always rises, so snapping retreated the camera up-slope away from the edge
+the photographer stands on; the openness search (extended to 64 m along-bearing) is the
+right model there. Crest-snap still serves bearingless panoramas (cone summits).
+(2) Moor-habitat cells darken shade ×0.92 (matte dark vegetation — the far heather rim was
+hazing out pale). (3) Crown-notch clamp 0.15 → 0.10 (between "fortress walls" and the
+saw-tooth that 0.05 produced).
+
+Verdict: the camera fix is the cycle's win — Surprise View recovers the photo's whole
+composition (Derwentwater filling the frame from the lip; it was a sliver from the
+plateau), Swaledale finally clears its shoulder (valley floor, walled fields, winding
+dale). Mam Tor unchanged; Coombe reframed slightly and lost its ring artifact.
+
+REVERTED within the cycle: tapering crown fine-roughness by dome height (to cure
+saw-tooth silhouettes) showed no benefit — an A/B against uniform roughness rendered the
+same crown-shoulder contour bands on Wye Downs' near scrub (they are camera-geometry
+dependent: the 64 m openness search now stands closer above the wood, where ±18%/3 m
+roughness is too weak to fragment the contours). Uniform roughness kept for simplicity.
+The saw-tooth silhouettes come from per-clump height variance (0.6+0.8×noise), not fine
+roughness — a future cycle can narrow that range and strengthen close-range roughness.
+
+Queued for cycle 9: (1) trial narrower per-clump canopy height variance for calmer wood
+silhouettes; (2) near-foreground own-slope texture (Mam Tor/Conistone/Wensleydale smooth
+domes remain the weakest structural element); (3) rock material for tors/limestone
+(Valley of Rocks, Conistone Pie); (4) woods seen from above render as smooth dark aprons
+(Surprise View foreground) — canopy-top texture at steep down-angles.
+
 ## Failures ledger (do not repeat)
 
 - (from pre-loop) Fixed march steps near the observer paint terrace bands — step must scale
@@ -174,3 +203,7 @@ Conistone Pie) — OSM natural=bare_rock/cliff as a data source.
 - (c6) Smooth crown-dome height contours paint giant concentric amphitheatre rings when a
   wood sits close below the camera — canopy height needs fine (~3 m) roughness so the
   contours fragment into foliage.
+- (c8) Saw-tooth wood silhouettes are NOT caused by crown fine-roughness (A/B verified:
+  tapering it by dome height changes nothing visible) — they come from per-clump height
+  variance (0.6+0.8×noise). Contour rings on crowns seen close-from-above need STRONGER
+  near-range roughness, not redistribution.

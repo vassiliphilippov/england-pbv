@@ -292,11 +292,14 @@ def _render_kernel(
                     fx35 = x / 35.0 - math.floor(x / 35.0) - 0.5
                     fy35 = y / 35.0 - math.floor(y / 35.0) - 0.5
                     dome_sq = 1.0 - 3.2 * (fx35 * fx35 + fy35 * fy35)
-                    if dome_sq < 0.15:
-                        dome_sq = 0.15
+                    if dome_sq < 0.10:
+                        dome_sq = 0.10  # notch between crowns — 0.05 turns woods saw-toothed,
+                        # 0.15 turns them into fortress walls
                     # Fine foliage roughness (~3 m scale) fragments the dome's smooth
                     # height contours, which otherwise paint as concentric terrace
-                    # rings when a crown sits close below the camera.
+                    # rings when a crown sits close below the camera. Keep it UNIFORM:
+                    # tapering it by dome height brings the rings back at crown
+                    # shoulders (see failures ledger, c8).
                     z_surf = z + TREE_HEIGHT_M * math.sqrt(dome_sq) * (
                         0.6 + 0.8 * _cell_noise(x + 17.0, y + 31.0, 35.0)
                     ) * (0.82 + 0.36 * _smooth_noise(x * 0.31, y * 0.31))
@@ -423,6 +426,9 @@ def _render_kernel(
                 ):
                     if habitat_moor:
                         moor = 0.55 + 0.45 * _cell_noise(x, y, 130.0)
+                        # Moor vegetation is matte and dark — without this the far
+                        # heather rim hazes out pale instead of the photos' dark line.
+                        shade *= 0.92
                     else:
                         moor = (z - MOOR_GRASS_START_M) / (MOOR_GRASS_FULL_M - MOOR_GRASS_START_M)
                         if moor > 1.0:
@@ -455,6 +461,7 @@ def _render_kernel(
                     if lc_color == 2 and (habitat_moor or (not habitat_known and z > 300.0)):
                         if habitat_moor:
                             heather = 0.8
+                            shade *= 0.92
                         else:
                             heather = (z - 300.0) / 200.0
                             if heather > 1.0:
@@ -646,12 +653,12 @@ def _open_camera(
     northing: float,
     bearing_rad: float,
 ) -> tuple[float, float, float]:
-    """Pick the most open standing spot within ~40 m along the view bearing."""
+    """Pick the most open standing spot within ~64 m along the view bearing."""
     bx = math.sin(bearing_rad)
     by = math.cos(bearing_rad)
     best_e, best_n = easting, northing
     best_score = _foreground_block(dem, dem10, has10, easting, northing, bearing_rad)
-    for step_index in range(1, 6):
+    for step_index in range(1, 9):
         for lateral_index in range(-2, 3):
             offset = step_index * 8.0
             lateral = lateral_index * 8.0
@@ -712,13 +719,17 @@ def _run_kernel(
     pitch_rad: float,
     view_bearing_rad: float = -99.0,
 ) -> NDArray[np.uint8]:
-    easting, northing, ground = _crest_snap(dem, dem10, has10, easting, northing)
     if view_bearing_rad > -10.0:
         # Photographers stand where the view opens: search a short line along the view
         # bearing for the position whose near foreground blocks the least of the frame.
+        # No crest snap here — at a crag lip the ground behind always rises, and
+        # snapping retreats the camera up-slope away from the very edge the
+        # photographer stands on (Surprise View loses Derwentwater that way).
         easting, northing, ground = _open_camera(
             dem, dem10, has10, easting, northing, view_bearing_rad
         )
+    else:
+        easting, northing, ground = _crest_snap(dem, dem10, has10, easting, northing)
     eye_z = ground + EYE_HEIGHT_M + EYE_BOOST_M
     image = np.zeros((height, len(col_azimuth), 3), dtype=np.uint8)
     _render_kernel(
