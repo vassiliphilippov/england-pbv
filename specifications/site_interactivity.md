@@ -43,8 +43,8 @@ is widened (never truncating the far end).
 | --- | --- | --- |
 | national | top 600 nationally | full: 360° panorama + 2 camera views |
 | regional | top 5 per 25 km cell | full |
-| lite | top 2 per 10 km cell | panorama + 1 camera view, JPEG q78 |
-| micro | top 3 per 5 km cell | panorama only, downscaled to 960 px, JPEG q62, no camera views |
+| lite | top 2 per 10 km cell | panorama + 1 camera view, JPEG q75 |
+| micro | top 3 per 5 km cell | panorama only, downscaled to 900 px, JPEG q56, no camera views |
 
 Tiers are cumulative (a point already paged is not re-selected); the micro tier takes the site
 past 10,000 pages while staying inside GitHub Pages' 1 GB published-site budget.

@@ -50,5 +50,5 @@ def test_charts_stay_small() -> None:
     horizon = rng.uniform(-2.0, 8.0, 720).astype(np.float32)
     veg = horizon + rng.uniform(0.0, 1.5, 720).astype(np.float32)
     d_far = rng.uniform(0.0, 60.0, 720).astype(np.float32)
-    assert len(horizon_panorama_svg(horizon, horizon_veg_deg=veg, d_far_km=d_far)) < 12000
-    assert len(polar_reach_svg(d_far)) < 8000
+    assert len(horizon_panorama_svg(horizon, horizon_veg_deg=veg, d_far_km=d_far)) < 9000
+    assert len(polar_reach_svg(d_far)) < 6000

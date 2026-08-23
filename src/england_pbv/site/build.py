@@ -51,14 +51,14 @@ REGIONAL_PAGES_PER_CELL: int = 5
 # pages carry one camera view instead of two to keep the published site small.
 FILL_CELL_M: float = 10000.0
 FILL_PAGES_PER_CELL: int = 2
-LITE_JPEG_QUALITY: int = 78
+LITE_JPEG_QUALITY: int = 75
 # Micro tier: the local top of every 5 km cell gets a page, taking the site past
 # 10,000 pages. Micro pages carry one downscaled panorama and no camera views so
 # the published site stays inside GitHub Pages' size budget.
 MICRO_CELL_M: float = 5000.0
 MICRO_PAGES_PER_CELL: int = 3
-MICRO_JPEG_QUALITY: int = 62
-MICRO_PANORAMA_WIDTH: int = 960
+MICRO_JPEG_QUALITY: int = 56
+MICRO_PANORAMA_WIDTH: int = 900
 N_TOP_LIST: int = 50
 N_SUBLIST: int = 20
 COASTAL_WATER_FRACTION: float = 0.08
@@ -418,10 +418,14 @@ def build_site(*, max_pages: int | None = None, skip_pages: bool = False) -> Non
             if is_micro:
                 height = round(panorama.height * MICRO_PANORAMA_WIDTH / panorama.width)
                 panorama = panorama.resize((MICRO_PANORAMA_WIDTH, height), Image.Resampling.LANCZOS)
-                panorama.save(renders_dir / f"{slug}.jpg", quality=MICRO_JPEG_QUALITY)
+                panorama.save(
+                    renders_dir / f"{slug}.jpg", quality=MICRO_JPEG_QUALITY, optimize=True
+                )
             else:
                 panorama.save(
-                    renders_dir / f"{slug}.jpg", quality=LITE_JPEG_QUALITY if is_lite else 79
+                    renders_dir / f"{slug}.jpg",
+                    quality=LITE_JPEG_QUALITY if is_lite else 76,
+                    optimize=True,
                 )
 
             view_cards = []
@@ -439,7 +443,9 @@ def build_site(*, max_pages: int | None = None, skip_pages: bool = False) -> Non
                     )
                     view_file = f"{slug}_view{view_index}.jpg"
                     view_image.save(
-                        renders_dir / view_file, quality=LITE_JPEG_QUALITY if is_lite else 81
+                        renders_dir / view_file,
+                        quality=LITE_JPEG_QUALITY if is_lite else 78,
+                        optimize=True,
                     )
                     view_cards.append(
                         {

@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Best views near you — Potentially Beautiful Views of England</title>
+<meta name="description" content="Enter an England postcode and get the driving-time ladder of ever more beautiful viewpoints reachable from your door.">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>&#x26F0;</text></svg>">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+</head>
+<body>
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="index.html">Potentially Beautiful <span>Views of England</span></a>
+    <nav>
+      <a href="index.html">Map &amp; rankings</a>
+      <a href="postcode.html">Near me</a>
+      <a href="vote.html">Vote</a>
+      <a href="verification.html">Verification</a>
+      <a href="methodology.html">Methodology</a>
+      <a href="https://github.com/vassiliphilippov/england-pbv">GitHub</a>
+    </nav>
+  </div>
+</header>
+<main class="wrap">
+
+<section class="hero">
+  <h1 id="pc-title">Best views near you</h1>
+  <p class="lede" id="pc-lede">The most beautiful place five minutes from your door &mdash; then the
+  first place worth driving further for, and the next, all the way up to England's best. A
+  Pareto ladder: every rung is a better view than anything closer to you.</p>
+  <form class="postcode-form" id="pc-form" action="postcode.html" method="get">
+    <input type="text" name="postcode" id="pc-input" placeholder="Postcode, e.g. HP22 6NE" required
+           autocomplete="postal-code" aria-label="Postcode">
+    <button type="submit">Find views</button>
+    <span id="pc-status" class="area-note"></span>
+  </form>
+</section>
+
+<div id="pc-content" hidden>
+  <div id="map"></div>
+  <div class="area-panel">
+    <button id="ladder-btn">Show the whole ladder on the map</button>
+    <button id="local-btn" hidden>&#8630; Back to the local view</button>
+    <span class="area-note" id="mode-note">numbered pins: the best views within about half an hour's drive</span>
+  </div>
+
+  <div class="grid-2">
+    <section>
+      <h2>The ladder: better views, further away</h2>
+      <p class="note">Each row beats everything closer. Times are driving estimates from
+      <span id="pc-label">your postcode</span><span id="refine-note"> (straight-line calibration;
+      refining against road routing&hellip;)</span>.</p>
+      <div id="ladder-results"></div>
+    </section>
+    <section>
+      <h2>Best within ~30 minutes</h2>
+      <p class="note">The strongest view potential scores in your local patch, whether or not
+      they make the national list.</p>
+      <div id="local-results"></div>
+    </section>
+  </div>
+</div>
+<p class="note" id="pc-error" hidden></p>
+
+<script src="data/points.js"></script>
+<script src="assets/traveltime.js"></script>
+<script>
+// ALL_POINTS rows: [lat, lon, score, water_fraction, name(html-escaped), slug].
+const LOCAL_MAX_MINUTES = 32;
+const LADDER_MIN_GAIN = 0.5;
+const LADDER_MAX_ROWS = 15;
+
+const params = new URLSearchParams(location.search);
+const postcode = (params.get('postcode') || '').trim();
+const statusEl = document.getElementById('pc-status');
+const errorEl = document.getElementById('pc-error');
+
+let map = null, localLayer = null, ladderLayer = null, homeMarker = null;
+let home = null;           // {lat, lon, label}
+let est = null;            // per-point estimated minutes
+let refined = null;        // Map slug/index -> road-routed minutes
+let ladder = [];           // current ladder rows [{i, minutes, routed}]
+
+function colorFor(s) {
+  if (s >= 90) return '#1d4436';
+  if (s >= 80) return '#2f6f4f';
+  if (s >= 70) return '#7fae72';
+  return '#c9c39b';
+}
+function esc(s) { return s; } // names in ALL_POINTS are escaped at build time
+function pointPopup(r, minutes) {
+  let h = '<b>' + r[4] + '</b><br>view potential ' + r[2].toFixed(1);
+  if (minutes != null) h += '<br>~' + Math.round(minutes) + ' min drive';
+  h += '<br>';
+  if (r[5]) h += '<a href="viewpoints/' + r[5] + '.html">details &rarr;</a> &middot; ';
+  h += '<a href="https://maps.google.com/?q=' + r[0] + ',' + r[1] + '">Google Maps</a>';
+  return h;
+}
+
+function minutesFor(i) {
+  return (refined !== null && refined.has(i)) ? refined.get(i) : est[i];
+}
+
+function frontierWithGain(order, gain) {
+  const rows = [];
+  let best = -Infinity;
+  for (const i of order) {
+    const s = ALL_POINTS[i][2];
+    if (s > best + gain) {
+      rows.push({ i: i, minutes: minutesFor(i), routed: refined !== null && refined.has(i) });
+      best = s;
+    }
+  }
+  return rows;
+}
+function computeLadder() {
+  // Pareto frontier over (drive minutes, score): sort candidate indices by
+  // minutes, keep every strict score improvement. If that gives too many rungs,
+  // demand a bigger improvement per rung rather than cutting off the far end —
+  // the ladder must always climb to the best view in England.
+  const order = [];
+  for (let i = 0; i < ALL_POINTS.length; i++) order.push(i);
+  order.sort((a, b) => minutesFor(a) - minutesFor(b));
+  let gain = LADDER_MIN_GAIN;
+  let rows = frontierWithGain(order, gain);
+  while (rows.length > LADDER_MAX_ROWS && gain < 16) {
+    gain *= 1.6;
+    rows = frontierWithGain(order, gain);
+  }
+  return rows.slice(0, LADDER_MAX_ROWS);
+}
+
+function renderLadder() {
+  ladder = computeLadder();
+  const rows = ladder.map((row, k) => {
+    const r = ALL_POINTS[row.i];
+    const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + esc(r[4]) + '</a>' : esc(r[4]);
+    const t = (row.routed ? '' : '~') + Math.round(row.minutes) + ' min';
+    return '<tr><td class="num">' + (k + 1) + '</td><td>' + name + '</td>' +
+      '<td class="num">' + t + '</td>' +
+      '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
+  }).join('');
+  document.getElementById('ladder-results').innerHTML =
+    '<table class="rank"><tr><th>#</th><th>Place</th><th class="num">Drive</th><th class="num">Score</th></tr>' +
+    rows + '</table>';
+  drawLadderPins();
+}
+
+function renderLocal() {
+  const hits = [];
+  for (let i = 0; i < ALL_POINTS.length; i++) {
+    if (est[i] <= LOCAL_MAX_MINUTES) hits.push(i);
+  }
+  hits.sort((a, b) => ALL_POINTS[b][2] - ALL_POINTS[a][2]);
+  const top = hits.slice(0, 15);
+  localLayer.clearLayers();
+  top.forEach((i, k) => {
+    const r = ALL_POINTS[i];
+    const pin = L.marker([r[0], r[1]], {
+      icon: L.divIcon({
+        className: 'rank-pin-wrap',
+        html: '<div class="rank-pin">' + (k + 1) + '</div>',
+        iconSize: [26, 26], iconAnchor: [13, 13]
+      }),
+      zIndexOffset: 1000 - k
+    });
+    pin.bindPopup(pointPopup(r, minutesFor(i)));
+    localLayer.addLayer(pin);
+  });
+  const rows = top.map((i, k) => {
+    const r = ALL_POINTS[i];
+    const name = r[5] ? '<a href="viewpoints/' + r[5] + '.html">' + esc(r[4]) + '</a>' : esc(r[4]);
+    return '<tr><td class="num">' + (k + 1) + '</td><td>' + name + '</td>' +
+      '<td class="num">~' + Math.round(est[i]) + ' min</td>' +
+      '<td class="num"><span class="score-pill">' + r[2].toFixed(1) + '</span></td></tr>';
+  }).join('');
+  document.getElementById('local-results').innerHTML = top.length === 0
+    ? '<p class="note">No candidate viewpoints within about 30 minutes — try the ladder for the nearest worthwhile drive.</p>'
+    : '<table class="rank"><tr><th>#</th><th>Place</th><th class="num">Drive</th><th class="num">Score</th></tr>' +
+      rows + '</table>';
+  return top;
+}
+
+function drawLadderPins() {
+  ladderLayer.clearLayers();
+  ladder.forEach((row, k) => {
+    const r = ALL_POINTS[row.i];
+    const pin = L.marker([r[0], r[1]], {
+      icon: L.divIcon({
+        className: 'rank-pin-wrap',
+        html: '<div class="rank-pin ladder-pin">' + (k + 1) + '</div>',
+        iconSize: [26, 26], iconAnchor: [13, 13]
+      }),
+      zIndexOffset: 2000 - k
+    });
+    pin.bindPopup(pointPopup(r, row.minutes));
+    ladderLayer.addLayer(pin);
+  });
+}
+
+let ladderMode = false;
+function setMode(toLadder) {
+  ladderMode = toLadder;
+  document.getElementById('ladder-btn').hidden = toLadder;
+  document.getElementById('local-btn').hidden = !toLadder;
+  document.getElementById('mode-note').textContent = toLadder
+    ? 'only the ladder: each pin is a better view than every pin closer to you'
+    : "numbered pins: the best views within about half an hour's drive";
+  if (toLadder) {
+    map.removeLayer(localLayer);
+    map.addLayer(ladderLayer);
+    const pts = ladder.map(row => [ALL_POINTS[row.i][0], ALL_POINTS[row.i][1]]);
+    pts.push([home.lat, home.lon]);
+    map.fitBounds(L.latLngBounds(pts).pad(0.08));
+  } else {
+    map.removeLayer(ladderLayer);
+    map.addLayer(localLayer);
+    map.setView([home.lat, home.lon], 10);
+  }
+}
+
+async function refineWithRoadRouting() {
+  // One polite request to the FOSSGIS OSRM instance (CORS-enabled, no key):
+  // real road durations for a pool of ladder-relevant points, then recompute.
+  // The pool: current ladder plus each 5-minute band's two best scores.
+  try {
+    const pool = new Set(ladder.map(row => row.i));
+    const bands = new Map();
+    for (let i = 0; i < ALL_POINTS.length; i++) {
+      if (est[i] > 300) continue;
+      const band = Math.floor(est[i] / 5);
+      let list = bands.get(band);
+      if (!list) { list = []; bands.set(band, list); }
+      list.push(i);
+    }
+    bands.forEach(list => {
+      list.sort((a, b) => ALL_POINTS[b][2] - ALL_POINTS[a][2]);
+      pool.add(list[0]);
+      if (list.length > 1) pool.add(list[1]);
+    });
+    const ids = Array.from(pool).slice(0, 320);
+    const coords = [home.lon.toFixed(4) + ',' + home.lat.toFixed(4)]
+      .concat(ids.map(i => ALL_POINTS[i][1].toFixed(4) + ',' + ALL_POINTS[i][0].toFixed(4)))
+      .join(';');
+    const url = 'https://routing.openstreetmap.de/routed-car/table/v1/driving/' + coords +
+      '?sources=0';
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error('table ' + resp.status);
+    const data = await resp.json();
+    if (data.code !== 'Ok' || !data.durations || !data.durations[0]) throw new Error(data.code);
+    refined = new Map();
+    ids.forEach((i, k) => {
+      const seconds = data.durations[0][k + 1];
+      if (seconds != null) refined.set(i, seconds / 60 * 1.15);  // free-flow -> typical traffic
+    });
+    renderLadder();
+    if (ladderMode) setMode(true);
+    document.getElementById('refine-note').textContent =
+      ' (ladder times are road-routed via OSRM; ~ marks straight-line estimates)';
+  } catch (err) {
+    document.getElementById('refine-note').textContent =
+      ' (straight-line estimates calibrated against road routing)';
+  }
+}
+
+async function start() {
+  if (!postcode) { statusEl.textContent = ''; return; }
+  document.getElementById('pc-input').value = postcode;
+  statusEl.textContent = 'Looking up ' + postcode + '…';
+  let geo;
+  try {
+    const resp = await fetch('https://api.postcodes.io/postcodes/' + encodeURIComponent(postcode));
+    geo = await resp.json();
+    if (geo.status !== 200) throw new Error(geo.error || 'not found');
+  } catch (err) {
+    statusEl.textContent = '';
+    errorEl.hidden = false;
+    errorEl.textContent = 'Could not find that postcode (' + postcode + '). Check the spelling — it needs to be a UK postcode, e.g. HP22 6NE.';
+    return;
+  }
+  const r = geo.result;
+  home = { lat: r.latitude, lon: r.longitude,
+           label: r.postcode + (r.admin_district ? ', ' + r.admin_district : '') };
+  if (r.country !== 'England') {
+    statusEl.textContent = '';
+    errorEl.hidden = false;
+    errorEl.textContent = home.label + ' is outside England — this site only ranks English viewpoints. The map and ladder still work, but the nearest candidates may be a long drive away.';
+  }
+  statusEl.textContent = '';
+  document.getElementById('pc-title').textContent = 'Best views near ' + r.postcode;
+  document.getElementById('pc-label').textContent = home.label;
+  document.getElementById('pc-content').hidden = false;
+
+  est = new Float64Array(ALL_POINTS.length);
+  for (let i = 0; i < ALL_POINTS.length; i++) {
+    est[i] = driveMinutes(haversineKm(home.lat, home.lon, ALL_POINTS[i][0], ALL_POINTS[i][1]));
+  }
+
+  map = L.map('map').setView([home.lat, home.lon], 10);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 17,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+  homeMarker = L.marker([home.lat, home.lon], { title: home.label }).addTo(map);
+  homeMarker.bindPopup('<b>' + home.label + '</b><br>your postcode');
+  localLayer = L.layerGroup().addTo(map);
+  ladderLayer = L.layerGroup();
+
+  renderLocal();
+  renderLadder();
+  document.getElementById('ladder-btn').addEventListener('click', () => setMode(true));
+  document.getElementById('local-btn').addEventListener('click', () => setMode(false));
+  refineWithRoadRouting();
+}
+start();
+</script>
+
+</main>
+<footer class="site">
+  <div class="wrap">
+    Computed from open data: OS Terrain 50 (contains OS data &copy; Crown copyright and database right 2026)
+    &middot; ESA WorldCover 2021 (CC-BY 4.0) &middot; OpenStreetMap (ODbL) &middot; Database of British and Irish Hills (CC-BY 4.0).
+    Scores describe measurable view geometry ("view potential"), never beauty itself.
+    Locations are computed &mdash; always check access rights, paths and safety before visiting.
+  </div>
+</footer>
+</body>
+</html>

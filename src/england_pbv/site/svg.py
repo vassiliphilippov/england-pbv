@@ -46,7 +46,7 @@ def horizon_panorama_svg(
     def y_at(value: float) -> float:
         return MARGIN_T + (y_max - value) / (y_max - y_min) * inner_h
 
-    skyline = [(x_at(i), y_at(float(horizon_deg[i]))) for i in range(0, n, 4)]
+    skyline = [(x_at(i), y_at(float(horizon_deg[i]))) for i in range(0, n, 5)]
     skyline.append((x_at(n), y_at(float(horizon_deg[0]))))
     base_y = y_at(y_min)
     fill_path = (
@@ -70,14 +70,14 @@ def horizon_panorama_svg(
     parts.append(f'<path d="{fill_path}" class="terrain-fill"/>')
 
     if horizon_veg_deg is not None:
-        veg = [(x_at(i), y_at(float(horizon_veg_deg[i]))) for i in range(0, n, 4)]
+        veg = [(x_at(i), y_at(float(horizon_veg_deg[i]))) for i in range(0, n, 5)]
         veg.append((x_at(n), y_at(float(horizon_veg_deg[0]))))
         parts.append(f'<polyline points="{_polyline(veg)}" class="veg-line" fill="none"/>')
 
-    # distance strip: colour each azimuth by how far the ground is visible (thinned 9x)
+    # distance strip: colour each azimuth by how far the ground is visible (thinned 12x)
     strip_y = CHART_H - MARGIN_B + 8
     strip_h = 8
-    thin = 9
+    thin = 12
     step = inner_w / n * thin
     for i in range(0, n, thin):
         dist = float(np.max(d_far_km[i : i + thin]))
@@ -121,7 +121,7 @@ def polar_reach_svg(d_far_km: NDArray[np.float32], max_km: float = 60.0) -> str:
             f'<text x="{cx + 3:.1f}" y="{cy - r - 2:.1f}" '
             f'class="polar-ring-label">{ring_km}km</text>'
         )
-    thin = 9
+    thin = 12
     step = 2.0 * math.pi / n * thin
     for i in range(0, n, thin):
         dist = min(float(np.max(d_far_km[i : i + thin])), max_km)
