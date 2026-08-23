@@ -389,6 +389,22 @@ def build_site(*, max_pages: int | None = None, skip_pages: bool = False) -> Non
         # --- viewpoint pages (re-run the engine for horizon profiles) ---
         dem = load_dem_grid(paths.DEM_GRID_NPY)
         landcover = load_uint8_grid(paths.LANDCOVER_GRID_NPY)
+        # Photo-calibrated render inputs (see verification/render_iteration_log.md):
+        # 10 m terrain + land cover with path/habitat/rock flags, and the Sentinel-2
+        # true-colour mosaic blended in beyond 2 km.
+        dem10 = (
+            np.load(paths.DEM10_GRID_NPY, mmap_mode="r") if paths.DEM10_GRID_NPY.exists() else None
+        )
+        landcover10 = (
+            np.load(paths.LANDCOVER10_GRID_NPY, mmap_mode="r")
+            if paths.LANDCOVER10_GRID_NPY.exists()
+            else None
+        )
+        satellite10 = (
+            np.load(paths.SATELLITE10_GRID_NPY, mmap_mode="r")
+            if paths.SATELLITE10_GRID_NPY.exists()
+            else None
+        )
         plan = build_sampling_plan()
         eastings = np.array([v.candidate.easting for v in pages], dtype=np.float64)
         northings = np.array([v.candidate.northing for v in pages], dtype=np.float64)
@@ -414,6 +430,9 @@ def build_site(*, max_pages: int | None = None, skip_pages: bool = False) -> Non
                 landcover,
                 easting=item.candidate.easting,
                 northing=item.candidate.northing,
+                dem10=dem10,
+                landcover10=landcover10,
+                satellite10=satellite10,
             )
             if is_micro:
                 height = round(panorama.height * MICRO_PANORAMA_WIDTH / panorama.width)
@@ -440,6 +459,9 @@ def build_site(*, max_pages: int | None = None, skip_pages: bool = False) -> Non
                         easting=item.candidate.easting,
                         northing=item.candidate.northing,
                         center_azimuth_deg=direction.azimuth_deg,
+                        dem10=dem10,
+                        landcover10=landcover10,
+                        satellite10=satellite10,
                     )
                     view_file = f"{slug}_view{view_index}.jpg"
                     view_image.save(

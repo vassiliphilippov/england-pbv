@@ -7,9 +7,11 @@ Cells inside moor/heath/bog habitat polygons get a +2 flag on the 10 m land-cove
 (``code % 10 == 2``; the +1 path flag wins where both apply), and the renderer colours
 moor grass, bracken and heather from the flag instead of altitude.
 
-Run: uv run python -m england_pbv.data.habitats
+Run: uv run python -m england_pbv.data.habitats            (calibration sites)
+     uv run python -m england_pbv.data.habitats --national  (all England, checkpointed)
 """
 
+import argparse
 import json
 import time
 from typing import cast
@@ -170,7 +172,135 @@ def burn_habitats(site_features: dict[str, SiteFeatures]) -> int:
     return burned
 
 
+# ArcGIS-side filter to the moor classes the renderer colours — fetching all ~2.5M PHI
+# polygons nationally would be mostly lowland grassland/woodland we never use.
+NATIONAL_WHERE: str = (
+    "UPPER(MainHabs) LIKE '%HEATH%' OR UPPER(MainHabs) LIKE '%BLANKET BOG%' OR "
+    "UPPER(MainHabs) LIKE '%RAISED BOG%' OR UPPER(MainHabs) LIKE '%PURPLE MOOR GRASS%' OR "
+    "UPPER(MainHabs) LIKE '%MARITIME CLIFF%' OR UPPER(MainHabs) LIKE '%FLUSHES%'"
+)
+NATIONAL_TILE_M: float = 50000.0
+GRID_E_MAX: float = 660000.0
+GRID_N_MAX: float = 660000.0
+
+
+def _burn_ring_batch(
+    grid: "np.ndarray[tuple[int, ...], np.dtype[np.uint8]]",
+    moor_rings: list[list[list[list[float]]]],
+) -> int:
+    """Rasterize one batch of already-moor-class polygon ring lists; returns new cells."""
+    grid_height, grid_width = grid.shape
+    all_points = [pt for rings in moor_rings for ring in rings for pt in ring]
+    if not all_points:
+        return 0
+    cols = [int((float(pt[0]) - GRID_X0_M) / GRID_CELL_M) for pt in all_points]
+    rows = [int((float(pt[1]) - GRID_Y0_M) / GRID_CELL_M) for pt in all_points]
+    col0 = max(0, min(cols) - 1)
+    row0 = max(0, min(rows) - 1)
+    col1 = min(grid_width, max(cols) + 2)
+    row1 = min(grid_height, max(rows) + 2)
+    if col1 <= col0 or row1 <= row0:
+        return 0
+    mask_img = Image.new("1", (col1 - col0, row1 - row0), 0)
+    draw = ImageDraw.Draw(mask_img)
+    for rings in moor_rings:
+        for ring_index, ring in enumerate(rings):
+            pixel_ring = [
+                (
+                    (float(pt[0]) - GRID_X0_M) / GRID_CELL_M - col0,
+                    (float(pt[1]) - GRID_Y0_M) / GRID_CELL_M - row0,
+                )
+                for pt in ring
+            ]
+            if len(pixel_ring) >= 3:
+                draw.polygon(pixel_ring, fill=0 if ring_index > 0 else 1)
+    mask = np.array(mask_img, dtype=bool)
+    window = grid[row0:row1, col0:col1]
+    eligible = mask & (window != 0) & (window != 80) & (window % 10 == 0)
+    window[eligible] += 2
+    return int(eligible.sum())
+
+
+def fetch_and_burn_national() -> None:
+    """Sweep all England in 50 km tiles, burning moor-class PHI polygons as +2 flags.
+
+    Checkpointed per tile so an interrupted run resumes; re-burning is idempotent
+    (flagged cells no longer end in 0).
+    """
+    grid = np.load(paths.LANDCOVER10_GRID_NPY, mmap_mode="r+")
+    done_path = paths.RAW_DIR / "national_habitats_done.json"
+    done: dict[str, int] = (
+        json.loads(done_path.read_text(encoding="utf-8")) if done_path.exists() else {}
+    )
+    tiles = [
+        (east, north)
+        for east in np.arange(GRID_X0_M, GRID_E_MAX, NATIONAL_TILE_M)
+        for north in np.arange(GRID_Y0_M, GRID_N_MAX, NATIONAL_TILE_M)
+    ]
+    for index, (east, north) in enumerate(tiles):
+        key = f"{int(east)}_{int(north)}"
+        if key in done:
+            continue
+        envelope = f"{east},{north},{east + NATIONAL_TILE_M},{north + NATIONAL_TILE_M}"
+        burned = 0
+        offset = 0
+        while True:
+            params = {
+                "where": NATIONAL_WHERE,
+                "geometry": envelope,
+                "geometryType": "esriGeometryEnvelope",
+                "inSR": "27700",
+                "outSR": "27700",
+                "outFields": "MainHabs",
+                "f": "geojson",
+                "resultOffset": str(offset),
+                "resultRecordCount": str(PAGE_SIZE),
+            }
+            payload = None
+            for attempt in range(5):
+                try:
+                    resp = requests.get(
+                        PHI_QUERY_URL,
+                        params=params,
+                        timeout=300,
+                        headers={"User-Agent": USER_AGENT},
+                    )
+                    resp.raise_for_status()
+                    payload = resp.json()
+                    break
+                except (requests.RequestException, ValueError):
+                    time.sleep(10.0 * (attempt + 1))
+            assert payload is not None, "PHI national query succeeds after retries"
+            page = payload.get("features", [])
+            moor_rings: list[list[list[list[float]]]] = []
+            for feature in page:
+                geometry = feature.get("geometry") or {}
+                rings: list[list[list[float]]] = []
+                if geometry.get("type") == "Polygon":
+                    rings = [[[pt[0], pt[1]] for pt in ring] for ring in geometry["coordinates"]]
+                elif geometry.get("type") == "MultiPolygon":
+                    for polygon in geometry["coordinates"]:
+                        rings.extend([[pt[0], pt[1]] for pt in ring] for ring in polygon)
+                if rings:
+                    moor_rings.append(rings)
+            burned += _burn_ring_batch(grid, moor_rings)
+            if len(page) < PAGE_SIZE:
+                break
+            offset += PAGE_SIZE
+        grid.flush()
+        done[key] = burned
+        done_path.write_text(json.dumps(done), encoding="utf-8")
+        print(f"[{index + 1}/{len(tiles)}] tile {key}: {burned} cells", flush=True)
+    print(f"national habitat burn complete: {sum(done.values())} cells total")
+
+
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Burn PHI moor-habitat flags")
+    parser.add_argument("--national", action="store_true", help="sweep all of England")
+    args = parser.parse_args()
+    if args.national:
+        fetch_and_burn_national()
+        return
     site_features = fetch_all_habitats()
     burned = burn_habitats(site_features)
     print(f"flagged {burned} new moor-habitat cells across {len(site_features)} sites")
