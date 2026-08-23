@@ -67,6 +67,20 @@ _EXCLUDED_SUBJECT_PATTERN: re.Pattern[str] = re.compile(
     re.IGNORECASE,
 )
 
+# Votes must compare GROUND-LEVEL standing views — the whole site ranks places a
+# person can stand. Titles/categories betraying an elevated or airborne vantage
+# (tower tops, roofs, aerial/drone shots, windows above ground) are excluded.
+_ELEVATED_VANTAGE_PATTERN: re.Pattern[str] = re.compile(
+    r"\b(aerial|drone|from the air|bird'?s.?eye"
+    r"|from (?:the |a |st |york minster )?(?:central |bell |church |clock |castle "
+    r"|cathedral |minster )?tower|tower view"
+    r"|from the (?:roof|rooftop|spire|steeple|keep|battlements|ramparts|walls"
+    r"|balcony|window|top floor|observation)"
+    r"|roof ?top view|window view|balloon|paraglid|hang.?glid|from (?:a |the )?plane"
+    r"|cable car|big wheel|ferris wheel|from the wheel)\b",
+    re.IGNORECASE,
+)
+
 _HTML_TAG_PATTERN: re.Pattern[str] = re.compile(r"<[^>]+>")
 
 
@@ -436,6 +450,13 @@ def _photo_from_page(page: dict[str, object], area_name: str) -> VotePhoto | Non
     if _EXCLUDED_SUBJECT_PATTERN.search(title) is not None:
         return None
     if categories is not None and _EXCLUDED_SUBJECT_PATTERN.search(categories) is not None:
+        return None
+    if _ELEVATED_VANTAGE_PATTERN.search(title) is not None:
+        return None
+    if categories is not None and (
+        _ELEVATED_VANTAGE_PATTERN.search(categories) is not None
+        or "aerial photograph" in categories.lower()
+    ):
         return None
     location = _camera_location(page=page, extmetadata=extmetadata)
     if location is None or not _inside_england(location):
