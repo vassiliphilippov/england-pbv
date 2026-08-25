@@ -175,7 +175,15 @@ def main() -> None:
             key = str(scene["id"])
             if key in done:
                 continue
-            filled = burn_scene(str(scene["url"]), mosaic, landcover)
+            try:
+                filled = burn_scene(str(scene["url"]), mosaic, landcover)
+            except Exception as error:  # noqa: BLE001 - one bad scene must not stop the sweep
+                # Record the failure so the scene is not retried forever; other
+                # scenes for the same tile still get their chance.
+                done[key] = -1
+                done_path.write_text(json.dumps(done), encoding="utf-8")
+                print(f"[rank {rank}] {tile} SKIPPED {key}: {type(error).__name__}", flush=True)
+                continue
             done[key] = filled
             done_path.write_text(json.dumps(done), encoding="utf-8")
             print(

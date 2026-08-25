@@ -39,7 +39,10 @@ TREE_HEIGHT_M: float = 15.0
 BUILT_HEIGHT_M: float = 8.0
 
 MAX_RENDER_DISTANCE_M: float = 60000.0
-HAZE_DISTANCE_M: float = 16000.0
+HAZE_DISTANCE_M: float = 11000.0
+HAZE_R_SCALE: float = 1.30
+HAZE_B_SCALE: float = 0.80
+HAZE_DESATURATION: float = 0.55
 SUN_AZIMUTH_DEG: float = 225.0
 SUN_ELEVATION_DEG: float = 38.0
 SHADE_AMBIENT: float = 0.52
@@ -62,7 +65,9 @@ SAT_NEAR_M: float = 2000.0
 SAT_FULL_M: float = 3500.0
 SAT_STRENGTH: float = 0.85
 SAT_GAIN: float = 1.22
-SAT_SATURATION: float = 1.35  # TCI reflectance reads paler than the graded palette
+# Gained Sentinel true colour is MORE chromatic than real turf once lit, which reads
+# fluorescent rather than photographic; pull it back toward its own luminance.
+SAT_SATURATION: float = 0.92
 
 PROJECTION_PANORAMA: int = 0
 PROJECTION_RECTILINEAR: int = 1
@@ -285,7 +290,11 @@ def _render_kernel(
             x = obs_e + dx * r
             y = obs_n + dy * r
             z = _sample_elev(dem, dem10, has10, x, y)
-            lc_bin = _landcover_at2(landcover, landcover10, has10_lc, x, y)
+            # Displace the class lookup by a smooth ~7 m offset so wood and hedgerow
+            # outlines follow organic shapes instead of 10 m raster rectangles.
+            jx = 7.0 * (_smooth_noise(x * 0.06, y * 0.06) - 0.5)
+            jy = 7.0 * (_smooth_noise(x * 0.06 + 31.0, y * 0.06) - 0.5)
+            lc_bin = _landcover_at2(landcover, landcover10, has10_lc, x + jx, y + jy)
             clearing = (r - CLEARING_RAMP_START_M) / (CLEARING_RAMP_FULL_M - CLEARING_RAMP_START_M)
             if clearing < 0.0:
                 clearing = 0.0
@@ -297,7 +306,7 @@ def _render_kernel(
                 # The clearing ramp thins tree DENSITY, not height: near the observer only
                 # scattered full-height trees stand (like a real clearing edge). Scaling
                 # height instead would grow a staircase of canopy fronts with distance.
-                clump = _cell_noise(x, y, 35.0)
+                clump = _cell_noise(x, y, 35.0)  # density thinning near the observer
                 if clump < clearing:
                     tree_here = True
                     # Rounded crowns: a dome profile across each 35 m clump cell.
@@ -315,9 +324,15 @@ def _render_kernel(
                     # Clump height range 0.75–1.3 (was 0.6–1.4): neighbouring crowns
                     # jumping 2x in height cut saw-tooth wood silhouettes.
                     rough_amp = 0.36 + 0.50 * math.exp(-r / 250.0)
-                    z_surf = z + TREE_HEIGHT_M * math.sqrt(dome_sq) * (
-                        0.75 + 0.55 * _cell_noise(x + 17.0, y + 31.0, 35.0)
-                    ) * (1.0 - 0.5 * rough_amp + rough_amp * _smooth_noise(x * 0.31, y * 0.31))
+                    # Height from CONTINUOUS multi-scale noise: the old per-35 m-cell
+                    # height stamped an identical dome on a visible lattice across
+                    # every distant plain.
+                    canopy_scale = (0.62 + 0.44 * _smooth_noise(x / 17.0, y / 17.0)) * (
+                        0.74 + 0.32 * _smooth_noise(x / 5.5 + 21.0, y / 5.5)
+                    )
+                    z_surf = z + TREE_HEIGHT_M * math.sqrt(dome_sq) * canopy_scale * (
+                        1.0 - 0.5 * rough_amp + rough_amp * _smooth_noise(x * 0.31, y * 0.31)
+                    )
             elif lc_bin == 5:
                 z_surf = z + clearing * BUILT_HEIGHT_M * (0.5 + _cell_noise(x, y, 45.0))
             code10_here = _landcover_code10(landcover10, has10_lc, x, y)
@@ -571,9 +586,39 @@ def _render_kernel(
                         and sat_row >= 0
                         and sat_row < satellite.shape[0]
                     ):
-                        sat_red = float(satellite[sat_row, sat_col, 0])
-                        sat_green = float(satellite[sat_row, sat_col, 1])
-                        sat_blue = float(satellite[sat_row, sat_col, 2])
+                        sat_fc = (x - DEM10_X0) / DEM10_CELL - 0.5
+                        sat_fr = (y - DEM10_Y0) / DEM10_CELL - 0.5
+                        sc0 = int(sat_fc)
+                        sr0 = int(sat_fr)
+                        stx = sat_fc - sc0
+                        sty = sat_fr - sr0
+                        out_of_range = sc0 < 0 or sr0 < 0
+                        out_of_range = out_of_range or sc0 >= satellite.shape[1] - 1
+                        out_of_range = out_of_range or sr0 >= satellite.shape[0] - 1
+                        if out_of_range:
+                            sc0 = sat_col
+                            sr0 = sat_row
+                            stx = 0.0
+                            sty = 0.0
+                        # Bilinear: nearest-neighbour made visible 10 m blocks.
+                        sat_red = (
+                            float(satellite[sr0, sc0, 0]) * (1 - stx) * (1 - sty)
+                            + float(satellite[sr0, sc0 + 1, 0]) * stx * (1 - sty)
+                            + float(satellite[sr0 + 1, sc0, 0]) * (1 - stx) * sty
+                            + float(satellite[sr0 + 1, sc0 + 1, 0]) * stx * sty
+                        )
+                        sat_green = (
+                            float(satellite[sr0, sc0, 1]) * (1 - stx) * (1 - sty)
+                            + float(satellite[sr0, sc0 + 1, 1]) * stx * (1 - sty)
+                            + float(satellite[sr0 + 1, sc0, 1]) * (1 - stx) * sty
+                            + float(satellite[sr0 + 1, sc0 + 1, 1]) * stx * sty
+                        )
+                        sat_blue = (
+                            float(satellite[sr0, sc0, 2]) * (1 - stx) * (1 - sty)
+                            + float(satellite[sr0, sc0 + 1, 2]) * stx * (1 - sty)
+                            + float(satellite[sr0 + 1, sc0, 2]) * (1 - stx) * sty
+                            + float(satellite[sr0 + 1, sc0 + 1, 2]) * stx * sty
+                        )
                         if sat_red + sat_green + sat_blue > 12.0:
                             sat_luma = 0.299 * sat_red + 0.587 * sat_green + 0.114 * sat_blue
                             sat_red = sat_luma + (sat_red - sat_luma) * SAT_SATURATION
@@ -593,9 +638,20 @@ def _render_kernel(
                             red = red + (sat_red * sat_light - red) * sat_w
                             green = green + (sat_green * sat_light - green) * sat_w
                             blue = blue + (sat_blue * sat_light - blue) * sat_w
-                red = red + (haze_color[0] - red) * haze
+                # Aerial perspective: scattering washes CHROMA before brightness, and
+                # short wavelengths scatter most, so distance shifts blue. Measured
+                # against the calibration photos, single-colour haze left distant land
+                # far too dark and too saturated.
+                lum_h = 0.299 * red + 0.587 * green + 0.114 * blue
+                desat = haze * HAZE_DESATURATION
+                red = lum_h + (red - lum_h) * (1.0 - desat)
+                green = lum_h + (green - lum_h) * (1.0 - desat)
+                blue = lum_h + (blue - lum_h) * (1.0 - desat)
+                haze_r = 1.0 - math.exp(-r / (HAZE_DISTANCE_M * HAZE_R_SCALE))
+                haze_b = 1.0 - math.exp(-r / (HAZE_DISTANCE_M * HAZE_B_SCALE))
+                red = red + (haze_color[0] - red) * haze_r
                 green = green + (haze_color[1] - green) * haze
-                blue = blue + (haze_color[2] - blue) * haze
+                blue = blue + (haze_color[2] - blue) * haze_b
 
                 if projection == PROJECTION_PANORAMA:
                     row_hi = int((top_rad - max_ang) / rad_per_row)

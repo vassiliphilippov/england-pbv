@@ -23,7 +23,12 @@ from numpy.typing import NDArray
 from PIL import Image
 
 from england_pbv.constants import EARTH_RADIUS_M, REFRACTION_K
+from england_pbv.viewshed.horizon import _bilinear
 from england_pbv.viewshed.render import (
+    DEM10_CELL,
+    DEM10_INVALID,
+    DEM10_X0,
+    DEM10_Y0,
     _cell_noise,
     _landcover_at2,
     _landcover_code10,
@@ -32,6 +37,10 @@ from england_pbv.viewshed.render import (
 )
 
 RENDER_CURVATURE: float = (1.0 - REFRACTION_K) / (2.0 * EARTH_RADIUS_M)
+PROJECTION_PANORAMA: int = 0
+PROJECTION_RECTILINEAR: int = 1
+PANORAMA_TOP_DEG: float = 8.0
+PANORAMA_BOTTOM_DEG: float = -12.0
 R_NEAR_MAX: float = 1800.0
 EYE_M: float = 1.7
 MAX_DISTANCE_M: float = 60000.0
@@ -89,6 +98,13 @@ TEX_MAX_R_M: float = 1400.0
 CANOPY_GAP_DEPTH_M: float = 5.0
 CANOPY_GAP_FOOT_M: float = 0.55
 CANOPY_CROWN_FOOT_M: float = 2.6
+# You cannot stand inside a tree. Without a 1 m surface to say otherwise, land
+# cover alone will put a 15 m crown a few metres from the eye, and that single
+# sample then paints the whole frame. Thin procedural canopy to nothing within
+# CLEARING_START_M, full height by CLEARING_FULL_M.
+CLEARING_START_M: float = 130.0
+CLEARING_FULL_M: float = 280.0
+MICRO_RELIEF_R_M: float = 260.0
 
 
 @njit(cache=True, inline="always")
@@ -347,12 +363,16 @@ def _render2_kernel(
     has_sat: bool,
     tex: NDArray[np.float32],
     has_tex: bool,
+    has_window: bool,
     hdri: NDArray[np.float32],
     obs_e: float,
     obs_n: float,
     eye_z: float,
     col_azimuth: NDArray[np.float64],
+    projection: int,
     height: int,
+    top_rad: float,
+    bottom_rad: float,
     f_v_px: float,
     cy_px: float,
     pitch_rad: float,
@@ -369,8 +389,9 @@ def _render2_kernel(
     haze_lin_r = _srgb_to_lin(float(haze_color[0]))
     haze_lin_g = _srgb_to_lin(float(haze_color[1]))
     haze_lin_b = _srgb_to_lin(float(haze_color[2]))
+    rad_per_row = (top_rad - bottom_rad) / height
     # Angular size of one supersampled pixel: drives texture band-limiting.
-    px_angle = 1.0 / f_v_px
+    px_angle = rad_per_row if projection == PROJECTION_PANORAMA else 1.0 / f_v_px
     sun_az = math.radians(SUN_AZIMUTH_DEG)
     sun_el = math.radians(SUN_ELEVATION_DEG)
     sun_x = math.sin(sun_az) * math.cos(sun_el)
@@ -383,7 +404,7 @@ def _render2_kernel(
         azimuth = col_azimuth[col]
         dx = math.sin(azimuth)
         dy = math.cos(azimuth)
-        max_ang = -1.55
+        max_ang = bottom_rad
         prev_z = eye_z - EYE_M
         prev_slope = 0.0
         prev_visible = True
@@ -454,6 +475,12 @@ def _render2_kernel(
                     # Continuous multi-scale canopy: a dome per 35 m grid cell put
                     # identical "broccoli" on a visible lattice across every plain.
                     canopy_h = _far_canopy_h(x, y)
+                    clearing = (r - CLEARING_START_M) / (CLEARING_FULL_M - CLEARING_START_M)
+                    if clearing < 0.0:
+                        clearing = 0.0
+                    elif clearing > 1.0:
+                        clearing = 1.0
+                    canopy_h *= clearing
                     # Taper at the wood edge instead of a vertical wall: sample two
                     # neighbours and drop the height where the class runs out.
                     edge = 1.0
@@ -462,8 +489,23 @@ def _render2_kernel(
                     if _landcover_at2(lc50, lc10, has10_lc, x + jx, y + jy + 9.0) != 1:
                         edge -= 0.32
                     z_surf = z_ground + canopy_h * edge
-                elif lc_bin_far == 5:
-                    z_surf = z_ground + 8.0 * (0.5 + _cell_noise(x, y, 45.0))
+                elif lc_bin_far != 8 and r < MICRO_RELIEF_R_M and not has_window:
+                    # A 10 m DEM is glass-smooth, so at grazing incidence the near
+                    # ground paints as one stretched colour wall. Real turf is lumpy
+                    # at 0.5-3 m; adding that as GEOMETRY (not just a normal) gives
+                    # the ray-marcher something to resolve and breaks the smear.
+                    relief = 1.0 - r / MICRO_RELIEF_R_M
+                    z_surf = z_ground + relief * (
+                        0.22 * (_smooth_noise(x * 0.55, y * 0.55) - 0.5)
+                        + 0.09 * (_smooth_noise(x * 1.9 + 5.0, y * 1.9) - 0.5)
+                    )
+                if lc_bin_far == 5:
+                    built = (r - CLEARING_START_M) / (CLEARING_FULL_M - CLEARING_START_M)
+                    if built < 0.0:
+                        built = 0.0
+                    elif built > 1.0:
+                        built = 1.0
+                    z_surf = z_ground + built * 8.0 * (0.5 + _cell_noise(x, y, 45.0))
 
             z_eff = z_surf - RENDER_CURVATURE * r * r
             ang = math.atan((z_eff - eye_z) / r)
@@ -689,6 +731,54 @@ def _render2_kernel(
                         red *= detail
                         green *= detail
                         blue *= detail
+                        # Without a 1 m window (the national case) this branch also
+                        # paints the near ground, so it needs the same photographic
+                        # treatment: dry/green mottle, photo texture, micro-relief.
+                        if foot < 2.5:
+                            mott = 0.55 * _smooth_noise(x / 3.5, y / 3.5) + 0.45 * _smooth_noise(
+                                x / 1.1, y / 1.1
+                            )
+                            dryness = (mott - 0.44) * 1.7
+                            if dryness < 0.0:
+                                dryness = 0.0
+                            elif dryness > 0.30:
+                                dryness = 0.30
+                            dryness /= 1.0 + (foot / 1.1) * (foot / 1.1)
+                            red = red + (DRY_GRASS[0] - red) * dryness
+                            green = green + (DRY_GRASS[1] - green) * dryness
+                            blue = blue + (DRY_GRASS[2] - blue) * dryness
+                            tr, tg, tb = _ground_texture(
+                                tex, has_tex, 1 if mott > 0.62 else 0, x, y, foot
+                            )
+                            tlum = 0.299 * tr + 0.587 * tg + 0.114 * tb
+                            span_fade = 1.0
+                            if prev_span_px > 2.0:
+                                span_fade = 2.0 / prev_span_px
+                            tw = TEX_STRENGTH * span_fade
+                            red *= 1.0 + tw * (0.82 * tlum + 0.18 * tr - 1.0)
+                            green *= 1.0 + tw * (0.82 * tlum + 0.18 * tg - 1.0)
+                            blue *= 1.0 + tw * (0.82 * tlum + 0.18 * tb - 1.0)
+                            if foot < 1.2:
+                                bmp = 0.30 * (1.0 - foot / 1.2)
+                                gx += bmp * (
+                                    _smooth_noise(x * 0.62 + 11.0, y * 0.62)
+                                    - _smooth_noise(x * 0.62 + 9.0, y * 0.62)
+                                )
+                                gy += bmp * (
+                                    _smooth_noise(x * 0.62, y * 0.62 + 11.0)
+                                    - _smooth_noise(x * 0.62, y * 0.62 + 9.0)
+                                )
+                                inv_len = 1.0 / math.sqrt(gx * gx + gy * gy + 1.0)
+                                n_dot = (-gx * sun_x - gy * sun_y + sun_z) * inv_len
+                                if n_dot < 0.0:
+                                    n_dot = 0.0
+                                n_dot_final = n_dot * (1.0 - deshade) + 0.62 * deshade
+                        code10 = _landcover_code10(lc10, has10_lc, x, y)
+                        if code10 >= 0 and code10 % 10 == 1 and r < 2500.0:
+                            worn = 0.45
+                            red = red + (196.0 - red) * worn
+                            green = green + (184.0 - green) * worn
+                            blue = blue + (156.0 - blue) * worn
                     else:
                         red, green, blue = _GRASS_BASE
 
@@ -722,8 +812,12 @@ def _render2_kernel(
                 lin_r = lin_r + (haze_lin_r - lin_r) * haze_r
                 lin_g = lin_g + (haze_lin_g - lin_g) * haze
                 lin_b = lin_b + (haze_lin_b - lin_b) * haze_b
-                row_hi = int(cy_px - f_v_px * math.tan(max_ang - pitch_rad))
-                row_lo = int(cy_px - f_v_px * math.tan(ang - pitch_rad))
+                if projection == PROJECTION_PANORAMA:
+                    row_hi = int((top_rad - max_ang) / rad_per_row)
+                    row_lo = int((top_rad - ang) / rad_per_row)
+                else:
+                    row_hi = int(cy_px - f_v_px * math.tan(max_ang - pitch_rad))
+                    row_lo = int(cy_px - f_v_px * math.tan(ang - pitch_rad))
                 if row_lo < 0:
                     row_lo = 0
                 if row_hi > height:
@@ -770,11 +864,17 @@ def _render2_kernel(
                 step = 400.0
 
         # Photographic sky from the equirectangular HDRI.
-        horizon_row = int(cy_px - f_v_px * math.tan(max_ang - pitch_rad))
+        if projection == PROJECTION_PANORAMA:
+            horizon_row = int((top_rad - max_ang) / rad_per_row)
+        else:
+            horizon_row = int(cy_px - f_v_px * math.tan(max_ang - pitch_rad))
         if horizon_row > height:
             horizon_row = height
         for row in range(0, horizon_row):
-            elev = math.atan((cy_px - row) / f_v_px) + pitch_rad
+            if projection == PROJECTION_PANORAMA:
+                elev = top_rad - row * rad_per_row
+            else:
+                elev = math.atan((cy_px - row) / f_v_px) + pitch_rad
             u = (azimuth % (2.0 * math.pi)) / (2.0 * math.pi) * ws
             v = (0.5 - elev / math.pi) * hs
             ui = int(u) % ws
@@ -794,44 +894,47 @@ def _render2_kernel(
             image[row, col, 2] = np.uint8(min(255.0, sky_b))
 
 
-def render_view2(
-    window: dict[str, NDArray[np.generic]],
-    dem50: NDArray[np.float32],
-    lc50: NDArray[np.uint8],
-    hdri: NDArray[np.float32],
-    *,
+_DTM_STUB: NDArray[np.float32] = np.full((1, 1), np.nan, dtype=np.float32)
+_BLD_STUB: NDArray[np.uint8] = np.zeros((1, 1), dtype=np.uint8)
+
+
+def _window_arrays(
+    window: dict[str, NDArray[np.generic]] | None,
+) -> tuple[NDArray[np.float32], NDArray[np.float32], NDArray[np.uint8], float, float]:
+    """1 m LiDAR window, or stubs that make every near-field lookup miss.
+
+    Per-viewpoint 1 m windows cost ~52 MB and a minute each, so the national site
+    renders without them: every sample then takes the measured-terrain-plus-
+    land-cover path, keeping the new lighting, colour, texture and haze.
+    """
+    if window is None:
+        return _DTM_STUB, _DTM_STUB, _BLD_STUB, 0.0, 0.0
+    return (
+        np.asarray(window["dtm"], dtype=np.float32),
+        np.asarray(window["dsm"], dtype=np.float32),
+        np.asarray(window["buildings"], dtype=np.uint8),
+        float(window["x0"]),
+        float(window["y0"]),
+    )
+
+
+def _place_camera(
+    dtm1: NDArray[np.float32],
+    dsm1: NDArray[np.float32],
+    win_x0: float,
+    win_y0: float,
     easting: float,
     northing: float,
     center_azimuth_deg: float,
-    hfov_deg: float,
-    width: int,
-    height: int,
-    horizon_fraction: float,
-    dem10: NDArray[np.int16],
-    lc10: NDArray[np.uint8],
-    sat: NDArray[np.uint8],
-    tex: NDArray[np.float32],
-) -> tuple[Image.Image, float]:
-    scale = SUPERSAMPLE
-    render_w = width * scale
-    render_h = height * scale
-    f_h = (render_w / 2.0) / math.tan(math.radians(hfov_deg) / 2.0)
-    center = math.radians(center_azimuth_deg)
-    offsets = (np.arange(render_w, dtype=np.float64) + 0.5) - render_w / 2.0
-    col_azimuth = center + np.arctan(offsets / f_h)
-    cy = render_h * horizon_fraction
-
-    dtm1 = np.asarray(window["dtm"], dtype=np.float32)
-    dsm1 = np.asarray(window["dsm"], dtype=np.float32)
-    bld = np.asarray(window["buildings"], dtype=np.uint8)
-    win_x0 = float(window["x0"])
-    win_y0 = float(window["y0"])
+) -> tuple[float, float]:
+    """Reconcile a recorded coordinate with the 1 m surface (no-op without one)."""
+    if dtm1.shape[0] < 4:
+        return easting, northing
     start_e, start_n = easting, northing
-    # If the recorded cell is under canopy in the LiDAR (a person cannot stand
-    # inside a tree crown — grid-ref quantization or vegetation change since the
-    # 2022 composite), relocate to the nearest open cell within 25 m first.
     cfx = easting - win_x0
     cfy = northing - win_y0
+    if not (0 <= int(cfy) < dtm1.shape[0] and 0 <= int(cfx) < dtm1.shape[1]):
+        return easting, northing
     cam_ndsm = float(dsm1[int(cfy), int(cfx)]) - float(dtm1[int(cfy), int(cfx)])
     if not math.isnan(cam_ndsm) and cam_ndsm > 2.0:
         best_d = 1e9
@@ -846,10 +949,6 @@ def render_view2(
                     best_d = d
                     easting = win_x0 + cfx + de
                     northing = win_y0 + cfy + dn
-    # Photo grid references quantize to 10 m; at a brow that hides the whole
-    # valley. Probe up to 12 m along the view bearing on the 1 m DTM and stand
-    # where the near ground blocks least — a documented, bounded compensation,
-    # not the old free-roaming openness search.
     bx = math.sin(math.radians(center_azimuth_deg))
     by = math.cos(math.radians(center_azimuth_deg))
     best_block = 1e9
@@ -862,8 +961,6 @@ def render_view2(
             if math.isnan(g2):
                 continue
             eye2 = g2 + EYE_M
-            # Probe the SURFACE (DSM): standing in scrub means the first metres of
-            # canopy fill the whole frame, which ground-only probing cannot see.
             worst = -0.35
             probe = 2.0
             while probe <= 120.0:
@@ -878,9 +975,6 @@ def render_view2(
                 best_block = cost
                 best_e, best_n = e2, n2
     easting, northing = best_e, best_n
-    # Escalation, disclosed on the output: when the frame is still essentially
-    # walled (near surface >6 deg above eye across the probe), widen the search
-    # to 40 m — vegetation has demonstrably changed since the recorded photo.
     if best_block > 0.105:
         for forward in range(0, 41, 4):
             for lateral in range(-40, 41, 4):
@@ -905,52 +999,131 @@ def render_view2(
                     best_block = cost
                     best_e, best_n = e2, n2
         easting, northing = best_e, best_n
-    fx = easting - win_x0
-    fy = northing - win_y0
-    ground = float(dtm1[int(fy), int(fx)])
-    if math.isnan(ground):
-        raise ValueError("camera cell has no 1 m DTM data")
-    eye_z = ground + EYE_M
+    return easting, northing
 
-    # Horizon-band haze colour straight from the HDRI (its own atmosphere).
+
+def _run2(
+    window: dict[str, NDArray[np.generic]] | None,
+    dem50: NDArray[np.float32],
+    lc50: NDArray[np.uint8],
+    hdri: NDArray[np.float32],
+    *,
+    easting: float,
+    northing: float,
+    col_azimuth: NDArray[np.float64],
+    projection: int,
+    render_h: int,
+    top_rad: float,
+    bottom_rad: float,
+    f_v_px: float,
+    cy_px: float,
+    pitch_rad: float,
+    center_azimuth_deg: float,
+    dem10: NDArray[np.int16],
+    lc10: NDArray[np.uint8],
+    sat: NDArray[np.uint8],
+    tex: NDArray[np.float32],
+) -> tuple[NDArray[np.uint8], float]:
+    dtm1, dsm1, bld, win_x0, win_y0 = _window_arrays(window)
+    start_e, start_n = easting, northing
+    easting, northing = _place_camera(
+        dtm1, dsm1, win_x0, win_y0, easting, northing, center_azimuth_deg
+    )
+    ground = np.nan
+    if dtm1.shape[0] > 4:
+        ground = float(dtm1[int(northing - win_y0), int(easting - win_x0)])
+    if math.isnan(ground):
+        ground = float(_bilinear(dem50, easting, northing))
+        if lc10.shape[0] > 4:
+            col = int((easting - DEM10_X0) / DEM10_CELL)
+            row = int((northing - DEM10_Y0) / DEM10_CELL)
+            if 0 <= col < dem10.shape[1] and 0 <= row < dem10.shape[0]:
+                value = int(dem10[row, col])
+                if value > DEM10_INVALID:
+                    ground = value * 0.1
+    eye_z = ground + EYE_M
     band = hdri[int(hdri.shape[0] * 0.48) : int(hdri.shape[0] * 0.50)]
     haze_color = band.reshape(-1, 3).mean(axis=0).astype(np.float32)
-    # Sky-dome ambient: mean of the upper hemisphere, i.e. the light the sky
-    # actually casts into shadows.
     ambient_color = hdri[: hdri.shape[0] // 2].reshape(-1, 3).mean(axis=0).astype(np.float32)
-
-    image = np.zeros((render_h, render_w, 3), dtype=np.uint8)
+    image = np.zeros((render_h, len(col_azimuth), 3), dtype=np.uint8)
     _render2_kernel(
-        dtm1,
-        dsm1,
-        bld,
-        win_x0,
-        win_y0,
-        dem50,
-        dem10,
-        True,
-        lc50,
-        lc10,
-        True,
-        sat,
-        True,
-        tex,
-        tex.shape[0] >= 3,
-        hdri,
-        easting,
-        northing,
-        eye_z,
-        col_azimuth,
-        render_h,
-        f_h,
-        cy,
-        0.0,
-        haze_color,
-        ambient_color,
-        image,
-    )
-    # No PIL colour/contrast bump: the filmic tonemap now provides the response
-    # curve, and stacking a second one is what made the old renders poster-ish.
-    result = Image.fromarray(image).resize((width, height), Image.Resampling.LANCZOS)
-    offset_m = math.hypot(easting - start_e, northing - start_n)
-    return result, offset_m
+        dtm1, dsm1, bld, win_x0, win_y0, dem50, dem10, True, lc50, lc10, True,
+        sat, True, tex, tex.shape[0] >= 3, dtm1.shape[0] > 4, hdri, easting, northing, eye_z,
+        col_azimuth, projection, render_h, top_rad, bottom_rad, f_v_px, cy_px,
+        pitch_rad, haze_color, ambient_color, image,
+    )  # fmt: skip
+    return image, math.hypot(easting - start_e, northing - start_n)
+
+
+def _finish(image: NDArray[np.uint8], width: int, height: int) -> Image.Image:
+    # No PIL colour/contrast bump: the filmic tonemap provides the response curve.
+    return Image.fromarray(image).resize((width, height), Image.Resampling.LANCZOS)
+
+
+def render_panorama2(
+    dem50: NDArray[np.float32],
+    lc50: NDArray[np.uint8],
+    hdri: NDArray[np.float32],
+    *,
+    easting: float,
+    northing: float,
+    width: int,
+    height: int,
+    dem10: NDArray[np.int16],
+    lc10: NDArray[np.uint8],
+    sat: NDArray[np.uint8],
+    tex: NDArray[np.float32],
+    window: dict[str, NDArray[np.generic]] | None = None,
+) -> Image.Image:
+    """360-degree panorama with the next-generation material and light model."""
+    scale = SUPERSAMPLE
+    render_w = width * scale
+    render_h = height * scale
+    col_azimuth = 2.0 * math.pi * (np.arange(render_w, dtype=np.float64) + 0.5) / render_w
+    image, _ = _run2(
+        window, dem50, lc50, hdri,
+        easting=easting, northing=northing, col_azimuth=col_azimuth,
+        projection=PROJECTION_PANORAMA, render_h=render_h,
+        top_rad=math.radians(PANORAMA_TOP_DEG), bottom_rad=math.radians(PANORAMA_BOTTOM_DEG),
+        f_v_px=1.0, cy_px=0.0, pitch_rad=0.0, center_azimuth_deg=-999.0,
+        dem10=dem10, lc10=lc10, sat=sat, tex=tex,
+    )  # fmt: skip
+    return _finish(image, width, height)
+
+
+def render_view2(
+    window: dict[str, NDArray[np.generic]] | None,
+    dem50: NDArray[np.float32],
+    lc50: NDArray[np.uint8],
+    hdri: NDArray[np.float32],
+    *,
+    easting: float,
+    northing: float,
+    center_azimuth_deg: float,
+    hfov_deg: float,
+    width: int,
+    height: int,
+    horizon_fraction: float,
+    dem10: NDArray[np.int16],
+    lc10: NDArray[np.uint8],
+    sat: NDArray[np.uint8],
+    tex: NDArray[np.float32],
+) -> tuple[Image.Image, float]:
+    """Rectilinear camera view; returns the image and how far the camera moved."""
+    scale = SUPERSAMPLE
+    render_w = width * scale
+    render_h = height * scale
+    f_h = (render_w / 2.0) / math.tan(math.radians(hfov_deg) / 2.0)
+    center = math.radians(center_azimuth_deg)
+    offsets = (np.arange(render_w, dtype=np.float64) + 0.5) - render_w / 2.0
+    col_azimuth = center + np.arctan(offsets / f_h)
+    cy = render_h * horizon_fraction
+    image, offset_m = _run2(
+        window, dem50, lc50, hdri,
+        easting=easting, northing=northing, col_azimuth=col_azimuth,
+        projection=PROJECTION_RECTILINEAR, render_h=render_h,
+        top_rad=math.atan(cy / f_h), bottom_rad=math.atan((cy - render_h) / f_h),
+        f_v_px=f_h, cy_px=cy, pitch_rad=0.0, center_azimuth_deg=center_azimuth_deg,
+        dem10=dem10, lc10=lc10, sat=sat, tex=tex,
+    )  # fmt: skip
+    return _finish(image, width, height), offset_m

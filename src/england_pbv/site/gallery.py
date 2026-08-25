@@ -69,8 +69,9 @@ a{{color:#8fc4ea}} code{{background:#20262c;padding:1px 5px;border-radius:4px}}<
 <h2>What changed</h2><p class="note">{changed}</p>
 {issues_html}
 {"".join(figs)}
-<p class="note" style="margin-top:26px">EA 1 m LiDAR DTM + first-return DSM (OGL) &middot; OSM (ODbL)
-&middot; contains modified Copernicus Sentinel data &middot; textures and sky Poly Haven (CC0).</p>
+<p class="note" style="margin-top:26px">EA 1 m LiDAR DTM + first-return DSM (OGL)
+&middot; OSM (ODbL) &middot; contains modified Copernicus Sentinel data
+&middot; textures and sky Poly Haven (CC0).</p>
 </div></body></html>""",
         encoding="utf-8",
     )
