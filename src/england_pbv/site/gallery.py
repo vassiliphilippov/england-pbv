@@ -57,9 +57,11 @@ def main() -> None:
     (out / "index.html").write_text(
         f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
 <title>Next-Gen Renderer — {tag}</title><style>
-body{{font:15px/1.6 -apple-system,sans-serif;background:#14181c;color:#e8e8e2;margin:0;padding:24px}}
+body{{font:15px/1.6 -apple-system,sans-serif;background:#14181c;
+color:#e8e8e2;margin:0;padding:24px}}
 .wrap{{max-width:1140px;margin:0 auto}} h1{{font-size:26px;margin:0 0 4px}}
-h2{{font-size:19px;margin:30px 0 2px;color:#9fdcb4}} .meta{{color:#9aa4ae;font-size:13px;margin:2px 0 10px}}
+h2{{font-size:19px;margin:30px 0 2px;color:#9fdcb4}}
+.meta{{color:#9aa4ae;font-size:13px;margin:2px 0 10px}}
 img{{width:100%;border-radius:10px;display:block}} .note{{color:#9aa4ae;font-size:13px}}
 a{{color:#8fc4ea}} code{{background:#20262c;padding:1px 5px;border-radius:4px}}</style></head>
 <body><div class="wrap"><h1>Next-generation renderer — {tag}</h1>
