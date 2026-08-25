@@ -39,9 +39,15 @@ GRID_CELL_M: float = 10.0
 USER_AGENT: str = "england-pbv-satellite (github.com/vassiliphilippov/england-pbv)"
 
 
-def best_summer_scenes() -> list[dict[str, object]]:
-    """One least-cloudy summer scene per MGRS tile, sorted lowest cloud first."""
-    best: dict[str, dict[str, object]] = {}
+def summer_scenes_by_tile() -> dict[str, list[dict[str, object]]]:
+    """All qualifying summer scenes per MGRS tile, least-cloudy first.
+
+    One scene per tile is NOT enough: Sentinel-2 granules are often partial
+    strips at the edge of an orbit swath, so a single scene leaves black wedges
+    that nothing else fills. Measured after a one-scene-per-tile build: only 51%
+    of England had colour. Later ranks fill what earlier ones left empty.
+    """
+    by_tile: dict[str, list[dict[str, object]]] = {}
     body: dict[str, object] = {
         "collections": [COLLECTION],
         "bbox": list(ENGLAND_BBOX),
@@ -64,9 +70,22 @@ def best_summer_scenes() -> list[dict[str, object]]:
             visual = item.get("assets", {}).get("visual", {}).get("href")
             if not tile or visual is None:
                 continue
-            current = best.get(tile)
-            if current is None or cloud < float(current["cloud"]):  # type: ignore[arg-type]
-                best[tile] = {"tile": tile, "cloud": cloud, "url": str(visual), "id": item["id"]}
+            # Rank by cloud AND nodata. Cloud percentage is computed over VALID
+            # pixels only, so a half-empty swath-edge granule scores a perfect
+            # 0.0% cloud — ranking on cloud alone systematically picks granules
+            # that cover almost none of the tile, which is what left England 51%
+            # covered after the first build.
+            nodata = float(properties.get("s2:nodata_pixel_percentage", 0.0) or 0.0)
+            by_tile.setdefault(tile, []).append(
+                {
+                    "tile": tile,
+                    "cloud": cloud,
+                    "nodata": nodata,
+                    "score": cloud + nodata,
+                    "url": str(visual),
+                    "id": item["id"],
+                }
+            )
         next_link = next(
             (link for link in payload.get("links", []) if link.get("rel") == "next"), None
         )
@@ -77,7 +96,9 @@ def best_summer_scenes() -> list[dict[str, object]]:
         merged = dict(body)
         merged.update(next_link.get("body", {}))
         body = merged
-    return sorted(best.values(), key=lambda scene: float(scene["cloud"]))  # type: ignore[arg-type]
+    for scenes in by_tile.values():
+        scenes.sort(key=lambda scene: float(str(scene["score"])))
+    return by_tile
 
 
 def burn_scene(
@@ -122,6 +143,9 @@ def burn_scene(
     return int(fill.sum())
 
 
+MAX_RANKS: int = 4
+
+
 def main() -> None:
     landcover = np.load(paths.LANDCOVER10_GRID_NPY, mmap_mode="r")
     grid_height, grid_width = landcover.shape
@@ -134,24 +158,31 @@ def main() -> None:
             dtype=np.uint8,
             shape=(grid_height, grid_width, 3),
         )
-    scenes = best_summer_scenes()
-    print(f"{len(scenes)} tiles with a summer scene under {MAX_CLOUD_PERCENT}% cloud")
-    done_path = paths.RAW_DIR / "satellite_scenes_done.json"
+    by_tile = summer_scenes_by_tile()
+    total_scenes = sum(len(v) for v in by_tile.values())
+    print(f"{len(by_tile)} tiles, {total_scenes} candidate scenes under {MAX_CLOUD_PERCENT}% cloud")
+    done_path = paths.RAW_DIR / "satellite_scenes_v2.json"
     done: dict[str, int] = (
         json.loads(done_path.read_text(encoding="utf-8")) if done_path.exists() else {}
     )
-    for index, scene in enumerate(scenes):
-        tile = str(scene["tile"])
-        if tile in done:
-            continue
-        filled = burn_scene(str(scene["url"]), mosaic, landcover)
-        done[tile] = filled
-        done_path.write_text(json.dumps(done), encoding="utf-8")
-        cloud = float(str(scene["cloud"]))
-        print(
-            f"[{index + 1}/{len(scenes)}] {tile} cloud={cloud:.1f}% "
-            f"filled {filled} cells ({scene['id']})"
-        )
+    # Rank-major order: every tile gets its best scene, then its second-best, so
+    # an interrupted run still leaves uniform national coverage.
+    for rank in range(MAX_RANKS):
+        for tile, scenes in sorted(by_tile.items()):
+            if rank >= len(scenes):
+                continue
+            scene = scenes[rank]
+            key = str(scene["id"])
+            if key in done:
+                continue
+            filled = burn_scene(str(scene["url"]), mosaic, landcover)
+            done[key] = filled
+            done_path.write_text(json.dumps(done), encoding="utf-8")
+            print(
+                f"[rank {rank}] {tile} cloud={float(str(scene['cloud'])):.1f}% "
+                f"nodata={float(str(scene['nodata'])):.0f}% filled {filled} cells ({key})",
+                flush=True,
+            )
     mosaic.flush()
     total = sum(done.values())
     print(f"mosaic complete: {total} England cells filled")

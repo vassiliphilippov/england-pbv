@@ -64,6 +64,12 @@ def main() -> None:
     lc10 = np.load(paths.LANDCOVER10_GRID_NPY, mmap_mode="r")
     sat = np.load(paths.SATELLITE10_GRID_NPY, mmap_mode="r")
     hdri = load_hdri()
+    tex_path = paths.OUTPUTS_DIR / "nextgen" / "ground_textures.npy"
+    tex = (
+        np.load(tex_path).astype(np.float32)
+        if tex_path.exists()
+        else np.ones((1, 1, 1, 1, 3), dtype=np.float32)
+    )
 
     timings: dict[str, dict[str, float]] = {}
     for site in sites:
@@ -96,6 +102,7 @@ def main() -> None:
             dem10=dem10,
             lc10=lc10,
             sat=sat,
+            tex=tex,
         )
         new_seconds = time.perf_counter() - t0
         t0 = time.perf_counter()

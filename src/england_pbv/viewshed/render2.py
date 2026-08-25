@@ -35,7 +35,15 @@ RENDER_CURVATURE: float = (1.0 - REFRACTION_K) / (2.0 * EARTH_RADIUS_M)
 R_NEAR_MAX: float = 1800.0
 EYE_M: float = 1.7
 MAX_DISTANCE_M: float = 60000.0
-HAZE_DISTANCE_M: float = 16000.0
+# Aerial perspective. Measured against the calibration photos, distant land was
+# coming out far too dark and too saturated: real haze both washes chroma out and
+# lifts distant terrain toward sky brightness. Per-channel extinction makes the
+# distance shift BLUE (short wavelengths scatter most), which is the cue that
+# separates 5 km from 25 km.
+HAZE_DISTANCE_M: float = 9500.0
+HAZE_R_SCALE: float = 1.30
+HAZE_B_SCALE: float = 0.78
+HAZE_DESATURATION: float = 0.62
 SUN_AZIMUTH_DEG: float = 225.0
 SUN_ELEVATION_DEG: float = 38.0
 SHADOW_MARCH_MAX_M: float = 240.0
@@ -52,10 +60,11 @@ _GRASS_BASE: tuple[float, float, float] = (148.0, 154.0, 96.0)
 SUN_RGB: tuple[float, float, float] = (1.0, 0.95, 0.86)
 SUN_INTENSITY: float = 2.15
 AMBIENT_INTENSITY: float = 0.62
-EXPOSURE: float = 0.60
+EXPOSURE: float = 0.54
 # Sentinel-2 true colour is genuinely dark (vegetation reflects ~5-10% in visible);
 # lift it into a plausible albedo range before it becomes surface colour.
 SAT_ALBEDO_GAIN: float = 1.72
+SAT_CHROMA: float = 0.78
 # Ground detail octaves (wavelength m, amplitude): included only while the
 # wavelength stays above ~2 pixel footprints, so texture never aliases.
 DETAIL_WL: tuple[float, float, float, float] = (9.0, 2.8, 0.9, 0.3)
@@ -64,6 +73,22 @@ BUMP_MAX_R_M: float = 500.0
 # Real turf is a mottle of green and dead/dry blades at ~0.5-4 m scale; a single
 # flat green is the clearest "painted" tell after geometry is fixed.
 DRY_GRASS: tuple[float, float, float] = (186.0, 168.0, 112.0)
+# Photo-texture detail (CC0, england_pbv.data.ground_textures). One tile covers
+# TEX_WORLD_M; mip level is chosen from the pixel's ground footprint, so the
+# pattern band-limits itself to nothing at distance instead of aliasing.
+TEX_SIZE: int = 512
+TEX_LEVELS: int = 6
+TEX_WORLD_M: float = 6.0
+TEX_STRENGTH: float = 0.85
+TEX_MAX_R_M: float = 1400.0
+# Foliage is not a solid surface. A first-return DSM is a canopy blanket, so rays
+# either hit it or miss it and crowns render as opaque rubber blobs. Perforating
+# the canopy top with foliage-scale gaps lets rays through between leaf clumps,
+# which is what gives a real tree its ragged, sky-showing silhouette. Band-limited:
+# the gaps fade out once a pixel footprint is wider than the gaps themselves.
+CANOPY_GAP_DEPTH_M: float = 5.0
+CANOPY_GAP_FOOT_M: float = 0.55
+CANOPY_CROWN_FOOT_M: float = 2.6
 
 
 @njit(cache=True, inline="always")
@@ -145,6 +170,82 @@ def _tonemap(v: float) -> float:
 
 
 @njit(cache=True, inline="always")
+def _tex_bilinear(
+    tex: NDArray[np.float32], idx: int, level: int, u: float, v: float
+) -> tuple[float, float, float]:
+    fu = (u - math.floor(u)) * TEX_SIZE
+    fv = (v - math.floor(v)) * TEX_SIZE
+    x0 = int(fu) % TEX_SIZE
+    y0 = int(fv) % TEX_SIZE
+    x1 = (x0 + 1) % TEX_SIZE
+    y1 = (y0 + 1) % TEX_SIZE
+    tx = fu - int(fu)
+    ty = fv - int(fv)
+    out_r = 0.0
+    out_g = 0.0
+    out_b = 0.0
+    for k in range(3):
+        a = tex[idx, level, y0, x0, k]
+        b = tex[idx, level, y0, x1, k]
+        c = tex[idx, level, y1, x0, k]
+        d = tex[idx, level, y1, x1, k]
+        val = a * (1 - tx) * (1 - ty) + b * tx * (1 - ty) + c * (1 - tx) * ty + d * tx * ty
+        if k == 0:
+            out_r = val
+        elif k == 1:
+            out_g = val
+        else:
+            out_b = val
+    return out_r, out_g, out_b
+
+
+@njit(cache=True, inline="always")
+def _ground_texture(
+    tex: NDArray[np.float32],
+    has_tex: bool,
+    idx: int,
+    x: float,
+    y: float,
+    footprint_m: float,
+) -> tuple[float, float, float]:
+    """Trilinear photo-texture pattern (mean 1.0) for a ground sample."""
+    if not has_tex:
+        return 1.0, 1.0, 1.0
+    texels_per_px = footprint_m * TEX_SIZE / TEX_WORLD_M
+    if texels_per_px < 1.0:
+        texels_per_px = 1.0
+    lod = math.log(texels_per_px) / math.log(2.0)
+    if lod >= TEX_LEVELS - 1:
+        return 1.0, 1.0, 1.0  # fully filtered away: no pattern, no aliasing
+    l0 = int(lod)
+    frac = lod - l0
+    # Break the 6 m tile repeat with a CONTINUOUS low-frequency offset: a
+    # per-cell hash offset seams at cell borders, and at grazing incidence those
+    # borders project to vertical stripes across the foreground.
+    ox = 4.0 * _smooth_noise(x / 240.0, y / 240.0)
+    oy = 4.0 * _smooth_noise(x / 240.0 + 37.0, y / 240.0 + 11.0)
+    u = x / TEX_WORLD_M + ox
+    v = y / TEX_WORLD_M + oy
+    ar, ag, ab = _tex_bilinear(tex, idx, l0, u, v)
+    br, bg, bb = _tex_bilinear(tex, idx, min(l0 + 1, TEX_LEVELS - 1), u, v)
+    return (
+        ar + (br - ar) * frac,
+        ag + (bg - ag) * frac,
+        ab + (bb - ab) * frac,
+    )
+
+
+@njit(cache=True, inline="always")
+def _far_canopy_h(x: float, y: float) -> float:
+    """Continuous multi-scale canopy height used beyond the 1 m window."""
+    return (
+        15.0
+        * (0.55 + 0.50 * _smooth_noise(x / 17.0, y / 17.0))
+        * (0.72 + 0.34 * _smooth_noise(x / 5.5 + 21.0, y / 5.5))
+    )
+
+
+@njit(cache=True, inline="always")
 def _detail_factor(x: float, y: float, footprint_m: float) -> float:
     """Multi-octave ground detail, band-limited to the pixel footprint."""
     factor = 1.0
@@ -197,6 +298,12 @@ def _sat_bilinear(
         total += v
     if total <= 24.0:
         return 0.0, 0.0, 0.0, False
+    # Gained Sentinel true colour is more chromatic than real turf; pulling it back
+    # toward its own luminance is what stops near ground reading fluorescent.
+    luma = 0.299 * out_r + 0.587 * out_g + 0.114 * out_b
+    out_r = luma + (out_r - luma) * SAT_CHROMA
+    out_g = luma + (out_g - luma) * SAT_CHROMA
+    out_b = luma + (out_b - luma) * SAT_CHROMA
     return out_r, out_g, out_b, True
 
 
@@ -238,6 +345,8 @@ def _render2_kernel(
     has10_lc: bool,
     sat: NDArray[np.uint8],
     has_sat: bool,
+    tex: NDArray[np.float32],
+    has_tex: bool,
     hdri: NDArray[np.float32],
     obs_e: float,
     obs_n: float,
@@ -278,6 +387,11 @@ def _render2_kernel(
         prev_z = eye_z - EYE_M
         prev_slope = 0.0
         prev_visible = True
+        # One march sample paints a whole span of pixel rows. At grazing incidence
+        # that span grows and any texture inside it becomes a horizontal smear, so
+        # the step adapts to keep spans near one pixel, and texture is attenuated
+        # while a span is still tall.
+        prev_span_px = 1.0
         r = 2.0
         step = 0.05
         while r < MAX_DISTANCE_M:
@@ -295,21 +409,59 @@ def _render2_kernel(
                     near = True
                     z_surf = zs
                     z_ground = zg
+                    canopy = zs - zg
+                    if canopy > 1.5:
+                        foot_here = r / f_v_px
+                        # Two gap scales. Leaf-scale gaps (~0.15 m) are only
+                        # resolvable very close; crown-scale gaps (~3 m, the spaces
+                        # between neighbouring trees) survive to a kilometre and are
+                        # what makes a distant wood read as trees, not a green sheet.
+                        pen = 0.0
+                        if foot_here < CANOPY_GAP_FOOT_M:
+                            gap = 0.55 * _smooth_noise(x * 2.6, y * 2.6) + 0.45 * _smooth_noise(
+                                x * 7.0 + 13.0, y * 7.0
+                            )
+                            fine = (gap - 0.38) * 1.9
+                            if fine > 1.0:
+                                fine = 1.0
+                            if fine > 0.0:
+                                pen = fine * (1.0 - foot_here / CANOPY_GAP_FOOT_M)
+                        if foot_here < CANOPY_CROWN_FOOT_M:
+                            crown_gap = _smooth_noise(x * 0.33 + 7.0, y * 0.33)
+                            coarse = (crown_gap - 0.46) * 2.4
+                            if coarse > 1.0:
+                                coarse = 1.0
+                            if coarse > 0.0:
+                                coarse *= 1.0 - foot_here / CANOPY_CROWN_FOOT_M
+                                if coarse > pen:
+                                    pen = coarse
+                        if pen > 0.0:
+                            depth = CANOPY_GAP_DEPTH_M
+                            if depth > canopy - 0.5:
+                                depth = canopy - 0.5
+                            z_surf = zs - pen * depth
             if not near:
                 z_ground = _sample_elev(dem50, dem10, has10, x, y)
                 z_surf = z_ground
-                lc_bin_far = _landcover_at2(lc50, lc10, has10_lc, x, y)
+                # Jitter the class lookup: a 10 m raster extruded straight up gives
+                # rectangular green slabs with hard vertical sides across every
+                # distant plain. Displacing the lookup by a smooth ~7 m offset turns
+                # those raster edges into organic wood and hedgerow outlines.
+                jx = 7.0 * (_smooth_noise(x * 0.06, y * 0.06) - 0.5)
+                jy = 7.0 * (_smooth_noise(x * 0.06 + 31.0, y * 0.06) - 0.5)
+                lc_bin_far = _landcover_at2(lc50, lc10, has10_lc, x + jx, y + jy)
                 if lc_bin_far == 1:
-                    clump = _cell_noise(x, y, 35.0)
-                    if clump < 1.0:
-                        fx35 = x / 35.0 - math.floor(x / 35.0) - 0.5
-                        fy35 = y / 35.0 - math.floor(y / 35.0) - 0.5
-                        dome_sq = 1.0 - 3.2 * (fx35 * fx35 + fy35 * fy35)
-                        if dome_sq < 0.10:
-                            dome_sq = 0.10
-                        z_surf = z_ground + 15.0 * math.sqrt(dome_sq) * (
-                            0.75 + 0.55 * _cell_noise(x + 17.0, y + 31.0, 35.0)
-                        ) * (0.82 + 0.36 * _smooth_noise(x * 0.31, y * 0.31))
+                    # Continuous multi-scale canopy: a dome per 35 m grid cell put
+                    # identical "broccoli" on a visible lattice across every plain.
+                    canopy_h = _far_canopy_h(x, y)
+                    # Taper at the wood edge instead of a vertical wall: sample two
+                    # neighbours and drop the height where the class runs out.
+                    edge = 1.0
+                    if _landcover_at2(lc50, lc10, has10_lc, x + jx + 9.0, y + jy) != 1:
+                        edge -= 0.32
+                    if _landcover_at2(lc50, lc10, has10_lc, x + jx, y + jy + 9.0) != 1:
+                        edge -= 0.32
+                    z_surf = z_ground + canopy_h * edge
                 elif lc_bin_far == 5:
                     z_surf = z_ground + 8.0 * (0.5 + _cell_noise(x, y, 45.0))
 
@@ -329,6 +481,7 @@ def _render2_kernel(
                 red = 0.0
                 green = 0.0
                 blue = 0.0
+                is_foliage = False
                 # Pixel ground footprint: texture and bump are band-limited to it,
                 # so detail never aliases into shimmer at distance.
                 foot = r * px_angle
@@ -371,10 +524,16 @@ def _render2_kernel(
                             blue = 0.82 * sb + 0.18 * _TREE_BASE[2]
                         else:
                             red, green, blue = _TREE_BASE
-                        folg = 0.86 + 0.28 * _smooth_noise(x * 0.9, y * 0.9)
+                        # Crown-scale species/age variation, continuous (no grid).
+                        species = _smooth_noise(x / 14.0 + 61.0, y / 14.0) - 0.5
+                        red *= 1.0 + 0.26 * species
+                        green *= 1.0 + 0.14 * species
+                        blue *= 1.0 + 0.08 * species
+                        folg = 0.80 + 0.40 * _smooth_noise(x * 0.9, y * 0.9)
                         red *= folg
                         green *= folg
                         blue *= folg
+                        is_foliage = True
                         # Crowns are rough: perturb the normal so foliage is not a
                         # smooth painted dome.
                         gx += 0.9 * (_smooth_noise(x * 1.1 + 3.0, y * 1.1) - 0.5)
@@ -402,19 +561,37 @@ def _render2_kernel(
                         green *= detail
                         blue *= detail
                         # Dry/green mottle, band-limited like the detail octaves.
-                        if foot < 2.0:
-                            mott = 0.55 * _smooth_noise(x / 3.5, y / 3.5) + 0.45 * _smooth_noise(
-                                x / 1.1, y / 1.1
-                            )
-                            dryness = (mott - 0.44) * 1.7
-                            if dryness < 0.0:
-                                dryness = 0.0
-                            elif dryness > 0.5:
-                                dryness = 0.5
-                            dryness *= 1.0 - foot / 2.0
-                            red = red + (DRY_GRASS[0] - red) * dryness
-                            green = green + (DRY_GRASS[1] - green) * dryness
-                            blue = blue + (DRY_GRASS[2] - blue) * dryness
+                        # Band-limited with a CONTINUOUS falloff: a hard `foot < 2`
+                        # gate put a visible edge wherever the incidence (and so the
+                        # footprint) jumped at a break of slope.
+                        mott = 0.55 * _smooth_noise(x / 3.5, y / 3.5) + 0.45 * _smooth_noise(
+                            x / 1.1, y / 1.1
+                        )
+                        dryness = (mott - 0.44) * 1.7
+                        if dryness < 0.0:
+                            dryness = 0.0
+                        elif dryness > 0.30:
+                            dryness = 0.30
+                        dryness /= 1.0 + (foot / 1.1) * (foot / 1.1)
+                        red = red + (DRY_GRASS[0] - red) * dryness
+                        green = green + (DRY_GRASS[1] - green) * dryness
+                        blue = blue + (DRY_GRASS[2] - blue) * dryness
+                        # Photo texture supplies STRUCTURE (blade contrast, clumps,
+                        # bare patches); satellite still supplies the colour.
+                        if r < TEX_MAX_R_M:
+                            tex_idx = 1 if mott > 0.62 else 0
+                            tr, tg, tb = _ground_texture(tex, has_tex, tex_idx, x, y, foot)
+                            tlum = 0.299 * tr + 0.587 * tg + 0.114 * tb
+                            span_fade = 1.0
+                            if prev_span_px > 2.0:
+                                span_fade = 2.0 / prev_span_px
+                            tex_w = TEX_STRENGTH * span_fade
+                            mix_r = 1.0 + tex_w * (0.82 * tlum + 0.18 * tr - 1.0)
+                            mix_g = 1.0 + tex_w * (0.82 * tlum + 0.18 * tg - 1.0)
+                            mix_b = 1.0 + tex_w * (0.82 * tlum + 0.18 * tb - 1.0)
+                            red *= mix_r
+                            green *= mix_g
+                            blue *= mix_b
                         # Micro-relief (tussocks, sheep tracks, molehills) as a bump:
                         # perfectly smooth turf at grazing incidence is the strongest
                         # "CGI dune" tell in the previous round.
@@ -434,6 +611,11 @@ def _render2_kernel(
                             red = red + (196.0 - red) * worn
                             green = green + (184.0 - green) * worn
                             blue = blue + (156.0 - blue) * worn
+                            if r < TEX_MAX_R_M:
+                                pr, pg, pb = _ground_texture(tex, has_tex, 2, x, y, foot)
+                                red *= 0.55 + 0.45 * pr
+                                green *= 0.55 + 0.45 * pg
+                                blue *= 0.55 + 0.45 * pb
                         if code10 >= 0 and code10 // 10 == 8:
                             red, green, blue = 120.0, 150.0, 175.0
                     inv_len = 1.0 / math.sqrt(gx * gx + gy * gy + 1.0)
@@ -463,21 +645,44 @@ def _render2_kernel(
                     lateral = (zr - zl) / (2.0 * lat_w)
                     gx = radial_slope * dx - lateral * dy
                     gy = radial_slope * dy + lateral * dx
+                    tree_top = z_surf > z_ground + 2.0
+                    if tree_top:
+                        # Beyond ~700 m crown STRUCTURE is sub-pixel, but a wood still
+                        # needs a lit side and a shaded side. Normal-mapping the canopy
+                        # height gives that for nothing: no geometry, just relief
+                        # shading, which is what stops distant woodland reading as
+                        # flat green paint.
+                        d = 4.0
+                        cgx = (_far_canopy_h(x + d, y) - _far_canopy_h(x - d, y)) / (2.0 * d)
+                        cgy = (_far_canopy_h(x, y + d) - _far_canopy_h(x, y - d)) / (2.0 * d)
+                        bump = 1.0
+                        if foot > 6.0:
+                            bump = 6.0 / foot  # band-limit: fade as crowns go sub-pixel
+                        gx += cgx * bump
+                        gy += cgy * bump
                     inv_len = 1.0 / math.sqrt(gx * gx + gy * gy + 1.0)
                     n_dot = (-gx * sun_x - gy * sun_y + sun_z) * inv_len
                     if n_dot < 0.0:
                         n_dot = 0.0
-                    n_dot_final = n_dot
+                    # De-shade with distance: the satellite already contains shadows
+                    # from ITS sun angle, so re-lighting it with ours double-shades
+                    # everything far away and makes distant land look muddy.
+                    deshade = r / 14000.0
+                    if deshade > 0.5:
+                        deshade = 0.5
+                    n_dot_final = n_dot * (1.0 - deshade) + 0.62 * deshade
                     amb_vis = 0.55 + 0.45 * inv_len
                     sr, sg, sb, sat_ok = _sat_bilinear(sat, has_sat, x, y)
-                    tree_top = z_surf > z_ground + 2.0
                     if tree_top:
+                        # The satellite pixel over a wood already encodes species,
+                        # season and canopy density: use it, barely tinted.
                         if sat_ok:
-                            red = 0.80 * sr + 0.20 * _TREE_BASE[0]
-                            green = 0.80 * sg + 0.20 * _TREE_BASE[1]
-                            blue = 0.80 * sb + 0.20 * _TREE_BASE[2]
+                            red = 0.92 * sr + 0.08 * _TREE_BASE[0]
+                            green = 0.92 * sg + 0.08 * _TREE_BASE[1]
+                            blue = 0.92 * sb + 0.08 * _TREE_BASE[2]
                         else:
                             red, green, blue = _TREE_BASE
+                        is_foliage = True
                     elif sat_ok:
                         red, green, blue = sr, sg, sb
                         detail = _detail_factor(x, y, foot)
@@ -492,20 +697,39 @@ def _render2_kernel(
                 alb_g = _srgb_to_lin(green)
                 alb_b = _srgb_to_lin(blue)
                 sun_term = SUN_INTENSITY * n_dot_final * sun_vis
+                if is_foliage:
+                    # Leaves transmit light: crowns between the eye and the sun glow
+                    # instead of going flat dark. Without this every wood reads as a
+                    # matte cut-out.
+                    toward_sun = dx * sun_x + dy * sun_y
+                    if toward_sun > 0.0:
+                        sun_term += (
+                            SUN_INTENSITY * 0.42 * toward_sun * (1.0 - n_dot_final) * sun_vis
+                        )
                 amb_term = AMBIENT_INTENSITY * amb_vis
                 lin_r = alb_r * (SUN_RGB[0] * sun_term + amb_r * amb_term)
                 lin_g = alb_g * (SUN_RGB[1] * sun_term + amb_g * amb_term)
                 lin_b = alb_b * (SUN_RGB[2] * sun_term + amb_b * amb_term)
                 haze = 1.0 - math.exp(-r / HAZE_DISTANCE_M)
-                lin_r = lin_r + (haze_lin_r - lin_r) * haze
+                # Scattering washes chroma before it washes brightness.
+                lum = 0.299 * lin_r + 0.587 * lin_g + 0.114 * lin_b
+                desat = haze * HAZE_DESATURATION
+                lin_r = lum + (lin_r - lum) * (1.0 - desat)
+                lin_g = lum + (lin_g - lum) * (1.0 - desat)
+                lin_b = lum + (lin_b - lum) * (1.0 - desat)
+                haze_r = 1.0 - math.exp(-r / (HAZE_DISTANCE_M * HAZE_R_SCALE))
+                haze_b = 1.0 - math.exp(-r / (HAZE_DISTANCE_M * HAZE_B_SCALE))
+                lin_r = lin_r + (haze_lin_r - lin_r) * haze_r
                 lin_g = lin_g + (haze_lin_g - lin_g) * haze
-                lin_b = lin_b + (haze_lin_b - lin_b) * haze
+                lin_b = lin_b + (haze_lin_b - lin_b) * haze_b
                 row_hi = int(cy_px - f_v_px * math.tan(max_ang - pitch_rad))
                 row_lo = int(cy_px - f_v_px * math.tan(ang - pitch_rad))
                 if row_lo < 0:
                     row_lo = 0
                 if row_hi > height:
                     row_hi = height
+                span_now = row_hi - row_lo
+                prev_span_px = float(span_now) if span_now > 0 else 1.0
                 out_r = _lin_to_srgb(_tonemap(lin_r))
                 out_g = _lin_to_srgb(_tonemap(lin_g))
                 out_b = _lin_to_srgb(_tonemap(lin_b))
@@ -513,10 +737,16 @@ def _render2_kernel(
                     hsh = ((col * 7919) ^ (row * 104729)) & 0x7FFFFFFF
                     hsh = (hsh ^ (hsh >> 11)) * 2654435761
                     noise = ((hsh >> 8) & 0xFFFF) / 65535.0 - 0.5
-                    tex = 1.0 + (0.05 * (1.0 - haze)) * noise
-                    rr = min(255.0, out_r * tex)
-                    gg = min(255.0, out_g * tex)
-                    bb = min(255.0, out_b * tex)
+                    pix_tex = 1.0 + (0.05 * (1.0 - haze)) * noise
+                    rr = out_r * pix_tex
+                    gg = out_g * pix_tex
+                    bb = out_b * pix_tex
+                    if rr > 255.0:
+                        rr = 255.0
+                    if gg > 255.0:
+                        gg = 255.0
+                    if bb > 255.0:
+                        bb = 255.0
                     image[row, col, 0] = np.uint8(rr)
                     image[row, col, 1] = np.uint8(gg)
                     image[row, col, 2] = np.uint8(bb)
@@ -531,11 +761,11 @@ def _render2_kernel(
             # crowns, walls): never stride past them, or trees alias into spikes.
             if r < R_NEAR_MAX and step > 1.5:
                 step = 1.5
-            vertical_step = 0.0008 * r * r
+            vertical_step = (0.00045 if r < R_NEAR_MAX else 0.0008) * r * r
             if vertical_step < step:
                 step = vertical_step
-            if step < 0.04:
-                step = 0.04
+            if step < 0.02:
+                step = 0.02
             elif step > 400.0:
                 step = 400.0
 
@@ -580,6 +810,7 @@ def render_view2(
     dem10: NDArray[np.int16],
     lc10: NDArray[np.uint8],
     sat: NDArray[np.uint8],
+    tex: NDArray[np.float32],
 ) -> tuple[Image.Image, float]:
     scale = SUPERSAMPLE
     render_w = width * scale
@@ -703,6 +934,8 @@ def render_view2(
         True,
         sat,
         True,
+        tex,
+        tex.shape[0] >= 3,
         hdri,
         easting,
         northing,
